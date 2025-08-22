@@ -17,6 +17,15 @@ export class MusicManager {
     this.audio.loop = true
     this.audio.volume = 0 // Start at 0 for fade in
     this.audio.preload = 'auto'
+    
+    // Add error handling
+    this.audio.addEventListener('error', (e) => {
+      console.error('Music load error:', e)
+    })
+    
+    this.audio.addEventListener('canplaythrough', () => {
+      console.log('Music loaded and ready to play')
+    })
   }
 
   async play() {
