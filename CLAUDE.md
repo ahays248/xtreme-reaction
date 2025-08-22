@@ -1,11 +1,17 @@
 # Xtreme Reaction - AI Assistant Guide
 
+**Last Updated**: August 22, 2025 - Core Game Complete (75%)
+**GitHub**: https://github.com/ahays248/xtreme-reaction
+
 ## Project Overview
 You're working on **Xtreme Reaction**, a competitive reaction time game designed for viral sharing on X (Twitter). This is a mobile-friendly web app where users tap in response to visual cues while avoiding fake cues and distractions.
 
+**IMPORTANT**: The core game is FULLY FUNCTIONAL and playable at http://localhost:3001 (port 3001, not 3000)
+
 ## Important Documents
+- **SESSION_HANDOFF.md** - START HERE! Detailed handoff for new sessions
 - **PROGRESS.md** - Contains detailed progress tracking, completed features, and TODO list
-- **README.md** - User-facing documentation (to be created)
+- **README.md** - User-facing documentation (✅ CREATED)
 - **supabase/migrations/001_initial_schema.sql** - Database schema
 
 ## Tech Stack
@@ -31,12 +37,15 @@ XtremeReaction/
 └── supabase/             # Database migrations
 ```
 
-## Current Status
+## Current Status (75% Complete)
 - ✅ Core game mechanics fully functional
 - ✅ Database schema created
 - ✅ Visual effects and animations working
+- ✅ All major bugs fixed (see PROGRESS.md)
+- ✅ Mobile controls optimized
+- ✅ Git repository initialized and pushed to GitHub
 - ⏳ Authentication needs X OAuth setup
-- ⏳ Database integration pending
+- ⏳ Database integration pending (PRIORITY 1)
 - ⏳ Leaderboards need implementation
 - ⏳ X sharing functionality needs completion
 
@@ -68,9 +77,10 @@ npm run lint
 7. **X Integration**: Share scores with custom images
 
 ## Database Configuration
-- **URL**: https://xhcfjhzfyozzuicubqmh.supabase.co
+- **URL**: https://oksfkrbxypmoqvjttavc.supabase.co (UPDATED)
 - **Project**: Xtreme Reaction
 - Credentials are in `.env.local`
+- Schema is complete, just needs connection to game
 
 ## Game Logic Overview
 1. Player sees "Wait for the cue..."
@@ -106,7 +116,10 @@ npm run lint
 
 ## Known Issues
 - ✅ FIXED: Red circles now disappear automatically after timeout
-- Database connection not yet implemented
+- ✅ FIXED: Click detection only works on circles (not anywhere)
+- ✅ FIXED: Game properly ends after round 10
+- ✅ FIXED: Fair grading system implemented
+- Database connection not yet implemented (PRIORITY 1)
 - X OAuth needs configuration in Supabase dashboard
 
 ## Design Decisions
@@ -129,11 +142,18 @@ npm run lint
 - No client-side score calculation for final version
 
 ## Next Priority Tasks
-1. Connect game results to database
-2. Implement user authentication
-3. Build leaderboard page
-4. Add X sharing with screenshots
-5. Deploy to Vercel
+1. **URGENT**: Connect game results to database (save scores)
+2. **HIGH**: Implement user authentication (X OAuth)
+3. **MEDIUM**: Build leaderboard page
+4. **MEDIUM**: Add X sharing with screenshots
+5. **LOW**: Deploy to Vercel
+
+## Critical Notes for Next Session
+- DO NOT refactor the game logic in `/hooks/useGame.ts` - it works perfectly
+- The game runs on PORT 3001, not 3000
+- Test the game first at http://localhost:3001 to understand current state
+- Read SESSION_HANDOFF.md for complete status
+- Database schema is complete, just needs connection
 
 ## Contact & Resources
 - Supabase Dashboard: https://supabase.com/dashboard/project/xhcfjhzfyozzuicubqmh
