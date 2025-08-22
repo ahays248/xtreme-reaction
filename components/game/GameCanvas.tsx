@@ -119,15 +119,21 @@ export function GameCanvas() {
             <div 
               className="absolute inset-0"
               onClick={() => {
-                // Only handle background clicks during waiting phase
+                // Handle background clicks
                 if (gameState.status === 'waiting') {
                   handleTap() // This will trigger "too early" punishment
+                } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
+                  // Clicked background instead of green circle - count as missed click
+                  handleTap(true) // Pass true to indicate a missed click
                 }
               }}
               onTouchStart={(e) => {
                 if (gameState.status === 'waiting') {
                   e.preventDefault()
                   handleTap()
+                } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
+                  e.preventDefault()
+                  handleTap(true) // Missed click on touch
                 }
               }}
             >
@@ -137,7 +143,7 @@ export function GameCanvas() {
                 onCueClick={() => {
                   // Handle clicks directly on the circle
                   if (gameState.status === 'cue') {
-                    handleTap()
+                    handleTap(false) // Pass false to indicate successful circle click
                   }
                 }}
               />

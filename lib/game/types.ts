@@ -7,6 +7,7 @@ export interface GameState {
   incorrectHits: number
   missedCues: number
   fakesAvoided: number  // Track successfully avoided fake cues
+  totalClicks: number  // Total clicks attempted (including misses on circles)
   difficulty: number
   score: number
   cueStartTime: number | null
@@ -21,6 +22,7 @@ export interface GameResults {
   incorrectHits: number
   missedCues: number
   fakesAvoided: number
+  totalClicks: number
   difficulty: number
   score: number
   accuracy: number

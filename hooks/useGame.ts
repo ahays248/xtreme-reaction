@@ -20,6 +20,7 @@ const INITIAL_STATE: GameState = {
   incorrectHits: 0,
   missedCues: 0,
   fakesAvoided: 0,
+  totalClicks: 0,
   difficulty: 1,
   score: 0,
   cueStartTime: null,
@@ -174,12 +175,20 @@ export function useGame(config: Partial<GameConfig> = {}) {
     timeoutRef.current = setTimeout(() => startRound(), 2000)
   }, [gameConfig.totalRounds, startRound, clearAllTimeouts])
 
-  const handleTap = useCallback(() => {
+  const handleTap = useCallback((isMissedClick: boolean = false) => {
     const currentState = gameState
     
     // Ignore taps during punishment or finished
     if (currentState.status === 'punishment' || currentState.status === 'finished') {
       return
+    }
+    
+    // Track all clicks for accuracy calculation
+    if (currentState.status === 'cue' || currentState.status === 'waiting') {
+      setGameState(prev => ({
+        ...prev,
+        totalClicks: prev.totalClicks + 1
+      }))
     }
     
     if (currentState.status === 'waiting') {
@@ -213,6 +222,12 @@ export function useGame(config: Partial<GameConfig> = {}) {
     }
 
     if (currentState.status === 'cue') {
+      // If it's a missed click on a real cue, just count it but don't stop the round
+      if (isMissedClick && !currentState.isFakeCue) {
+        // Clicked background instead of green circle - no punishment, just track
+        return // Let the cue continue to display
+      }
+      
       clearAllTimeouts()
       
       if (currentState.isFakeCue) {

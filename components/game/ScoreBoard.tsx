@@ -110,7 +110,14 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
         </div>
         <div className="flex justify-between text-white">
           <span className="text-gray-400">Accuracy</span>
-          <span className="font-bold">{results.accuracy}%</span>
+          <span className="font-bold">
+            {results.accuracy}%
+            {results.totalClicks > 0 && (
+              <span className="text-xs text-gray-500 ml-1">
+                ({results.successfulHits}/{results.totalClicks} clicks)
+              </span>
+            )}
+          </span>
         </div>
         <div className="flex justify-between text-white">
           <span className="text-gray-400">Successful Hits</span>

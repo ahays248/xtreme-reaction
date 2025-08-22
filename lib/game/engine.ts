@@ -44,10 +44,20 @@ export function calculateResults(state: GameState): GameResults {
     ? Math.round(state.reactionTimes.reduce((a, b) => a + b, 0) / state.reactionTimes.length)
     : 0
 
-  // Accuracy includes successful hits and avoided fakes as good, errors as bad
-  const goodActions = state.successfulHits + state.fakesAvoided
-  const totalActions = goodActions + state.incorrectHits + state.missedCues
-  const accuracy = totalActions > 0 ? (goodActions / totalActions) * 100 : 0
+  // NEW: True accuracy based on total clicks
+  // Good clicks: successful hits on green circles
+  // Bad clicks: all other clicks (early, on red, missed green)
+  let accuracy = 0
+  if (state.totalClicks > 0) {
+    // Only successful hits count as accurate clicks
+    accuracy = (state.successfulHits / state.totalClicks) * 100
+  } else if (state.fakesAvoided > 0) {
+    // If no clicks but avoided fakes, that's perfect accuracy
+    accuracy = 100
+  }
+
+  // Calculate bonus score based on accuracy
+  const accuracyBonus = Math.round(accuracy * 10) // 10 points per accuracy percent
 
   return {
     avgReactionTime,
@@ -55,8 +65,9 @@ export function calculateResults(state: GameState): GameResults {
     incorrectHits: state.incorrectHits,
     missedCues: state.missedCues,
     fakesAvoided: state.fakesAvoided,
+    totalClicks: state.totalClicks,
     difficulty: state.difficulty,
-    score: calculateScore(state),
+    score: state.score + accuracyBonus, // Add accuracy bonus to final score
     accuracy: Math.round(accuracy),
   }
 }
