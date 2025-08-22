@@ -95,6 +95,11 @@ export class SoundManager {
   isEnabled() {
     return this.enabled
   }
+
+  initOnUserInteraction() {
+    // Ensure audio context is created and resumed on user interaction
+    this.ensureAudioContext()
+  }
 }
 
 // Singleton instance

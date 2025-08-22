@@ -15,24 +15,33 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
 
   // Grade based on performance (adjusted for choice reaction times)
   const getGrade = () => {
+    // Perfect accuracy gets bonus consideration
+    if (results.accuracy === 100) {
+      if (results.avgReactionTime < 500) return 'S'
+      if (results.avgReactionTime < 600) return 'A'
+      if (results.avgReactionTime < 700) return 'B'
+      if (results.avgReactionTime < 800) return 'C'
+      return 'B' // Minimum B for perfect accuracy
+    }
+    
     // S Grade: Elite performance
-    if (results.avgReactionTime < 500 && results.accuracy > 95) return 'S'
-    if (results.avgReactionTime < 450 && results.accuracy > 90) return 'S'
+    if (results.avgReactionTime < 500 && results.accuracy >= 95) return 'S'
+    if (results.avgReactionTime < 450 && results.accuracy >= 90) return 'S'
     
     // A Grade: Excellent performance
-    if (results.avgReactionTime < 600 && results.accuracy > 85) return 'A'
-    if (results.avgReactionTime < 550 && results.accuracy > 80) return 'A'
+    if (results.avgReactionTime < 600 && results.accuracy >= 85) return 'A'
+    if (results.avgReactionTime < 550 && results.accuracy >= 80) return 'A'
     
-    // B Grade: Good performance
-    if (results.avgReactionTime < 700 && results.accuracy > 75) return 'B'
-    if (results.avgReactionTime < 650 && results.accuracy > 70) return 'B'
+    // B Grade: Good performance  
+    if (results.avgReactionTime < 700 && results.accuracy >= 75) return 'B'
+    if (results.avgReactionTime < 650 && results.accuracy >= 70) return 'B'
     
     // C Grade: Average performance
-    if (results.avgReactionTime < 800 && results.accuracy > 65) return 'C'
-    if (results.avgReactionTime < 750 && results.accuracy > 60) return 'C'
+    if (results.avgReactionTime < 800 && results.accuracy >= 65) return 'C'
+    if (results.avgReactionTime < 750 && results.accuracy >= 60) return 'C'
     
     // D Grade: Below average
-    if (results.avgReactionTime < 900 && results.accuracy > 50) return 'D'
+    if (results.avgReactionTime < 900 && results.accuracy >= 50) return 'D'
     
     // F Grade: Needs improvement
     return 'F'

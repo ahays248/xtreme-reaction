@@ -12,24 +12,10 @@ export const DEFAULT_CONFIG: GameConfig = {
 }
 
 export function calculateScore(state: GameState): number {
-  // Reaction time only from successful real cue hits
-  const avgReactionTime = state.reactionTimes.length > 0
-    ? state.reactionTimes.reduce((a, b) => a + b, 0) / state.reactionTimes.length
-    : 0
-
-  // Accuracy includes both successful hits and avoided fakes as positive actions
-  const goodActions = state.successfulHits + state.fakesAvoided
-  const totalActions = goodActions + state.incorrectHits + state.missedCues
-  const accuracy = totalActions > 0 ? goodActions / totalActions : 0
-  
-  // Score formula: prioritize accuracy and speed, plus bonus for avoided fakes
-  const speedScore = Math.max(0, 1000 - avgReactionTime)
-  const accuracyBonus = accuracy * 500
-  const fakeAvoidBonus = state.fakesAvoided * 200  // Already added during game
-  const difficultyMultiplier = 1 + (state.difficulty * 0.1)
-  
-  // Note: fakeAvoidBonus is already in state.score, so we don't double-count
-  return Math.round((speedScore + accuracyBonus) * difficultyMultiplier)
+  // The score has already been accumulated during gameplay
+  // This includes all bonuses for successful hits, avoided fakes, etc.
+  // Just return the final accumulated score
+  return state.score
 }
 
 export function getRandomDelay(config: GameConfig, difficulty: number): number {

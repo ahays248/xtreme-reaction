@@ -2,6 +2,7 @@
 
 import { useGame } from '@/hooks/useGame'
 import { useSound } from '@/hooks/useSound'
+import { getSoundManager } from '@/lib/game/sounds'
 import { CueDisplay } from './CueDisplay'
 import { ScoreBoard } from './ScoreBoard'
 import { Punishment } from './Punishment'
@@ -59,6 +60,8 @@ export function GameCanvas() {
               <button
                 onClick={(e) => {
                   e.stopPropagation()
+                  // Initialize audio context on user interaction
+                  getSoundManager().initOnUserInteraction()
                   startGame()
                 }}
                 className="px-8 py-4 bg-green-500 text-white text-lg md:text-xl font-bold rounded-lg hover:bg-green-600 transition-colors touch-manipulation"
