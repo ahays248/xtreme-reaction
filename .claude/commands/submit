@@ -1,0 +1,7 @@
+We're ready to commit our most recent work. Please do this in order:
+
+1. Stage the files for commit
+2. Review the staged files and compare them to the documentation for the project to see if any of the documentation needs to be updated to reflect these changes.
+3. Update the documentation, if needed.
+4. Add the updated documentation to the commit
+5. Commit and push

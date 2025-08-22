@@ -67,6 +67,17 @@ npm run typecheck
 npm run lint
 ```
 
+## Claude Code Commands
+```bash
+# Smart commit with documentation check
+/submit
+```
+This command will automatically:
+1. Stage files for commit
+2. Review changes against documentation
+3. Update docs if needed
+4. Commit and push to GitHub
+
 ## Key Features
 1. **Reaction Testing**: 10-round games with millisecond precision
 2. **Fake Cues**: Red circles that players must avoid tapping

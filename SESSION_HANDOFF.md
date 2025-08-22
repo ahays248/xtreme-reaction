@@ -185,7 +185,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=[present in file]
 main
 
 # Last commit
-8c774df Initial commit: Xtreme Reaction game project
+7827656 Add session handoff documentation for continuity
 
 # Remote repository
 https://github.com/ahays248/xtreme-reaction
@@ -193,6 +193,18 @@ https://github.com/ahays248/xtreme-reaction
 # Clean working directory
 No uncommitted changes
 ```
+
+## 🛠️ Developer Tools
+
+### Claude Code Custom Commands
+- **`/submit`** - Smart commit workflow that:
+  1. Stages all changes
+  2. Reviews against documentation
+  3. Updates docs if needed
+  4. Commits with descriptive message
+  5. Pushes to GitHub
+
+Located in: `.claude/commands/submit`
 
 ## 📞 Contact & Resources
 
