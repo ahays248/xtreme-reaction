@@ -10,6 +10,8 @@ import {
 } from '@/lib/game/engine'
 import { getSoundManager } from '@/lib/game/sounds'
 import { getMusicManager } from '@/lib/game/music'
+import { saveGameSession } from '@/lib/supabase/gameService'
+import { createClient } from '@/lib/supabase/client'
 
 const INITIAL_STATE: GameState = {
   status: 'idle',
@@ -57,13 +59,30 @@ export function useGame(config: Partial<GameConfig> = {}) {
     }
   }, [clearAllTimeouts])
 
-  const finishGame = useCallback(() => {
+  const finishGame = useCallback(async () => {
     clearAllTimeouts()
     // Stop background music
     musicManager.stop()
+    
+    // Get current user for saving
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
     setGameState(prev => {
       const results = calculateResults(prev)
       setGameResults(results)
+      
+      // Save game results to database asynchronously
+      saveGameSession(results, user?.id).then(result => {
+        if (result.success) {
+          console.log('Game session saved successfully')
+        } else {
+          console.error('Failed to save game session:', result.error)
+        }
+      }).catch(error => {
+        console.error('Error saving game session:', error)
+      })
+      
       return { ...prev, status: 'finished', score: results.score }
     })
   }, [clearAllTimeouts])

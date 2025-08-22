@@ -7,11 +7,13 @@ export class MusicManager {
   
   constructor() {
     if (typeof window !== 'undefined') {
-      this.initMusic()
+      // Don't initialize audio immediately - wait for user interaction
     }
   }
 
   private initMusic() {
+    if (this.audio) return // Already initialized
+    
     // Initialize with your music file
     this.audio = new Audio('/music/background.mp3')
     this.audio.loop = true
@@ -28,7 +30,19 @@ export class MusicManager {
     })
   }
 
+  // Call this on first user interaction (e.g., Start Game button click)
+  initOnUserInteraction() {
+    if (typeof window !== 'undefined' && !this.audio) {
+      this.initMusic()
+    }
+  }
+
   async play() {
+    // Initialize if needed
+    if (!this.audio) {
+      this.initMusic()
+    }
+    
     if (!this.audio || !this.enabled) return
     
     try {
@@ -146,6 +160,10 @@ export class MusicManager {
 
   toggle() {
     this.enabled = !this.enabled
+    // Initialize if needed before pausing
+    if (!this.audio && this.enabled) {
+      this.initMusic()
+    }
     if (!this.enabled && this.audio) {
       this.pause()
     }

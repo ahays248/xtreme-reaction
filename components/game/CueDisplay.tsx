@@ -47,7 +47,6 @@ export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
                 transform: 'translate(-50%, -50%)',
               }}
               onClick={handleCueClick}
-              onTouchStart={handleCueClick}
             >
               <div
                 className={`relative ${

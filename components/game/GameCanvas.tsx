@@ -7,6 +7,7 @@ import { getMusicManager } from '@/lib/game/music'
 import { CueDisplay } from './CueDisplay'
 import { ScoreBoard } from './ScoreBoard'
 import { Punishment } from './Punishment'
+import { AuthStatus } from '@/components/auth/AuthStatus'
 import { motion } from 'framer-motion'
 
 export function GameCanvas() {
@@ -16,6 +17,9 @@ export function GameCanvas() {
 
   return (
     <div className="relative min-h-screen bg-gray-900 overflow-hidden select-none">
+      {/* Auth status - always visible */}
+      <AuthStatus />
+      
       {/* Audio controls - always visible */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         {/* Music toggle */}
@@ -85,6 +89,8 @@ export function GameCanvas() {
                   e.stopPropagation()
                   // Initialize audio context on user interaction
                   getSoundManager().initOnUserInteraction()
+                  // Initialize music manager on user interaction
+                  getMusicManager().initOnUserInteraction()
                   startGame()
                 }}
                 className="px-8 py-4 bg-green-500 text-white text-lg md:text-xl font-bold rounded-lg hover:bg-green-600 transition-colors touch-manipulation"
@@ -148,15 +154,6 @@ export function GameCanvas() {
                 } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
                   // Clicked background instead of green circle - count as missed click
                   handleTap(true) // Pass true to indicate a missed click
-                }
-              }}
-              onTouchStart={(e) => {
-                if (gameState.status === 'waiting') {
-                  e.preventDefault()
-                  handleTap()
-                } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
-                  e.preventDefault()
-                  handleTap(true) // Missed click on touch
                 }
               }}
             >
