@@ -12,22 +12,48 @@ export class MusicManager {
   }
 
   private initMusic() {
-    if (this.audio) return // Already initialized
+    if (this.audio) {
+      console.log('Audio already initialized')
+      return // Already initialized
+    }
     
-    // Initialize with your music file
-    this.audio = new Audio('/music/background.mp3')
-    this.audio.loop = true
-    this.audio.volume = 0 // Start at 0 for fade in
-    this.audio.preload = 'auto'
-    
-    // Add error handling
-    this.audio.addEventListener('error', (e) => {
-      console.error('Music load error:', e)
-    })
-    
-    this.audio.addEventListener('canplaythrough', () => {
-      console.log('Music loaded and ready to play')
-    })
+    try {
+      console.log('Initializing music with file: /music/background.mp3')
+      
+      // Initialize with your music file
+      this.audio = new Audio('/music/background.mp3')
+      this.audio.loop = true
+      this.audio.volume = 0 // Start at 0 for fade in
+      this.audio.preload = 'auto'
+      
+      // Add error handling
+      this.audio.addEventListener('error', (e: any) => {
+        console.error('Music load error:', e)
+        console.error('Error type:', e.type)
+        if (e.target) {
+          console.error('Audio src:', e.target.src)
+          console.error('Audio error code:', e.target.error?.code)
+          console.error('Audio error message:', e.target.error?.message)
+        }
+      })
+      
+      this.audio.addEventListener('loadstart', () => {
+        console.log('Music loading started...')
+      })
+      
+      this.audio.addEventListener('canplaythrough', () => {
+        console.log('Music loaded and ready to play')
+        console.log('Audio duration:', this.audio?.duration)
+      })
+      
+      this.audio.addEventListener('loadeddata', () => {
+        console.log('Music data loaded')
+      })
+      
+      console.log('Music manager initialized')
+    } catch (err) {
+      console.error('Failed to initialize music:', err)
+    }
   }
 
   // Call this on first user interaction (e.g., Start Game button click)
@@ -40,22 +66,40 @@ export class MusicManager {
   async play() {
     // Initialize if needed
     if (!this.audio) {
+      console.log('Music not initialized, initializing now...')
       this.initMusic()
     }
     
-    if (!this.audio || !this.enabled) return
+    if (!this.audio) {
+      console.log('Failed to initialize audio')
+      return
+    }
+    
+    if (!this.enabled) {
+      console.log('Music is disabled')
+      return
+    }
     
     try {
       // Reset to beginning if needed
       this.audio.currentTime = 0
       this.audio.volume = 0
       
+      console.log('Attempting to play music...')
       await this.audio.play()
+      console.log('Music started playing successfully')
       
       // Fade in over 2 seconds
       this.fadeIn(2000)
-    } catch (err) {
-      console.log('Music playback failed:', err)
+    } catch (err: any) {
+      console.error('Music playback failed:', err)
+      console.error('Error name:', err.name)
+      console.error('Error message:', err.message)
+      
+      // If it's an autoplay policy error, we need user interaction
+      if (err.name === 'NotAllowedError') {
+        console.log('Autoplay blocked. Music will play after user interaction.')
+      }
     }
   }
 

@@ -24,9 +24,22 @@ export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
 
   const handleCueClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation() // Prevent event from bubbling to game canvas
-    if (onCueClick) {
-      onCueClick()
+    e.preventDefault() // Prevent default behavior
+    
+    // Only process one event type to prevent double-firing
+    // On mobile, touchstart fires before click
+    if (e.type === 'touchstart') {
+      // This is a touch event, handle it
+      if (onCueClick) {
+        onCueClick()
+      }
+    } else if (e.type === 'click' && !('ontouchstart' in window)) {
+      // This is a click on desktop (no touch support)
+      if (onCueClick) {
+        onCueClick()
+      }
     }
+    // Ignore click events on mobile (touchstart already handled it)
   }
 
   return (
@@ -47,6 +60,7 @@ export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
                 transform: 'translate(-50%, -50%)',
               }}
               onClick={handleCueClick}
+              onTouchStart={handleCueClick}
             >
               <div
                 className={`relative ${

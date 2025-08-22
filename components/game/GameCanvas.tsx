@@ -147,12 +147,27 @@ export function GameCanvas() {
             {/* Cue display area - Full screen */}
             <div 
               className="absolute inset-0"
-              onClick={() => {
+              onClick={(e) => {
+                // Prevent double-firing on mobile
+                e.preventDefault()
+                
                 // Handle background clicks
                 if (gameState.status === 'waiting') {
                   handleTap() // This will trigger "too early" punishment
                 } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
                   // Clicked background instead of green circle - count as missed click
+                  handleTap(true) // Pass true to indicate a missed click
+                }
+              }}
+              onTouchStart={(e) => {
+                // Handle touch events separately to prevent phantom clicks
+                e.preventDefault()
+                
+                // Handle background touches
+                if (gameState.status === 'waiting') {
+                  handleTap() // This will trigger "too early" punishment
+                } else if (gameState.status === 'cue' && !gameState.isFakeCue) {
+                  // Touched background instead of green circle - count as missed click
                   handleTap(true) // Pass true to indicate a missed click
                 }
               }}

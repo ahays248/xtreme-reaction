@@ -1,8 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
 import { GameResults } from '@/lib/game/types'
-import type { Database } from './database.types'
-
-type GameSession = Database['public']['Tables']['game_sessions']['Insert']
 
 export async function saveGameSession(results: GameResults, userId?: string) {
   const supabase = createClient()
@@ -14,21 +11,17 @@ export async function saveGameSession(results: GameResults, userId?: string) {
       userId = user?.id
     }
     
-    // Prepare the game session data
-    const gameSession: GameSession = {
+    console.log('Saving game session...', { results, userId })
+    
+    // Prepare the game session data matching the actual database schema
+    const gameSession = {
       user_id: userId || null, // Can be null for anonymous users
-      score: results.score,
-      grade: results.grade,
-      avg_reaction_time: results.avgReactionTime,
-      fastest_reaction: results.fastestReaction,
-      slowest_reaction: results.slowestReaction,
+      avg_reaction_time: Math.round(results.avgReactionTime),
       successful_hits: results.successfulHits,
-      missed_cues: results.missedCues,
       incorrect_hits: results.incorrectHits,
-      fakes_avoided: results.fakesAvoided,
-      total_clicks: results.totalClicks,
-      accuracy: results.accuracy,
-      difficulty_reached: results.difficulty,
+      missed_cues: results.missedCues,
+      difficulty_reached: Math.round(results.difficulty || 1),
+      score: results.score,
       played_at: new Date().toISOString()
     }
     
@@ -41,8 +34,10 @@ export async function saveGameSession(results: GameResults, userId?: string) {
     
     if (error) {
       console.error('Error saving game session:', error)
-      return { success: false, error }
+      return { success: false, error: error.message }
     }
+    
+    console.log('Game session saved successfully:', data)
     
     // If user is logged in, update their profile stats
     if (userId) {
@@ -50,9 +45,9 @@ export async function saveGameSession(results: GameResults, userId?: string) {
     }
     
     return { success: true, data }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Unexpected error saving game session:', error)
-    return { success: false, error }
+    return { success: false, error: error.message || 'Unknown error' }
   }
 }
 
@@ -75,20 +70,11 @@ async function updateUserStats(userId: string, results: GameResults) {
     // Update profile stats
     const updates = {
       total_games: (profile.total_games || 0) + 1,
-      total_score: (profile.total_score || 0) + results.score,
-      best_score: Math.max(profile.best_score || 0, results.score),
-      best_reaction_time: Math.min(
-        profile.best_reaction_time || 999999,
-        results.fastestReaction || 999999
-      ),
-      avg_reaction_time: profile.avg_reaction_time
-        ? (profile.avg_reaction_time * profile.total_games + results.avgReactionTime) / (profile.total_games + 1)
-        : results.avgReactionTime,
-      s_grades: profile.s_grades + (results.grade === 'S' ? 1 : 0),
-      a_grades: profile.a_grades + (results.grade === 'A' ? 1 : 0),
-      b_grades: profile.b_grades + (results.grade === 'B' ? 1 : 0),
-      c_grades: profile.c_grades + (results.grade === 'C' ? 1 : 0),
-      d_grades: profile.d_grades + (results.grade === 'D' ? 1 : 0),
+      lifetime_hits: (profile.lifetime_hits || 0) + results.successfulHits,
+      lifetime_misses: (profile.lifetime_misses || 0) + results.incorrectHits + results.missedCues,
+      best_reaction_time: profile.best_reaction_time 
+        ? Math.min(profile.best_reaction_time, Math.round(results.avgReactionTime))
+        : Math.round(results.avgReactionTime),
       updated_at: new Date().toISOString()
     }
     
@@ -99,6 +85,8 @@ async function updateUserStats(userId: string, results: GameResults) {
     
     if (updateError) {
       console.error('Error updating profile stats:', updateError)
+    } else {
+      console.log('User profile stats updated successfully')
     }
   } catch (error) {
     console.error('Unexpected error updating user stats:', error)
@@ -108,36 +96,76 @@ async function updateUserStats(userId: string, results: GameResults) {
 export async function getLeaderboard(type: 'daily' | 'all_time' = 'all_time', limit = 10) {
   const supabase = createClient()
   
-  const view = type === 'daily' ? 'daily_leaderboard' : 'all_time_leaderboard'
-  
-  const { data, error } = await supabase
-    .from(view)
-    .select('*')
-    .limit(limit)
-  
-  if (error) {
-    console.error('Error fetching leaderboard:', error)
+  try {
+    let query = supabase
+      .from('game_sessions')
+      .select(`
+        *,
+        profiles!left(username, x_username)
+      `)
+      .order('score', { ascending: false })
+      .limit(limit)
+    
+    // For daily leaderboard, filter by today's date
+    if (type === 'daily') {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      query = query.gte('played_at', today.toISOString())
+    }
+    
+    const { data, error } = await query
+    
+    if (error) {
+      console.error('Error fetching leaderboard:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Unexpected error fetching leaderboard:', error)
     return []
   }
-  
-  return data
 }
 
 export async function getUserRank(userId: string, type: 'daily' | 'all_time' = 'all_time') {
   const supabase = createClient()
   
-  const view = type === 'daily' ? 'daily_leaderboard' : 'all_time_leaderboard'
-  
-  // Get all entries to calculate rank
-  const { data, error } = await supabase
-    .from(view)
-    .select('user_id')
-  
-  if (error || !data) {
-    console.error('Error fetching user rank:', error)
+  try {
+    let query = supabase
+      .from('game_sessions')
+      .select('user_id, score')
+      .order('score', { ascending: false })
+    
+    // For daily rank, filter by today's date
+    if (type === 'daily') {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      query = query.gte('played_at', today.toISOString())
+    }
+    
+    const { data, error } = await query
+    
+    if (error || !data) {
+      console.error('Error fetching user rank:', error)
+      return null
+    }
+    
+    const userIndex = data.findIndex(entry => entry.user_id === userId)
+    return userIndex === -1 ? null : userIndex + 1
+  } catch (error) {
+    console.error('Unexpected error fetching user rank:', error)
     return null
   }
+}
+
+export async function checkUserAuth() {
+  const supabase = createClient()
   
-  const userIndex = data.findIndex(entry => entry.user_id === userId)
-  return userIndex === -1 ? null : userIndex + 1
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    return { isAuthenticated: !!user, userId: user?.id || null }
+  } catch (error) {
+    console.error('Error checking auth:', error)
+    return { isAuthenticated: false, userId: null }
+  }
 }
