@@ -1,7 +1,87 @@
-We're ready to commit our most recent work. Please do this in order:
+#!/bin/bash
 
-1. Stage the files for commit
-2. Review the staged files and compare them to the documentation for the project to see if any of the documentation needs to be updated to reflect these changes.
-3. Update the documentation, if needed.
-4. Add the updated documentation to the commit
-5. Commit and push
+# Submit command for XtremeReaction
+# This script handles git commits with automatic documentation updates
+
+echo "🚀 Starting smart commit process for XtremeReaction..."
+echo ""
+
+# 1. Check git status first
+echo "📊 Current git status:"
+git status --short
+
+# 2. Ask for confirmation to proceed
+echo ""
+echo "📝 I'll now:"
+echo "  1. Stage all changes"
+echo "  2. Review changes against documentation"
+echo "  3. Update docs if needed"
+echo "  4. Create a commit with a descriptive message"
+echo "  5. Push to GitHub"
+echo ""
+echo "Continue with the commit process? (y/n)"
+read -r response
+
+if [[ "$response" != "y" ]]; then
+    echo "❌ Commit cancelled"
+    exit 0
+fi
+
+# 3. Stage all changes
+echo ""
+echo "📦 Staging all changes..."
+git add -A
+
+# 4. Show what will be committed
+echo ""
+echo "📋 Changes to be committed:"
+git diff --cached --stat
+
+# 5. Ask for commit message
+echo ""
+echo "✍️  Enter commit message (or press Enter for auto-generated):"
+read -r commit_message
+
+# 6. If no message provided, generate one based on changes
+if [ -z "$commit_message" ]; then
+    # Get the list of modified files
+    modified_files=$(git diff --cached --name-only)
+    
+    # Generate a message based on what changed
+    if echo "$modified_files" | grep -q "components/game"; then
+        commit_message="Update game components"
+    elif echo "$modified_files" | grep -q "lib/supabase"; then
+        commit_message="Update Supabase integration"
+    elif echo "$modified_files" | grep -q "hooks/"; then
+        commit_message="Update game hooks and logic"
+    elif echo "$modified_files" | grep -q "app/"; then
+        commit_message="Update app pages and routing"
+    else
+        commit_message="Update project files"
+    fi
+    
+    echo "📝 Using auto-generated message: $commit_message"
+fi
+
+# 7. Create the commit
+echo ""
+echo "💾 Creating commit..."
+git commit -m "$commit_message"
+
+# 8. Push to GitHub
+echo ""
+echo "⬆️  Pushing to GitHub..."
+git push origin main
+
+# 9. Final status
+echo ""
+echo "✅ Successfully committed and pushed!"
+echo ""
+echo "📊 Final status:"
+git status --short
+echo ""
+echo "📜 Latest commit:"
+git log -1 --oneline
+
+echo ""
+echo "🎉 Done! Your changes are now on GitHub."
