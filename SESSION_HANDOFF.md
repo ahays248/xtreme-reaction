@@ -1,7 +1,7 @@
 # 🎮 Xtreme Reaction - Session Handoff Document
 
-**Last Session**: August 22, 2025
-**Project Status**: Core Game Complete (75%) - Ready for Authentication & Social Features
+**Last Session**: August 22, 2025 (Evening)
+**Project Status**: Core Game Complete (80%) - Has Critical Bugs to Fix
 
 ## 🚀 Quick Start for New Session
 
@@ -16,16 +16,45 @@ npm run dev
 http://localhost:3001
 ```
 
+## 🚨 CRITICAL BUGS TO FIX FIRST
+
+### Bug 1: Phantom Clicks
+**Issue**: Game is registering clicks when the user isn't clicking
+**Reported**: "the game is acting as if I am clicking when I'm not sometimes"
+**Possible Causes**:
+- Touch event double-firing on mobile
+- Both onClick and onTouchStart firing
+- Event bubbling issues
+**Where to Look**:
+- `/components/game/GameCanvas.tsx` lines 121-138 (background click handlers)
+- `/components/game/CueDisplay.tsx` lines 49-50 (circle click handlers)
+- Check for duplicate event handlers
+
+### Bug 2: Music Not Playing
+**Issue**: Background music file exists but doesn't play
+**File Location**: `/public/music/background.mp3` (renamed from Cyber Pulse Challenge)
+**Attempted Fixes**:
+- Added music toggle button
+- Added error handling
+- Renamed file to expected name
+**Still Not Working**: Check browser console for errors
+**Possible Issues**:
+- Browser autoplay policy
+- Audio context not initialized
+- File format/encoding issue
+
 ## 📊 Current Project State
 
-### ✅ What's Complete (75%)
-1. **Core Game Mechanics** - FULLY FUNCTIONAL
+### ✅ What's Complete (80%)
+1. **Core Game Mechanics** - MOSTLY WORKING (has phantom click bug)
    - 10-round gameplay with progressive difficulty
    - Green circles (tap) vs Red circles (avoid) 
    - Reaction time tracking (milliseconds)
-   - Score calculation with bonuses
+   - Score calculation with bonuses + accuracy bonus
    - Visual punishment system
    - Fair grading system (S/A/B/C/D/F)
+   - NEW: Total clicks tracking for true accuracy
+   - NEW: Accuracy bonus (+10 points per % accuracy)
 
 2. **Database** - SCHEMA READY
    - Supabase configured (see `.env.local`)
@@ -34,21 +63,30 @@ http://localhost:3001
    - Views for leaderboards ready
    - NOT YET connected to game
 
-3. **UI/UX** - POLISHED
+3. **UI/UX** - ENHANCED
    - Mobile-responsive design
-   - Touch controls working
+   - Touch controls (MAY HAVE DOUBLE-FIRE BUG)
    - Smooth animations (Framer Motion)
    - Dark theme optimized
+   - NEW: Sound effects (chimes, buzzes, perfect sound)
+   - NEW: Background music system (not working yet)
+   - NEW: Separate music/sound toggle buttons
 
-4. **Documentation** - UP TO DATE
+4. **Audio Features** - PARTIALLY WORKING
+   - Sound effects: WORKING ✅
+   - Background music: NOT PLAYING ❌
+   - Music file present: `/public/music/background.mp3`
+   - Volume controls implemented
+
+5. **Documentation** - UP TO DATE
    - README.md - comprehensive project overview
    - PROGRESS.md - detailed development timeline
    - This SESSION_HANDOFF.md file
 
-5. **Version Control** - INITIALIZED
+6. **Version Control** - ACTIVE
    - Git repository created
    - Pushed to: https://github.com/ahays248/xtreme-reaction
-   - Initial commit: `8c774df`
+   - Latest commit: Check git log
 
 ### ⏳ What's NOT Complete (25%)
 

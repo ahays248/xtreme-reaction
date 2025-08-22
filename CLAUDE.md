@@ -1,7 +1,20 @@
 # Xtreme Reaction - AI Assistant Guide
 
-**Last Updated**: August 22, 2025 - Core Game Complete (75%)
+**Last Updated**: August 22, 2025 Evening - Core Game 80% (HAS CRITICAL BUGS)
 **GitHub**: https://github.com/ahays248/xtreme-reaction
+
+## ⚠️ CRITICAL BUGS TO FIX FIRST
+
+### 1. Phantom Clicks Bug
+- **Issue**: Game registers clicks when user isn't clicking
+- **User Report**: "the game is acting as if I am clicking when I'm not sometimes"
+- **Check**: GameCanvas.tsx event handlers (onClick AND onTouchStart)
+- **Possible Fix**: Prevent both events from firing, use preventDefault()
+
+### 2. Music Not Playing
+- **Issue**: Background music file exists but won't play
+- **File**: `/public/music/background.mp3` (1.5MB, was renamed from Cyber Pulse Challenge)
+- **Check**: Browser console for errors, autoplay policies
 
 ## Project Overview
 You're working on **Xtreme Reaction**, a competitive reaction time game designed for viral sharing on X (Twitter). This is a mobile-friendly web app where users tap in response to visual cues while avoiding fake cues and distractions.
