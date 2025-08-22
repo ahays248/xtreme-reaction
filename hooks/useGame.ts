@@ -8,6 +8,7 @@ import {
   getPunishmentDuration,
   calculateResults
 } from '@/lib/game/engine'
+import { getSoundManager } from '@/lib/game/sounds'
 
 const INITIAL_STATE: GameState = {
   status: 'idle',
@@ -32,6 +33,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const cueTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const gameConfig = { ...DEFAULT_CONFIG, ...config }
+  const soundManager = getSoundManager()
 
   // Clear all timeouts
   const clearAllTimeouts = useCallback(() => {
@@ -130,6 +132,8 @@ export function useGame(config: Partial<GameConfig> = {}) {
               }
             } else {
               // Real cue missed - this is bad!
+              soundManager.play('error') // Play error sound for missed cue
+              
               // Schedule next round or finish
               if (current.currentRound < current.totalRounds) {
                 setTimeout(() => startRound(), 1000)
@@ -174,6 +178,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
     if (currentState.status === 'waiting') {
       // Tapped too early (before cue appears)
       clearAllTimeouts()
+      soundManager.play('error') // Play error sound
       
       const punishmentDuration = getPunishmentDuration(gameConfig, currentState.consecutiveErrors)
       
@@ -205,6 +210,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
       
       if (currentState.isFakeCue) {
         // Tapped on fake cue - this is bad!
+        soundManager.play('error') // Play error sound
         const punishmentDuration = getPunishmentDuration(gameConfig, currentState.consecutiveErrors)
         
         setGameState(prev => ({
@@ -231,6 +237,13 @@ export function useGame(config: Partial<GameConfig> = {}) {
         // Successful tap on real cue - this is good!
         const reactionTime = Date.now() - (currentState.cueStartTime || Date.now())
         console.log(`Reaction time: ${reactionTime}ms for round ${currentState.currentRound}`)
+        
+        // Play appropriate success sound
+        if (reactionTime < 400) {
+          soundManager.play('perfect') // Very fast reaction
+        } else {
+          soundManager.play('success') // Normal success
+        }
         
         setGameState(prev => ({
           ...prev,

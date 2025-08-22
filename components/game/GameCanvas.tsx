@@ -1,6 +1,7 @@
 'use client'
 
 import { useGame } from '@/hooks/useGame'
+import { useSound } from '@/hooks/useSound'
 import { CueDisplay } from './CueDisplay'
 import { ScoreBoard } from './ScoreBoard'
 import { Punishment } from './Punishment'
@@ -8,9 +9,27 @@ import { motion } from 'framer-motion'
 
 export function GameCanvas() {
   const { gameState, gameResults, startGame, handleTap, resetGame } = useGame()
+  const { soundEnabled, toggleSound } = useSound()
 
   return (
     <div className="relative min-h-screen bg-gray-900 overflow-hidden select-none">
+      {/* Sound toggle button - always visible */}
+      <button
+        onClick={toggleSound}
+        className="fixed top-4 right-4 z-50 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+        aria-label={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
+      >
+        {soundEnabled ? (
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+        )}
+      </button>
       {/* Punishment overlay */}
       {gameState.status === 'punishment' && (
         <Punishment consecutiveErrors={gameState.consecutiveErrors} />

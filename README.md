@@ -22,12 +22,14 @@ A mobile-friendly reaction time challenge game built with Next.js, TypeScript, a
 - **Visual feedback**: Punishment effects for errors
 - **Grade system**: S/A/B/C/D/F performance grades
 
-### Visual Effects (✅ Complete)
+### Visual & Audio Effects (✅ Complete)
 - Screen shake on errors (intensity scales with consecutive mistakes)
 - Red overlay and blur effects for punishment
 - Smooth animations with Framer Motion
 - Random circle positioning across the screen
 - Progressive difficulty visualization
+- **Sound effects**: Success chimes, error buzzes, perfect reaction fanfare
+- Sound toggle button (mute/unmute)
 
 ### Scoring System (✅ Complete)
 - **Speed points**: 1000 - avg reaction time

@@ -93,6 +93,11 @@ The core game is **fully functional** and ready for testing at `http://localhost
 - [x] Visual feedback for all actions
 - [x] Smooth animations with Framer Motion
 - [x] Dark theme optimized for focus
+- [x] **Sound Effects** (NEW):
+  - Success chime for hitting green circles
+  - Perfect sound for ultra-fast reactions (<400ms)
+  - Error buzz for wrong clicks or misses
+  - Mute/unmute toggle button
 
 ---
 
