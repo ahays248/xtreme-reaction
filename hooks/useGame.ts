@@ -118,28 +118,21 @@ export function useGame(config: Partial<GameConfig> = {}) {
         return prev
       }
 
-      // Move to next round
-      setTimeout(() => {
-        isTransitioningRef.current = false
-      }, 100)
-      
-      return {
+      // Move to next round and schedule cue
+      const newState = {
         ...prev,
         status: 'waiting' as const,
         currentRound: prev.currentRound + 1,
         isFakeCue: false,
         cueStartTime: null,
       }
-    })
-
-    // Only schedule cue if not finished - use the state from the callback
-    setGameState(currentState => {
-      if (currentState.status === 'waiting' && currentState.currentRound <= currentState.totalRounds) {
-        // Schedule cue appearance after random delay
-        const delay = getRandomDelay(gameConfig, currentState.difficulty)
+      
+      // Schedule cue appearance after random delay
+      const delay = getRandomDelay(gameConfig, newState.difficulty)
+      console.log('Scheduling cue to appear in', delay, 'ms')
         
-        timeoutRef.current = setTimeout(() => {
-          const isFake = shouldShowFakeCue(gameConfig, currentState.difficulty)
+      timeoutRef.current = setTimeout(() => {
+        const isFake = shouldShowFakeCue(gameConfig, newState.difficulty)
         
         setGameState(current => {
           // Double-check we're still in waiting state
@@ -212,9 +205,13 @@ export function useGame(config: Partial<GameConfig> = {}) {
           })
         }, gameConfig.cueTimeout)
       }, delay)
-      }
       
-      return currentState // Return unchanged state
+      // Clear transition flag after delay is set
+      setTimeout(() => {
+        isTransitioningRef.current = false
+      }, 100)
+      
+      return newState
     })
   }, [gameConfig, finishGame, clearAllTimeouts])
 
@@ -276,7 +273,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
             clearAllTimeouts()
             timeoutRef.current = setTimeout(() => finishGame(), 500)
           }
-          return { ...prev, status: 'waiting' }
+          return { ...prev, status: 'idle' } // Set to idle so startRound can proceed
         })
       }, punishmentDuration)
       return
@@ -315,7 +312,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
               clearAllTimeouts()
               timeoutRef.current = setTimeout(() => finishGame(), 500)
             }
-            return { ...prev, status: 'waiting' }
+            return { ...prev, status: 'idle' } // Set to idle so startRound can proceed
           })
         }, punishmentDuration)
       } else {
@@ -332,7 +329,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
         
         setGameState(prev => ({
           ...prev,
-          status: 'waiting',
+          status: 'idle', // Set to idle so startRound can proceed
           reactionTimes: [...prev.reactionTimes, reactionTime],
           successfulHits: prev.successfulHits + 1,
           consecutiveErrors: 0,
@@ -343,6 +340,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
         // Continue to next round or finish
         clearAllTimeouts()
         if (currentState.currentRound < currentState.totalRounds) {
+          console.log('Scheduling next round after successful hit')
           timeoutRef.current = setTimeout(() => startRound(), 1000)
         } else {
           timeoutRef.current = setTimeout(() => finishGame(), 1000)
