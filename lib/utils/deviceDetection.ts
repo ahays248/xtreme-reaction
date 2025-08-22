@@ -74,47 +74,13 @@ export function getPlatformAdjustments(): PlatformAdjustments {
   const device = getDeviceType()
   const input = getInputMethod()
   
-  // Mobile with touch - most disadvantaged
+  // Mobile with touch - ADVANTAGED (small screen, everything in thumb reach)
   if (device === 'mobile' && input === 'touch') {
     return {
-      reactionTimeHandicap: -75,  // Subtract 75ms from their times
-      cueTimeoutBonus: 500,        // 500ms extra time
-      circleSizeMultiplier: 1.25,  // 25% larger circles
-      scoreMultiplier: 1.15,        // 15% score bonus
-      gradeThresholds: {
-        S: 350,
-        A: 450,
-        B: 550,
-        C: 650,
-        D: 750
-      }
-    }
-  }
-  
-  // Tablet with touch - somewhat disadvantaged
-  if (device === 'tablet' && input === 'touch') {
-    return {
-      reactionTimeHandicap: -50,
-      cueTimeoutBonus: 300,
-      circleSizeMultiplier: 1.15,
-      scoreMultiplier: 1.08,
-      gradeThresholds: {
-        S: 300,
-        A: 400,
-        B: 500,
-        C: 600,
-        D: 700
-      }
-    }
-  }
-  
-  // Desktop with mouse - baseline/advantaged
-  if (device === 'desktop' && input === 'mouse') {
-    return {
-      reactionTimeHandicap: 0,    // No adjustment
-      cueTimeoutBonus: 0,          // No bonus time
-      circleSizeMultiplier: 1.0,   // Standard size
-      scoreMultiplier: 1.0,         // Standard scoring
+      reactionTimeHandicap: 0,      // No handicap - they have the advantage
+      cueTimeoutBonus: 0,           // No extra time needed
+      circleSizeMultiplier: 1.0,    // Standard size - easy to tap on small screen
+      scoreMultiplier: 1.0,          // Standard scoring
       gradeThresholds: {
         S: 250,
         A: 350,
@@ -125,18 +91,52 @@ export function getPlatformAdjustments(): PlatformAdjustments {
     }
   }
   
-  // Hybrid devices (touchscreen laptops) - slight disadvantage
+  // Tablet with touch - Slightly advantaged
+  if (device === 'tablet' && input === 'touch') {
+    return {
+      reactionTimeHandicap: -25,    // Small handicap for medium screen
+      cueTimeoutBonus: 200,
+      circleSizeMultiplier: 1.1,
+      scoreMultiplier: 1.05,
+      gradeThresholds: {
+        S: 275,
+        A: 375,
+        B: 475,
+        C: 575,
+        D: 675
+      }
+    }
+  }
+  
+  // Desktop with mouse - DISADVANTAGED (large screen, long mouse travel)
+  if (device === 'desktop' && input === 'mouse') {
+    return {
+      reactionTimeHandicap: -100,   // Subtract 100ms for mouse travel time
+      cueTimeoutBonus: 750,         // 750ms extra time for mouse movement
+      circleSizeMultiplier: 1.3,    // 30% larger circles for easier targeting
+      scoreMultiplier: 1.2,          // 20% score bonus for difficulty
+      gradeThresholds: {
+        S: 400,  // Much more forgiving
+        A: 500,
+        B: 600,
+        C: 700,
+        D: 800
+      }
+    }
+  }
+  
+  // Hybrid devices (touchscreen laptops) - depends on input
   return {
-    reactionTimeHandicap: -25,
-    cueTimeoutBonus: 200,
-    circleSizeMultiplier: 1.1,
-    scoreMultiplier: 1.05,
+    reactionTimeHandicap: -50,
+    cueTimeoutBonus: 400,
+    circleSizeMultiplier: 1.15,
+    scoreMultiplier: 1.1,
     gradeThresholds: {
-      S: 275,
-      A: 375,
-      B: 475,
-      C: 575,
-      D: 675
+      S: 325,
+      A: 425,
+      B: 525,
+      C: 625,
+      D: 725
     }
   }
 }

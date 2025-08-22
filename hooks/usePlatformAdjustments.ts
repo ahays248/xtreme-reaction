@@ -88,25 +88,25 @@ export function usePlatformAdjustments() {
     if (deviceType === 'mobile' && actualInput === 'touch') {
       return {
         label: '📱 Mobile',
-        description: 'Mobile difficulty adjustments applied',
-        color: 'text-blue-400'
+        description: 'Mobile mode (easier - small screen advantage)',
+        color: 'text-green-400'
       }
     } else if (deviceType === 'tablet' && actualInput === 'touch') {
       return {
         label: '📱 Tablet', 
-        description: 'Tablet difficulty adjustments applied',
-        color: 'text-cyan-400'
+        description: 'Tablet mode (medium difficulty)',
+        color: 'text-blue-400'
       }
     } else if (deviceType === 'desktop' && actualInput === 'mouse') {
       return {
         label: '🖥️ Desktop',
-        description: 'Desktop difficulty (no adjustments)',
-        color: 'text-green-400'
+        description: 'Desktop mode (harder - large screen challenge)',
+        color: 'text-orange-400'
       }
     } else {
       return {
         label: '💻 Hybrid',
-        description: 'Mixed input adjustments applied',
+        description: 'Hybrid mode (balanced adjustments)',
         color: 'text-yellow-400'
       }
     }

@@ -17,9 +17,19 @@ export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
   useEffect(() => {
     if (isVisible) {
       // Generate random position when cue becomes visible
-      // Keep circles within safe bounds (10% margin from edges)
-      const x = 10 + Math.random() * 80 // 10% to 90%
-      const y = 20 + Math.random() * 60 // 20% to 80% (more centered vertically)
+      // Adjust spawn area based on platform (desktop needs more centered circles)
+      let minX = 10, maxX = 90, minY = 20, maxY = 80
+      
+      // On desktop, keep circles more centered to reduce mouse travel
+      if (window.innerWidth > 1024) {
+        minX = 25  // 25% to 75% horizontally
+        maxX = 75
+        minY = 30  // 30% to 70% vertically  
+        maxY = 70
+      }
+      
+      const x = minX + Math.random() * (maxX - minX)
+      const y = minY + Math.random() * (maxY - minY)
       setPosition({ x, y })
     }
   }, [isVisible])
