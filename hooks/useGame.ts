@@ -36,6 +36,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
   const [gameResults, setGameResults] = useState<GameResults | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const cueTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isTransitioningRef = useRef<boolean>(false)
   const gameConfig = { ...DEFAULT_CONFIG, ...config }
   const soundManager = getSoundManager()
   const musicManager = getMusicManager()
@@ -88,20 +89,36 @@ export function useGame(config: Partial<GameConfig> = {}) {
   }, [clearAllTimeouts])
 
   const startRound = useCallback(() => {
+    // Prevent multiple simultaneous round starts
+    if (isTransitioningRef.current) {
+      console.log('Already transitioning, skipping startRound')
+      return
+    }
+    
+    isTransitioningRef.current = true
+    
     setGameState(prev => {
-      // Don't start if already finished
-      if (prev.status === 'finished') {
+      // Don't start if already finished or already in waiting/cue state
+      if (prev.status === 'finished' || prev.status === 'waiting' || prev.status === 'cue') {
+        isTransitioningRef.current = false
         return prev
       }
 
       // Check if game should end BEFORE starting new round
       if (prev.currentRound >= prev.totalRounds) {
         // Schedule finish after brief delay
-        setTimeout(() => finishGame(), 100)
+        setTimeout(() => {
+          isTransitioningRef.current = false
+          finishGame()
+        }, 100)
         return prev
       }
 
       // Move to next round
+      setTimeout(() => {
+        isTransitioningRef.current = false
+      }, 100)
+      
       return {
         ...prev,
         status: 'waiting' as const,
@@ -141,10 +158,11 @@ export function useGame(config: Partial<GameConfig> = {}) {
             if (current.isFakeCue) {
               // Fake cue avoided successfully - this is good!
               // Schedule next round or finish
+              clearAllTimeouts()
               if (current.currentRound < current.totalRounds) {
-                setTimeout(() => startRound(), 1000)
+                timeoutRef.current = setTimeout(() => startRound(), 1000)
               } else {
-                setTimeout(() => finishGame(), 1000)
+                timeoutRef.current = setTimeout(() => finishGame(), 1000)
               }
               
               return {
@@ -159,10 +177,11 @@ export function useGame(config: Partial<GameConfig> = {}) {
               soundManager.play('error') // Play error sound for missed cue
               
               // Schedule next round or finish
+              clearAllTimeouts()
               if (current.currentRound < current.totalRounds) {
-                setTimeout(() => startRound(), 1000)
+                timeoutRef.current = setTimeout(() => startRound(), 1000)
               } else {
-                setTimeout(() => finishGame(), 1000)
+                timeoutRef.current = setTimeout(() => finishGame(), 1000)
               }
               
               return {
@@ -230,9 +249,11 @@ export function useGame(config: Partial<GameConfig> = {}) {
         setGameState(prev => {
           // Check if should continue or finish
           if (prev.currentRound < prev.totalRounds) {
-            setTimeout(() => startRound(), 500)
+            clearAllTimeouts()
+            timeoutRef.current = setTimeout(() => startRound(), 500)
           } else {
-            setTimeout(() => finishGame(), 500)
+            clearAllTimeouts()
+            timeoutRef.current = setTimeout(() => finishGame(), 500)
           }
           return { ...prev, status: 'waiting' }
         })
@@ -267,9 +288,11 @@ export function useGame(config: Partial<GameConfig> = {}) {
           setGameState(prev => {
             // Check if should continue or finish
             if (prev.currentRound < prev.totalRounds) {
-              setTimeout(() => startRound(), 500)
+              clearAllTimeouts()
+              timeoutRef.current = setTimeout(() => startRound(), 500)
             } else {
-              setTimeout(() => finishGame(), 500)
+              clearAllTimeouts()
+              timeoutRef.current = setTimeout(() => finishGame(), 500)
             }
             return { ...prev, status: 'waiting' }
           })
@@ -297,10 +320,11 @@ export function useGame(config: Partial<GameConfig> = {}) {
         }))
 
         // Continue to next round or finish
+        clearAllTimeouts()
         if (currentState.currentRound < currentState.totalRounds) {
-          setTimeout(() => startRound(), 1000)
+          timeoutRef.current = setTimeout(() => startRound(), 1000)
         } else {
-          setTimeout(() => finishGame(), 1000)
+          timeoutRef.current = setTimeout(() => finishGame(), 1000)
         }
       }
     }
@@ -309,6 +333,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
   const resetGame = useCallback(() => {
     clearAllTimeouts()
     musicManager.stop()
+    isTransitioningRef.current = false
     setGameState(INITIAL_STATE)
     setGameResults(null)
   }, [clearAllTimeouts])
