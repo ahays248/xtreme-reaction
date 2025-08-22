@@ -9,6 +9,7 @@ import {
   calculateResults
 } from '@/lib/game/engine'
 import { getSoundManager } from '@/lib/game/sounds'
+import { getMusicManager } from '@/lib/game/music'
 
 const INITIAL_STATE: GameState = {
   status: 'idle',
@@ -34,6 +35,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
   const cueTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const gameConfig = { ...DEFAULT_CONFIG, ...config }
   const soundManager = getSoundManager()
+  const musicManager = getMusicManager()
 
   // Clear all timeouts
   const clearAllTimeouts = useCallback(() => {
@@ -56,6 +58,8 @@ export function useGame(config: Partial<GameConfig> = {}) {
 
   const finishGame = useCallback(() => {
     clearAllTimeouts()
+    // Stop background music
+    musicManager.stop()
     setGameState(prev => {
       const results = calculateResults(prev)
       setGameResults(results)
@@ -163,6 +167,9 @@ export function useGame(config: Partial<GameConfig> = {}) {
     })
     setGameResults(null)
     
+    // Start background music
+    musicManager.play()
+    
     // Start first round after brief delay
     timeoutRef.current = setTimeout(() => startRound(), 2000)
   }, [gameConfig.totalRounds, startRound, clearAllTimeouts])
@@ -267,6 +274,7 @@ export function useGame(config: Partial<GameConfig> = {}) {
 
   const resetGame = useCallback(() => {
     clearAllTimeouts()
+    musicManager.stop()
     setGameState(INITIAL_STATE)
     setGameResults(null)
   }, [clearAllTimeouts])
