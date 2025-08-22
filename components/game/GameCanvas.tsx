@@ -8,12 +8,15 @@ import { CueDisplay } from './CueDisplay'
 import { ScoreBoard } from './ScoreBoard'
 import { Punishment } from './Punishment'
 import { AuthStatus } from '@/components/auth/AuthStatus'
+import { usePlatformAdjustments } from '@/hooks/usePlatformAdjustments'
 import { motion } from 'framer-motion'
 
 export function GameCanvas() {
   const { gameState, gameResults, startGame, handleTap, resetGame } = useGame()
   const { soundEnabled, toggleSound } = useSound()
   const musicManager = getMusicManager()
+  const { getPlatformInfo, reactionTimeHandicap, scoreMultiplier } = usePlatformAdjustments()
+  const platformInfo = getPlatformInfo()
 
   return (
     <div className="relative min-h-screen bg-gray-900 overflow-hidden select-none">
@@ -121,6 +124,23 @@ export function GameCanvas() {
             <div className="fixed top-0 left-0 right-0 p-4 bg-gradient-to-b from-gray-900 to-transparent z-10">
               {/* Progress bar */}
               <div className="max-w-2xl mx-auto">
+                {/* Platform indicator */}
+                <div className="text-center mb-2">
+                  <span className={`text-xs ${platformInfo.color}`}>
+                    {platformInfo.label} 
+                    {reactionTimeHandicap !== 0 && (
+                      <span className="ml-2 opacity-75">
+                        ({reactionTimeHandicap > 0 ? '+' : ''}{reactionTimeHandicap}ms handicap)
+                      </span>
+                    )}
+                    {scoreMultiplier !== 1 && (
+                      <span className="ml-2 opacity-75">
+                        ({scoreMultiplier}x score)
+                      </span>
+                    )}
+                  </span>
+                </div>
+                
                 <div className="flex justify-between text-white mb-2 text-sm md:text-base">
                   <span>Round {gameState.currentRound}/{gameState.totalRounds}</span>
                   <span className="font-bold">Score: {gameState.score}</span>

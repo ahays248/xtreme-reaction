@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { GameResults } from '@/lib/game/types'
 import { useEffect, useRef } from 'react'
+import { usePlatformAdjustments } from '@/hooks/usePlatformAdjustments'
 
 interface ScoreBoardProps {
   results: GameResults
@@ -12,9 +13,19 @@ interface ScoreBoardProps {
 
 export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
   const boardRef = useRef<HTMLDivElement>(null)
+  const { adjustReactionTime, adjustScore, getAdjustedGrade, getPlatformInfo } = usePlatformAdjustments()
+  const platformInfo = getPlatformInfo()
 
-  // Grade based on performance (adjusted for choice reaction times)
+  // Grade based on performance (adjusted for platform)
   const getGrade = () => {
+    return getAdjustedGrade(results.avgReactionTime, results.accuracy)
+  }
+  
+  // Get adjusted values for display
+  const adjustedReactionTime = adjustReactionTime(results.avgReactionTime)
+  const adjustedScore = adjustScore(results.score)
+  
+  /* OLD GRADING LOGIC - REPLACED BY PLATFORM ADJUSTMENTS
     // Perfect accuracy gets bonus consideration
     if (results.accuracy === 100) {
       if (results.avgReactionTime < 500) return 'S'
@@ -45,7 +56,7 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
     
     // F Grade: Needs improvement
     return 'F'
-  }
+  */
 
   const grade = getGrade()
   const gradeColors: Record<string, string> = {
@@ -89,8 +100,15 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
         transition={{ delay: 0.3 }}
         className="text-center mb-6"
       >
-        <div className="text-5xl font-bold text-white">{results.score}</div>
-        <div className="text-gray-400">Total Score</div>
+        <div className="text-5xl font-bold text-white">{adjustedScore}</div>
+        <div className="text-gray-400">
+          Total Score
+          {adjustedScore !== results.score && (
+            <span className="text-xs ml-2 text-blue-400">
+              (raw: {results.score})
+            </span>
+          )}
+        </div>
       </motion.div>
 
       {/* Stats */}
@@ -103,9 +121,14 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
         <div className="flex justify-between text-white">
           <span className="text-gray-400">Avg Reaction Time</span>
           <span className="font-bold">
-            {results.avgReactionTime}ms
-            {results.avgReactionTime < 400 && ' 🔥'}
-            {results.avgReactionTime < 300 && ' ⚡'}
+            {adjustedReactionTime}ms
+            {adjustedReactionTime !== results.avgReactionTime && (
+              <span className="text-xs text-blue-400 ml-1">
+                (raw: {results.avgReactionTime}ms)
+              </span>
+            )}
+            {adjustedReactionTime < 400 && ' 🔥'}
+            {adjustedReactionTime < 300 && ' ⚡'}
           </span>
         </div>
         <div className="flex justify-between text-white">
@@ -136,6 +159,14 @@ export function ScoreBoard({ results, onRestart, onShare }: ScoreBoardProps) {
         <div className="flex justify-between text-white">
           <span className="text-gray-400">Difficulty Reached</span>
           <span className="font-bold">{results.difficulty.toFixed(1)}</span>
+        </div>
+        
+        {/* Platform indicator */}
+        <div className="flex justify-between text-white">
+          <span className="text-gray-400">Platform</span>
+          <span className={`font-bold ${platformInfo.color}`}>
+            {platformInfo.label}
+          </span>
         </div>
       </motion.div>
 

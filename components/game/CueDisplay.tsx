@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { usePlatformAdjustments } from '@/hooks/usePlatformAdjustments'
 
 interface CueDisplayProps {
   isVisible: boolean
@@ -11,6 +12,7 @@ interface CueDisplayProps {
 
 export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
   const [position, setPosition] = useState({ x: 50, y: 50 })
+  const { circleSizeMultiplier } = usePlatformAdjustments()
 
   useEffect(() => {
     if (isVisible) {
@@ -69,10 +71,10 @@ export function CueDisplay({ isVisible, isFake, onCueClick }: CueDisplayProps) {
                     : 'bg-green-500 border-4 border-green-600'
                 } rounded-full shadow-2xl`}
                 style={{
-                  width: '80px',
-                  height: '80px',
-                  minWidth: '80px',
-                  minHeight: '80px',
+                  width: `${80 * circleSizeMultiplier}px`,
+                  height: `${80 * circleSizeMultiplier}px`,
+                  minWidth: `${80 * circleSizeMultiplier}px`,
+                  minHeight: `${80 * circleSizeMultiplier}px`,
                   boxShadow: isFake 
                     ? '0 0 40px rgba(239, 68, 68, 0.6)' 
                     : '0 0 40px rgba(34, 197, 94, 0.6)'
