@@ -1,73 +1,96 @@
 # Xtreme Reaction - AI Assistant Guide
 
-**Last Updated**: August 22, 2025 Evening - Core Game 80% (HAS CRITICAL BUGS)
+**Last Updated**: August 23, 2025 - FRESH START with Incremental Development
 **GitHub**: https://github.com/ahays248/xtreme-reaction
 
-## ⚠️ CRITICAL BUGS TO FIX FIRST
+## 🎯 CRITICAL: DEVELOPMENT PHILOSOPHY - READ THIS FIRST!
 
-### 1. Phantom Clicks Bug
-- **Issue**: Game registers clicks when user isn't clicking
-- **User Report**: "the game is acting as if I am clicking when I'm not sometimes"
-- **Check**: GameCanvas.tsx event handlers (onClick AND onTouchStart)
-- **Possible Fix**: Prevent both events from firing, use preventDefault()
+### We Are Building Incrementally
+After experiencing complexity spiral with the previous implementation, we've adopted a **STRICT** incremental approach:
 
-### 2. Music Not Playing
-- **Issue**: Background music file exists but won't play
-- **File**: `/public/music/background.mp3` (1.5MB, was renamed from Cyber Pulse Challenge)
-- **Check**: Browser console for errors, autoplay policies
+1. **Small Phases Only**: Each phase is 100-200 lines of code MAXIMUM
+2. **Test Before Progress**: Every phase must work PERFECTLY before moving on
+3. **No Premature Features**: Follow IMPLEMENTATION_PLAN.md EXACTLY
+4. **One Source of Truth**: Simple, linear logic only
+5. **Document First**: Read the Game Design Document before coding
 
-## Project Overview
-You're working on **Xtreme Reaction**, a competitive reaction time game designed for viral sharing on X (Twitter). This is a mobile-friendly web app where users tap in response to visual cues while avoiding fake cues and distractions.
+### Why This Approach?
+- Previous attempt had complex timeout chains, duplicate processing, competing systems
+- User said: "I'm about ready to say delete everything and restart"
+- We deleted ALL old code and started fresh with proper planning
+- This approach ensures we never get stuck in complexity again
 
-**IMPORTANT**: The core game is FULLY FUNCTIONAL and playable at http://localhost:3001 (port 3001, not 3000)
+## 📍 CURRENT STATUS
 
-## Important Documents
-- **SESSION_HANDOFF.md** - START HERE! Detailed handoff for new sessions
-- **PROGRESS.md** - Contains detailed progress tracking, completed features, and TODO list
-- **README.md** - User-facing documentation (✅ CREATED)
-- **supabase/migrations/001_initial_schema.sql** - Database schema
+### Where We Are Now
+- ✅ **GAME_DESIGN_DOCUMENT.md** - Complete game specification 
+- ✅ **IMPLEMENTATION_PLAN.md** - 20 phases of incremental development
+- ✅ **DATABASE_SCHEMA.md** - Full database documentation
+- ✅ All old complex code DELETED (clean slate)
+- ✅ Database migration 004 ready to align with new design
+- 🎮 Simple "Coming Soon" placeholder at http://localhost:3000
+- **→ Ready for Phase 1: Static Target Display**
+
+### What We're Building
+**Xtreme Reaction** is an X-exclusive competitive reaction time game:
+- **X Authentication Required**: No anonymous play for leaderboards
+- **60-Second Games Maximum**: Quick, addictive sessions
+- **Matrix Cyberpunk Theme**: Green on black aesthetics
+- **Viral Sharing**: Shareable scorecards to X
+- **Progressive Difficulty**: Adapts to player performance
+
+## 📚 ESSENTIAL DOCUMENTS - READ IN ORDER
+
+1. **GAME_DESIGN_DOCUMENT.md** - What we're building and why
+2. **IMPLEMENTATION_PLAN.md** - How we're building it (20 phases)
+3. **DATABASE_SCHEMA.md** - Database structure and relationships
+4. **PROJECT_STATUS.md** - Current development status
+
+## 🚀 HOW TO START DEVELOPMENT
+
+### For New Sessions
+1. **DO NOT** jump into coding immediately
+2. Read the essential documents above
+3. Check current phase in IMPLEMENTATION_PLAN.md
+4. Implement ONLY that phase (100-200 lines max)
+5. Test thoroughly before moving to next phase
+
+### Phase 1 Quick Start
+```bash
+# Current task: Create static target display
+# Files to create:
+# - components/Target.tsx (simple green circle)
+# - Update app/page.tsx (add show/hide button)
+```
 
 ## Tech Stack
 - **Framework**: Next.js 15.5 with TypeScript and App Router
 - **Styling**: Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth with X (Twitter) OAuth
-- **Animations**: Framer Motion
-- **State**: React hooks and Zustand
-- **Deployment**: Vercel (planned)
+- **Charts**: Recharts (Phase 19)
+- **Deployment**: Vercel (Phase 20)
 
 ## Project Structure
 ```
 XtremeReaction/
 ├── app/                    # Next.js App Router pages
-├── components/             # React components
-│   └── game/              # Game-specific components
+├── components/             # React components (currently empty)
 ├── lib/                   # Core logic and utilities
-│   ├── supabase/         # Database client and types
-│   └── game/             # Game engine and logic
-├── hooks/                 # Custom React hooks
+│   └── supabase/         # Database client and types
+├── hooks/                 # Custom React hooks (currently empty)
 ├── public/                # Static assets
+│   └── music/           # Background music
 └── supabase/             # Database migrations
+    └── migrations/       # SQL migration files
 ```
-
-## Current Status (75% Complete)
-- ✅ Core game mechanics fully functional
-- ✅ Database schema created
-- ✅ Visual effects and animations working
-- ✅ All major bugs fixed (see PROGRESS.md)
-- ✅ Mobile controls optimized
-- ✅ Git repository initialized and pushed to GitHub
-- ⏳ Authentication needs X OAuth setup
-- ⏳ Database integration pending (PRIORITY 1)
-- ⏳ Leaderboards need implementation
-- ⏳ X sharing functionality needs completion
 
 ## Development Commands
 ```bash
 # Install dependencies
 npm install
 
-# Run development server (runs on port 3001)
+# Run development server (port 3000)
 npm run dev
 
 # Build for production
@@ -80,113 +103,94 @@ npm run typecheck
 npm run lint
 ```
 
-## Claude Code Commands
-```bash
-# Smart commit with documentation check
-/submit
-```
-This command will automatically:
-1. Stage files for commit
-2. Review changes against documentation
-3. Update docs if needed
-4. Commit and push to GitHub
-
-## Key Features
-1. **Reaction Testing**: 10-round games with millisecond precision
-2. **Fake Cues**: Red circles that players must avoid tapping
-3. **Progressive Difficulty**: Game gets harder with each success
-4. **Punishment System**: Visual effects that intensify with errors
-5. **Scoring**: Based on speed, accuracy, and difficulty
-6. **Leaderboards**: Daily and all-time rankings
-7. **X Integration**: Share scores with custom images
-
 ## Database Configuration
-- **URL**: https://oksfkrbxypmoqvjttavc.supabase.co (UPDATED)
-- **Project**: Xtreme Reaction
+- **Project ID**: xhcfjhzfyozzuicubqmh
+- **URL**: https://xhcfjhzfyozzuicubqmh.supabase.co
+- **Dashboard**: https://supabase.com/dashboard/project/xhcfjhzfyozzuicubqmh
 - Credentials are in `.env.local`
-- Schema is complete, just needs connection to game
 
-## Game Logic Overview
-1. Player sees "Wait for the cue..."
-2. After random delay (1-5s), a circle appears
-3. **Green circle**: Tap quickly for points
-4. **Red circle**: Don't tap (it's a trap!)
-5. Errors trigger punishment effects
-6. Game tracks reaction times and accuracy
-7. Final score based on performance
-
-## Common Tasks
-
-### Adding New Features
-1. Check PROGRESS.md for current TODO items
-2. Update relevant CLAUDE.md files when adding new components
-3. Test on mobile devices (touch events are critical)
-
-### Working with Supabase
+### Apply Latest Migration
 ```bash
 # Login to Supabase CLI
 ~/.local/bin/supabase login --token sbp_eab39990962adb1bcbb57ba84def39d2189831e2
 
-# Run migrations
+# Apply migration 004
 ~/.local/bin/supabase db push --project-ref xhcfjhzfyozzuicubqmh
 ```
 
-### Testing the Game
-1. Open http://localhost:3001
-2. Click "Start Game"
-3. Tap green circles quickly
-4. Avoid red circles
-5. Check console for debug info
+## ⚠️ CRITICAL REMINDERS
 
-## Known Issues
-- ✅ FIXED: Red circles now disappear automatically after timeout
-- ✅ FIXED: Click detection only works on circles (not anywhere)
-- ✅ FIXED: Game properly ends after round 10
-- ✅ FIXED: Fair grading system implemented
-- Database connection not yet implemented (PRIORITY 1)
-- X OAuth needs configuration in Supabase dashboard
+### What NOT to Do
+1. **DO NOT** add features not in the current phase
+2. **DO NOT** optimize prematurely
+3. **DO NOT** create complex state management
+4. **DO NOT** skip testing between phases
+5. **DO NOT** write more than 200 lines per phase
 
-## Design Decisions
-- **Mobile-first**: Touch events prioritized over click
-- **Dark theme**: Better for focus and reduces eye strain
-- **Instant feedback**: All actions have immediate visual response
-- **Progressive punishment**: Errors compound to increase difficulty
-- **Grade system**: S/A/B/C/D grades for motivation
+### What TO Do
+1. **DO** follow the IMPLEMENTATION_PLAN.md exactly
+2. **DO** test on mobile and desktop after each phase
+3. **DO** keep code simple and readable
+4. **DO** commit after each successful phase
+5. **DO** update PROJECT_STATUS.md after completing phases
+
+## Game Mechanics (From Design Doc)
+1. One target appears at a time
+2. Green targets: Tap quickly for points
+3. Red targets: Don't tap (they're traps!)
+4. Progressive difficulty increases speed
+5. 60-second maximum game duration
+6. Score based on speed and accuracy
 
 ## Performance Targets
 - < 1 second load time
 - 60 FPS animations
-- < 250ms average reaction time for "A" grade
+- < 250ms average reaction for "A" grade
 - Support 1000+ concurrent users
 
 ## Security Considerations
-- Row Level Security (RLS) enabled on all tables
-- User can only modify their own data
-- Cheat detection planned for post-MVP
-- No client-side score calculation for final version
+- Row Level Security (RLS) on all tables
+- Users can only modify their own data
+- X OAuth required for leaderboard participation
+- No client-side score calculation in production
 
-## Next Priority Tasks
-1. **URGENT**: Connect game results to database (save scores)
-2. **HIGH**: Implement user authentication (X OAuth)
-3. **MEDIUM**: Build leaderboard page
-4. **MEDIUM**: Add X sharing with screenshots
-5. **LOW**: Deploy to Vercel
-
-## Critical Notes for Next Session
-- DO NOT refactor the game logic in `/hooks/useGame.ts` - it works perfectly
-- The game runs on PORT 3001, not 3000
-- Test the game first at http://localhost:3001 to understand current state
-- Read SESSION_HANDOFF.md for complete status
-- Database schema is complete, just needs connection
-
-## Contact & Resources
-- Supabase Dashboard: https://supabase.com/dashboard/project/xhcfjhzfyozzuicubqmh
-- X Developer Portal: https://developer.x.com
-- Vercel Dashboard: https://vercel.com
+## Implementation Phases Overview
+1. **Static Target** - Show/hide circle
+2. **Click Detection** - Register taps
+3. **Basic Timing** - Measure reaction
+4. **Auto-Hide** - Timeout targets
+5. **Game Loop** - Continuous spawning
+6. **Difficulty** - Progressive challenge
+7. **Trap Targets** - Add red circles
+8. **Scoring** - Calculate points
+9. **Accuracy** - Track hit rate
+10. **UI Polish** - Cyberpunk theme
+11. **Sound** - Audio feedback
+12. **Performance Card** - Show results
+13. **Database Setup** - Connect Supabase
+14. **X Auth** - OAuth login
+15. **Save Scores** - Persist data
+16. **Leaderboards** - Show rankings
+17. **Share to X** - Social features
+18. **Practice Mode** - Guest play
+19. **Charts** - Data viz
+20. **Final Polish** - Production ready
 
 ## Tips for AI Assistants
-- Always check PROGRESS.md before starting work
-- The game must work on mobile (test touch events)
-- Keep punishment effects smooth (performance matters)
-- Fake cues should be obviously different but still confusing
-- Update this file when adding major features
+- **ALWAYS** check which phase we're on before coding
+- **NEVER** implement features from future phases
+- **ALWAYS** test mobile touch events
+- **KEEP** state management minimal
+- **UPDATE** PROJECT_STATUS.md after completing work
+- **FOLLOW** the incremental approach strictly
+
+## Lessons Learned from Previous Attempt
+1. **Complex timeout chains** → Use simple, linear logic
+2. **Multiple competing systems** → One source of truth
+3. **Trying to build everything at once** → Small phases only
+4. **Poor state management** → Keep state minimal
+5. **No clear plan** → Follow Implementation Plan strictly
+
+---
+
+**Remember**: We deleted everything and started fresh for a reason. Stick to the plan. Small iterations. Test everything. Keep it simple.

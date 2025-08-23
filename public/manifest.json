@@ -1,0 +1,17 @@
+{
+  "name": "Xtreme Reaction",
+  "short_name": "XReaction",
+  "description": "Test your reflexes in this intense reaction time game",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

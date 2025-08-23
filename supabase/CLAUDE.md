@@ -94,23 +94,37 @@ USING (auth.uid() = id);
 
 ## Migrations
 
-### 001_initial_schema.sql
-Contains:
-- All table definitions
-- Indexes for performance
-- Views for leaderboards
-- RLS policies
-- Trigger functions
-- Default achievements
+### Migration Files
+1. **001_initial_schema.sql** - Initial database setup with all core tables
+2. **002_add_accuracy_and_stats.sql** - Added accuracy tracking columns
+3. **003_add_endless_mode_fields.sql** - Support for endless mode (not in current design)
+4. **004_align_with_new_design.sql** - ⭐ LATEST - Aligns with incremental development plan
+
+### Latest Migration (004) Changes
+- Adds `trap_targets_hit`, `game_duration`, `targets_shown` columns
+- Creates `game_efficiency` view for analytics
+- Updates terminology from "fakes" to "traps"
+- Adds new achievements aligned with game design
+- Creates function to maintain trap statistics
 
 ### Running Migrations
 ```bash
-# With Supabase CLI
+# Login first (if needed)
+~/.local/bin/supabase login --token sbp_eab39990962adb1bcbb57ba84def39d2189831e2
+
+# Apply all pending migrations
 ~/.local/bin/supabase db push --project-ref xhcfjhzfyozzuicubqmh
 
 # Or through dashboard
 # Go to SQL Editor and paste migration content
 ```
+
+### IMPORTANT: Database Philosophy
+Following our incremental development approach:
+- Database is already designed and ready (migrations 001-004)
+- Don't modify schema until Phase 13 of implementation
+- All tables support the features we'll build incrementally
+- RLS policies ensure security from day one
 
 ## Triggers & Functions
 
