@@ -1,6 +1,6 @@
 # Xtreme Reaction - Project Status
 **Date**: August 23, 2025  
-**Status**: Fresh Start - Ready for Phase 1 Implementation
+**Status**: Phase 2 Complete - Ready for Phase 3 (Basic Timing)
 
 ---
 
@@ -9,6 +9,8 @@
 2. **Implementation Plan** created - 20 phases of incremental development
 3. **Old code deleted** - removed all complex, buggy game code
 4. **Clean slate established** - simple placeholder page ready
+5. **Phase 1: Static Target Display** - Green circle with show/hide button (43 lines)
+6. **Phase 2: Click Detection** - Unified pointer events, click counting (80 lines total)
 
 ---
 
@@ -17,11 +19,13 @@
 ```
 XtremeReaction/
 ├── app/                    # Next.js App Router
-│   ├── page.tsx           # Simple "Coming Soon" page
+│   ├── page.tsx           # Main game page with click detection
 │   ├── layout.tsx         # Root layout with metadata
 │   └── globals.css        # Global styles (Tailwind)
-├── components/            # Empty - ready for new components
-├── hooks/                 # Empty - ready for custom hooks
+├── components/            # React components
+│   └── Target.tsx         # Green circle target component
+├── hooks/                 # Custom React hooks
+│   └── useClickHandler.ts # Unified pointer event handling
 ├── lib/                   # Utilities
 │   └── supabase/         # Database client files
 ├── public/               # Static assets
@@ -36,20 +40,20 @@ XtremeReaction/
 
 ---
 
-## 🎯 NEXT STEPS - Phase 1: Static Target Display
+## 🎯 NEXT STEPS - Phase 3: Basic Timing
 
-According to the Implementation Plan, Phase 1 involves:
+According to the Implementation Plan, Phase 3 involves:
 
-1. Create basic game page
-2. Add a green circle component
-3. Add show/hide button
-4. Style with basic CSS
+1. Record timestamp when target appears
+2. Calculate time difference on click
+3. Display reaction time
+4. Store last 5 reaction times
 
-**Goal**: Simply show and hide a circle on screen  
-**Expected Time**: 2 hours  
+**Goal**: Measure reaction time in milliseconds  
+**Expected Time**: 3 hours  
 **Files to Create**: 
-- `components/Target.tsx` (simple circle component)
-- Update `app/page.tsx` (add game interface)
+- `lib/timing.ts` (reaction time calculations)
+- Update `app/page.tsx` (show reaction times)
 
 ---
 
