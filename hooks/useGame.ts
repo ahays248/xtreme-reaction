@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { GameState, GameConfig, GameResults } from '@/lib/game/types'
 import { 
   DEFAULT_CONFIG, 
-  calculateScore, 
   getRandomDelay, 
   shouldShowFakeCue,
-  getPunishmentDuration,
+  getCueLifespan,
+  calculateStreakBonus,
   calculateResults
 } from '@/lib/game/engine'
 import { getSoundManager } from '@/lib/game/sounds'
@@ -16,19 +16,21 @@ import { createClient } from '@/lib/supabase/client'
 const INITIAL_STATE: GameState = {
   status: 'idle',
   currentRound: 0,
-  totalRounds: DEFAULT_CONFIG.totalRounds,
+  livesRemaining: DEFAULT_CONFIG.maxLives,
   reactionTimes: [],
   successfulHits: 0,
   incorrectHits: 0,
   missedCues: 0,
   fakesAvoided: 0,
   totalClicks: 0,
+  currentStreak: 0,
+  maxStreak: 0,
+  streakMultiplier: 1,
   difficulty: 1,
   score: 0,
   cueStartTime: null,
   isFakeCue: false,
-  punishmentEndTime: null,
-  consecutiveErrors: 0,
+  cueLifespan: DEFAULT_CONFIG.startingCueLifespan,
 }
 
 export function useGame(config: Partial<GameConfig> = {}) {
@@ -40,18 +42,40 @@ export function useGame(config: Partial<GameConfig> = {}) {
   const gameConfig = { ...DEFAULT_CONFIG, ...config }
   const soundManager = getSoundManager()
   const musicManager = getMusicManager()
+  
+  // Version marker to verify changes are loaded
+  useEffect(() => {
+    console.log('🎮 useGame hook loaded - v11.0 CLEAN TIMEOUTS!')
+    console.log('🎯 Simplified timeout logic, fixed red circle duplicate bug')
+    return () => {
+      console.log('🔄 useGame hook unmounting')
+    }
+  }, [])
 
-  // Clear all timeouts
-  const clearAllTimeouts = useCallback(() => {
+  // Clear main timeout
+  const clearMainTimeout = useCallback(() => {
     if (timeoutRef.current) {
+      console.log('🧹 Clearing main timeout')
       clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
+  }, [])
+  
+  // Clear cue timeout
+  const clearCueTimeout = useCallback(() => {
     if (cueTimeoutRef.current) {
+      console.log('🧹 Clearing cue timeout')
       clearTimeout(cueTimeoutRef.current)
       cueTimeoutRef.current = null
     }
   }, [])
+  
+  // Clear all timeouts
+  const clearAllTimeouts = useCallback(() => {
+    console.log('🧹 clearAllTimeouts called')
+    clearMainTimeout()
+    clearCueTimeout()
+  }, [clearMainTimeout, clearCueTimeout])
 
   // Clear timeouts on unmount
   useEffect(() => {
@@ -88,18 +112,75 @@ export function useGame(config: Partial<GameConfig> = {}) {
     })
   }, [clearAllTimeouts])
 
+  const handleCorrectAction = useCallback((isHit: boolean) => {
+    setGameState(prev => {
+      const newStreak = prev.currentStreak + 1
+      const newMaxStreak = Math.max(prev.maxStreak, newStreak)
+      
+      // Update streak multiplier
+      let newMultiplier = 1
+      if (newStreak >= gameConfig.streakThreshold) {
+        newMultiplier = gameConfig.streakMultiplier
+        // Play streak sound if we just hit the threshold
+        if (prev.currentStreak === gameConfig.streakThreshold - 1) {
+          soundManager.play('perfect') // Use perfect sound for streak
+        }
+      }
+      
+      return {
+        ...prev,
+        currentStreak: newStreak,
+        maxStreak: newMaxStreak,
+        streakMultiplier: newMultiplier,
+      }
+    })
+  }, [gameConfig, soundManager])
+
+  const handleMistake = useCallback(() => {
+    setGameState(prev => {
+      const newLives = prev.livesRemaining - 1
+      
+      // Play error sound
+      soundManager.play('error')
+      
+      // Check if game over
+      if (newLives <= 0) {
+        setTimeout(() => finishGame(), 1000)
+      }
+      
+      return {
+        ...prev,
+        livesRemaining: newLives,
+        currentStreak: 0, // Reset streak
+        streakMultiplier: 1, // Reset multiplier
+      }
+    })
+  }, [soundManager, finishGame])
+
+  const scheduleNextRound = useCallback((delayMs: number = 1500) => {
+    console.log(`⏭️ Scheduling next round in ${delayMs}ms`)
+    clearAllTimeouts()
+    timeoutRef.current = setTimeout(() => {
+      isTransitioningRef.current = false
+      startRound()
+    }, delayMs)
+  }, [clearAllTimeouts])
+
   const startRound = useCallback(() => {
     // Prevent multiple simultaneous round starts
     if (isTransitioningRef.current) {
-      console.log('Already transitioning, skipping startRound')
+      console.log('⚠️ Already transitioning, skipping startRound')
       return
     }
     
-    console.log('startRound called')
+    console.log('🎮 startRound called')
     isTransitioningRef.current = true
     
+    // Clear any existing timeouts first
+    clearAllTimeouts()
+    
     setGameState(prev => {
-      console.log('startRound - current status:', prev.status, 'round:', prev.currentRound)
+      console.log(`📊 Round ${prev.currentRound + 1} - Lives: ${prev.livesRemaining} - Streak: ${prev.currentStreak}`)
       
       // Don't start if already finished or already in waiting/cue state
       if (prev.status === 'finished' || prev.status === 'waiting' || prev.status === 'cue') {
@@ -108,9 +189,8 @@ export function useGame(config: Partial<GameConfig> = {}) {
         return prev
       }
 
-      // Check if game should end BEFORE starting new round
-      if (prev.currentRound >= prev.totalRounds) {
-        // Schedule finish after brief delay
+      // Check if game should end (no lives left)
+      if (prev.livesRemaining <= 0) {
         setTimeout(() => {
           isTransitioningRef.current = false
           finishGame()
@@ -118,124 +198,128 @@ export function useGame(config: Partial<GameConfig> = {}) {
         return prev
       }
 
-      // Move to next round and schedule cue
+      // Move to next round
+      const newRoundNumber = prev.currentRound + 1
+      const newCueLifespan = getCueLifespan(gameConfig, newRoundNumber)
+      const willBeFake = shouldShowFakeCue(gameConfig, prev.difficulty)
+      
+      console.log(`📈 Starting round ${newRoundNumber}, cue lifespan: ${newCueLifespan}ms, will be ${willBeFake ? 'RED' : 'GREEN'}`)
+      
       const newState = {
         ...prev,
         status: 'waiting' as const,
-        currentRound: prev.currentRound + 1,
-        isFakeCue: false,
+        currentRound: newRoundNumber,
+        isFakeCue: false, // Will be set when cue appears
         cueStartTime: null,
+        cueLifespan: newCueLifespan,
       }
       
       // Schedule cue appearance after random delay
       const delay = getRandomDelay(gameConfig, newState.difficulty)
-      console.log('Scheduling cue to appear in', delay, 'ms')
-        
+      console.log(`⏱️ Cue will appear in ${delay}ms`)
+      
       timeoutRef.current = setTimeout(() => {
-        const isFake = shouldShowFakeCue(gameConfig, newState.difficulty)
+        console.log(`⏰ Showing ${willBeFake ? 'RED (fake)' : 'GREEN (real)'} cue for round ${newRoundNumber}`)
         
         setGameState(current => {
-          // Double-check we're still in waiting state
-          if (current.status !== 'waiting') return current
+          if (current.status !== 'waiting') {
+            console.log(`❌ Status changed to ${current.status}, not showing cue`)
+            return current
+          }
+          
+          // Set cue timeout for auto-disappear
+          cueTimeoutRef.current = setTimeout(() => {
+            console.log(`🔔 Cue timeout fired for ${willBeFake ? 'RED' : 'GREEN'} circle!`)
+            
+            setGameState(curr => {
+              if (curr.status !== 'cue') {
+                console.log(`⚠️ Cue timeout fired but status is ${curr.status}, ignoring`)
+                return curr
+              }
+              
+              if (willBeFake) {
+                // Red circle avoided - good!
+                console.log(`✅ RED CIRCLE AVOIDED - round ${curr.currentRound}`)
+                const newStreak = curr.currentStreak + 1
+                const baseScore = 200
+                const bonusScore = calculateStreakBonus(baseScore, newStreak, gameConfig)
+                
+                // Schedule next round
+                scheduleNextRound()
+                
+                return {
+                  ...curr,
+                  status: 'idle' as const,
+                  fakesAvoided: curr.fakesAvoided + 1,
+                  score: curr.score + bonusScore,
+                  currentStreak: newStreak,
+                  maxStreak: Math.max(curr.maxStreak, newStreak),
+                  streakMultiplier: newStreak >= gameConfig.streakThreshold ? gameConfig.streakMultiplier : 1,
+                }
+              } else {
+                // Green circle missed - bad!
+                console.log(`❌ MISSED GREEN CIRCLE - round ${curr.currentRound}`)
+                soundManager.play('error')
+                
+                const newLives = curr.livesRemaining - 1
+                
+                if (newLives > 0) {
+                  scheduleNextRound()
+                } else {
+                  setTimeout(() => finishGame(), 1000)
+                }
+                
+                return {
+                  ...curr,
+                  status: newLives > 0 ? 'idle' as const : 'finished' as const,
+                  missedCues: curr.missedCues + 1,
+                  livesRemaining: newLives,
+                  currentStreak: 0,
+                  streakMultiplier: 1,
+                }
+              }
+            })
+          }, newCueLifespan)
           
           return {
             ...current,
             status: 'cue',
             cueStartTime: Date.now(),
-            isFakeCue: isFake,
+            isFakeCue: willBeFake,
           }
         })
-
-        // Set timeout for cue to disappear
-        cueTimeoutRef.current = setTimeout(() => {
-          setGameState(current => {
-            // Only process if still showing cue
-            if (current.status !== 'cue') return current
-            
-            if (current.isFakeCue) {
-              // Fake cue avoided successfully - this is good!
-              console.log('Red circle avoided - round', current.currentRound, 'of', current.totalRounds)
-              
-              // Clear timeouts first
-              clearAllTimeouts()
-              
-              // Update state
-              const updatedState = {
-                ...current,
-                status: 'idle' as const, // Set to idle so startRound can proceed
-                fakesAvoided: current.fakesAvoided + 1,
-                consecutiveErrors: 0,
-                score: current.score + 200,
-              }
-              
-              // Schedule next round or finish
-              if (current.currentRound < current.totalRounds) {
-                console.log('Scheduling next round from red circle timeout')
-                timeoutRef.current = setTimeout(() => startRound(), 1000)
-              } else {
-                console.log('Game should finish after red circle')
-                timeoutRef.current = setTimeout(() => finishGame(), 1000)
-              }
-              
-              return updatedState
-            } else {
-              // Real cue missed - this is bad!
-              soundManager.play('error') // Play error sound for missed cue
-              
-              // Clear timeouts first
-              clearAllTimeouts()
-              
-              // Update state
-              const updatedState = {
-                ...current,
-                status: 'idle' as const, // Set to idle so startRound can proceed
-                missedCues: current.missedCues + 1,
-                consecutiveErrors: current.consecutiveErrors + 1,
-              }
-              
-              // Schedule next round or finish
-              if (current.currentRound < current.totalRounds) {
-                timeoutRef.current = setTimeout(() => startRound(), 1000)
-              } else {
-                timeoutRef.current = setTimeout(() => finishGame(), 1000)
-              }
-              
-              return updatedState
-            }
-          })
-        }, gameConfig.cueTimeout)
       }, delay)
       
-      // Clear transition flag after delay is set
+      // Clear transition flag after setup
       setTimeout(() => {
         isTransitioningRef.current = false
       }, 100)
       
       return newState
     })
-  }, [gameConfig, finishGame, clearAllTimeouts])
+  }, [gameConfig, finishGame, clearAllTimeouts, soundManager, scheduleNextRound])
 
   const startGame = useCallback(() => {
     clearAllTimeouts()
     setGameState({
       ...INITIAL_STATE,
       status: 'ready',
-      totalRounds: gameConfig.totalRounds,
+      livesRemaining: gameConfig.maxLives,
     })
     setGameResults(null)
     
-    // Start background music
-    musicManager.play()
+    // Music is now started from GameCanvas after initialization
+    console.log('🎮 Game starting - music should be initialized from GameCanvas')
     
     // Start first round after brief delay
-    timeoutRef.current = setTimeout(() => startRound(), 2000)
-  }, [gameConfig.totalRounds, startRound, clearAllTimeouts])
+    scheduleNextRound(2000)
+  }, [gameConfig.maxLives, startRound, clearAllTimeouts])
 
   const handleTap = useCallback((isMissedClick: boolean = false) => {
     const currentState = gameState
     
-    // Ignore taps during punishment or finished
-    if (currentState.status === 'punishment' || currentState.status === 'finished') {
+    // Ignore taps if game is finished
+    if (currentState.status === 'finished') {
       return
     }
     
@@ -249,76 +333,53 @@ export function useGame(config: Partial<GameConfig> = {}) {
     
     if (currentState.status === 'waiting') {
       // Tapped too early (before cue appears)
+      console.log(`❌ Tapped too early in round ${currentState.currentRound}`)
       clearAllTimeouts()
-      soundManager.play('error') // Play error sound
       
-      const punishmentDuration = getPunishmentDuration(gameConfig, currentState.consecutiveErrors)
+      handleMistake()
       
       setGameState(prev => ({
         ...prev,
-        status: 'punishment',
+        status: 'idle',
         incorrectHits: prev.incorrectHits + 1,
-        consecutiveErrors: prev.consecutiveErrors + 1,
-        punishmentEndTime: Date.now() + punishmentDuration,
       }))
-
-      // End punishment and continue
-      timeoutRef.current = setTimeout(() => {
-        setGameState(prev => {
-          // Check if should continue or finish
-          if (prev.currentRound < prev.totalRounds) {
-            clearAllTimeouts()
-            timeoutRef.current = setTimeout(() => startRound(), 500)
-          } else {
-            clearAllTimeouts()
-            timeoutRef.current = setTimeout(() => finishGame(), 500)
-          }
-          return { ...prev, status: 'idle' } // Set to idle so startRound can proceed
-        })
-      }, punishmentDuration)
+      
+      // Continue to next round if lives remaining
+      if (currentState.livesRemaining > 1) {
+        scheduleNextRound()
+      }
       return
     }
 
     if (currentState.status === 'cue') {
       // If it's a missed click on a real cue, just count it but don't stop the round
       if (isMissedClick && !currentState.isFakeCue) {
-        // Clicked background instead of green circle - no punishment, just track
         return // Let the cue continue to display
       }
       
+      // Clear all timeouts when interacting with a cue
       clearAllTimeouts()
       
       if (currentState.isFakeCue) {
         // Tapped on fake cue - this is bad!
-        soundManager.play('error') // Play error sound
-        const punishmentDuration = getPunishmentDuration(gameConfig, currentState.consecutiveErrors)
+        console.log(`❌ Tapped red circle in round ${currentState.currentRound}`)
+        
+        handleMistake()
         
         setGameState(prev => ({
           ...prev,
-          status: 'punishment',
+          status: 'idle',
           incorrectHits: prev.incorrectHits + 1,
-          consecutiveErrors: prev.consecutiveErrors + 1,
-          punishmentEndTime: Date.now() + punishmentDuration,
         }))
-
-        // End punishment and continue
-        timeoutRef.current = setTimeout(() => {
-          setGameState(prev => {
-            // Check if should continue or finish
-            if (prev.currentRound < prev.totalRounds) {
-              clearAllTimeouts()
-              timeoutRef.current = setTimeout(() => startRound(), 500)
-            } else {
-              clearAllTimeouts()
-              timeoutRef.current = setTimeout(() => finishGame(), 500)
-            }
-            return { ...prev, status: 'idle' } // Set to idle so startRound can proceed
-          })
-        }, punishmentDuration)
+        
+        // Continue to next round if lives remaining
+        if (currentState.livesRemaining > 1) {
+          scheduleNextRound()
+        }
       } else {
         // Successful tap on real cue - this is good!
         const reactionTime = Date.now() - (currentState.cueStartTime || Date.now())
-        console.log(`Reaction time: ${reactionTime}ms for round ${currentState.currentRound}`)
+        console.log(`⚡ Reaction time: ${reactionTime}ms for round ${currentState.currentRound}`)
         
         // Play appropriate success sound
         if (reactionTime < 400) {
@@ -327,27 +388,29 @@ export function useGame(config: Partial<GameConfig> = {}) {
           soundManager.play('success') // Normal success
         }
         
+        // Handle correct action
+        handleCorrectAction(true)
+        
+        // Calculate base score (better score for faster reaction)
+        const baseScore = Math.max(0, 1000 - reactionTime)
+        const bonusScore = calculateStreakBonus(baseScore, currentState.currentStreak + 1, gameConfig)
+        
         setGameState(prev => ({
           ...prev,
-          status: 'idle', // Set to idle so startRound can proceed
+          status: 'idle',
           reactionTimes: [...prev.reactionTimes, reactionTime],
           successfulHits: prev.successfulHits + 1,
-          consecutiveErrors: 0,
           difficulty: Math.min(10, prev.difficulty + 0.1),
-          score: prev.score + Math.max(0, 1000 - reactionTime),
+          score: prev.score + bonusScore,
         }))
-
-        // Continue to next round or finish
-        clearAllTimeouts()
-        if (currentState.currentRound < currentState.totalRounds) {
-          console.log('Scheduling next round after successful hit')
-          timeoutRef.current = setTimeout(() => startRound(), 1000)
-        } else {
-          timeoutRef.current = setTimeout(() => finishGame(), 1000)
-        }
+        
+        console.log(`✅ Round ${currentState.currentRound} complete!`)
+        
+        // Schedule next round
+        scheduleNextRound()
       }
     }
-  }, [gameState, gameConfig, clearAllTimeouts, startRound, finishGame])
+  }, [gameState, gameConfig, clearAllTimeouts, handleCorrectAction, handleMistake, scheduleNextRound, soundManager])
 
   const resetGame = useCallback(() => {
     clearAllTimeouts()
@@ -365,3 +428,4 @@ export function useGame(config: Partial<GameConfig> = {}) {
     resetGame,
   }
 }
+
