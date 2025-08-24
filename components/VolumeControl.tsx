@@ -41,7 +41,7 @@ export default function VolumeControl({
 
   return (
     <motion.div 
-      className={`${expanded ? 'flex-col gap-3' : 'flex-row gap-2 sm:gap-4'} flex bg-black/90 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-2 border border-green-500/30`}
+      className={`${expanded ? 'flex-col gap-3 min-w-[220px] sm:min-w-[280px]' : 'flex-row gap-2 sm:gap-4'} flex bg-black/90 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-2 border border-green-500/30`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
@@ -92,9 +92,9 @@ export default function VolumeControl({
 
       {/* Expanded controls - Now works on mobile and desktop */}
       {expanded && (
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-full min-w-[200px] sm:min-w-[250px]">
           {/* Music Volume */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             <span className="text-green-400 text-xs font-mono min-w-[45px] sm:min-w-[50px]">Music:</span>
             <button
               onClick={onToggleMusicMute}
@@ -136,7 +136,7 @@ export default function VolumeControl({
           </div>
 
           {/* SFX Volume */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             <span className="text-green-400 text-xs font-mono min-w-[45px] sm:min-w-[50px]">SFX:</span>
             <button
               onClick={onToggleMute}
