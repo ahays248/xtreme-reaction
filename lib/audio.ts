@@ -4,7 +4,7 @@
  */
 
 export type SoundType = 'hit' | 'miss' | 'trap'
-export type MusicType = 'gameplay' | 'results'
+export type MusicType = 'menu' | 'gameplay' | 'results'
 
 class AudioManager {
   private audioContext: AudioContext | null = null
@@ -69,6 +69,16 @@ class AudioManager {
   }
 
   /**
+   * Ensure AudioContext is resumed (for mobile browsers)
+   */
+  async ensureResumed(): Promise<void> {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume()
+      console.log('AudioContext resumed')
+    }
+  }
+
+  /**
    * Preload all sound effects
    */
   private async preloadSounds(): Promise<void> {
@@ -92,7 +102,7 @@ class AudioManager {
    * Preload background music
    */
   private async preloadMusic(): Promise<void> {
-    const musicTracks: MusicType[] = ['gameplay', 'results']
+    const musicTracks: MusicType[] = ['menu', 'gameplay', 'results']
     
     const loadPromises = musicTracks.map(async (track) => {
       try {
@@ -111,8 +121,11 @@ class AudioManager {
   /**
    * Play a sound effect
    */
-  play(sound: SoundType): void {
+  async play(sound: SoundType): Promise<void> {
     if (!this.initialized || !this.audioContext || this.muted) return
+
+    // Ensure AudioContext is resumed (for mobile)
+    await this.ensureResumed()
 
     const buffer = this.buffers.get(sound)
     if (!buffer) return
@@ -130,8 +143,11 @@ class AudioManager {
   /**
    * Play background music
    */
-  playMusic(music: MusicType): void {
+  async playMusic(music: MusicType): Promise<void> {
     if (!this.initialized || !this.audioContext || this.musicMuted) return
+
+    // Ensure AudioContext is resumed (for mobile)
+    await this.ensureResumed()
 
     // Stop current music if playing
     this.stopMusic()

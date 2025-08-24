@@ -15,6 +15,7 @@ interface UseSoundReturn {
   musicMuted: boolean
   toggleMusicMute: () => void
   initialized: boolean
+  initializeAudio: () => Promise<void>
 }
 
 export function useSound(): UseSoundReturn {
@@ -90,6 +91,16 @@ export function useSound(): UseSoundReturn {
     setMusicMuted(newMutedState)
   }, [])
 
+  const initializeAudio = useCallback(async () => {
+    await audioManager.initialize()
+    await audioManager.ensureResumed()
+    setVolumeState(audioManager.getVolume())
+    setMusicVolumeState(audioManager.getMusicVolume())
+    setMuted(audioManager.isMuted())
+    setMusicMuted(audioManager.isMusicMuted())
+    setInitialized(true)
+  }, [])
+
   return {
     playSound,
     playMusic,
@@ -103,6 +114,7 @@ export function useSound(): UseSoundReturn {
     toggleMute,
     musicMuted,
     toggleMusicMute,
-    initialized
+    initialized,
+    initializeAudio
   }
 }
