@@ -162,7 +162,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl md:text-6xl font-orbitron font-black mb-4 text-glow-green animate-flicker">
+        <h1 className="text-4xl md:text-6xl font-orbitron font-black mb-4 text-glow-soft animate-flicker">
           XTREME REACTION
         </h1>
         <p className="text-xl mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
@@ -171,7 +171,7 @@ export default function Home() {
         </p>
       </motion.div>
 
-      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 z-10 ${
+      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 z-10 min-h-[500px] ${
         showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
       }`}>
         {/* Game status display */}
@@ -374,12 +374,14 @@ export default function Home() {
           )
         })()}
 
-        <Target 
-          isVisible={showTarget && gameState.status === 'playing'} 
-          onTargetClick={handleTargetClick}
-          size={currentDifficulty.targetSize}
-          variant={isTrapTarget ? 'trap' : 'normal'}
-        />
+        <div className="h-32 flex items-center justify-center">
+          <Target 
+            isVisible={showTarget && gameState.status === 'playing'} 
+            onTargetClick={handleTargetClick}
+            size={currentDifficulty.targetSize}
+            variant={isTrapTarget ? 'trap' : 'normal'}
+          />
+        </div>
       </div>
 
       {/* Game controls - moved to bottom */}
@@ -392,7 +394,7 @@ export default function Home() {
           {gameState.status === 'idle' && (
             <motion.button
               onClick={handleStartGame}
-              className="px-8 py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-xl rounded-lg hover:bg-neon-green hover:text-black transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+              className="px-8 py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -404,7 +406,7 @@ export default function Home() {
             <>
               <motion.button
                 onClick={handleStartGame}
-                className="px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green hover:text-black transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+                className="px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

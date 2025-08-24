@@ -26,21 +26,56 @@ body {
   overflow-x: hidden;
 }
 
-/* Cyberpunk text glow */
+/* Cyberpunk text glow with black outline for readability */
 .text-glow {
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  text-shadow: 
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    0 0 10px currentColor, 
+    0 0 20px currentColor;
 }
 
 .text-glow-green {
-  text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    0 0 10px var(--neon-green), 
+    0 0 20px var(--neon-green);
 }
 
 .text-glow-red {
-  text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+  text-shadow: 
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    0 0 10px var(--neon-red), 
+    0 0 20px var(--neon-red);
 }
 
 .text-glow-cyan {
-  text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+  text-shadow: 
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    0 0 10px var(--neon-cyan), 
+    0 0 20px var(--neon-cyan);
+}
+
+/* Softer glow for title */
+.text-glow-soft {
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    0 0 5px var(--neon-green), 
+    0 0 10px var(--neon-green);
 }
 
 /* Neon borders */
