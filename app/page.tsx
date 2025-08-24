@@ -505,7 +505,7 @@ export default function Home() {
               </motion.button>
               <motion.button
                 onClick={handleReset}
-                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold text-sm md:text-base rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
+                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-gray-500 text-white font-orbitron font-bold text-sm md:text-base rounded-lg hover:border-gray-300 hover:text-gray-100 transition-all duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

@@ -46,6 +46,9 @@ export default function PerformanceCard({
   const speedBar = Math.max(0, Math.min(100, (500 - avgReactionTime) / 5)) // 0ms = 100%, 500ms = 0%
   const streakBar = Math.min(bestStreak * 10, 100) // 10 streak = 100%
   
+  // Debug accuracy
+  console.log('Accuracy:', accuracy, 'AccuracyBar:', accuracyBar)
+  
   return (
     <motion.div 
       className="w-full max-w-lg mx-auto p-4 sm:p-6 space-y-4"
@@ -70,7 +73,7 @@ export default function PerformanceCard({
       {/* Score Section */}
       <div className="bg-black/50 border border-neon-green/30 rounded-lg p-4 space-y-3">
         <div className="text-center">
-          <p className="text-sm text-gray-400 font-mono">FINAL SCORE</p>
+          <p className="text-sm text-white font-mono">FINAL SCORE</p>
           <motion.p 
             className="text-4xl sm:text-5xl font-orbitron font-black text-neon-yellow text-glow mt-1"
             initial={{ scale: 0 }}
@@ -100,7 +103,7 @@ export default function PerformanceCard({
               🏆 NEW HIGH SCORE! 🏆
             </motion.p>
           ) : previousHighScore > 0 && (
-            <p className="mt-3 text-sm text-gray-400 font-mono">
+            <p className="mt-3 text-sm text-white font-mono">
               High Score: {formatScore(previousHighScore)}
             </p>
           )}
@@ -119,7 +122,7 @@ export default function PerformanceCard({
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-gradient-to-r from-neon-green to-neon-cyan"
+              className="h-full bg-neon-green"
               initial={{ width: "0%" }}
               animate={{ width: `${accuracyBar}%` }}
               transition={{ duration: 0.5, delay: 0.5 }}
@@ -188,11 +191,11 @@ export default function PerformanceCard({
       {/* Additional Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-400 font-mono">MAX DIFFICULTY</p>
+          <p className="text-xs text-white font-mono">MAX DIFFICULTY</p>
           <p className="text-lg font-bold text-purple-400">Level {Math.round(difficultyLevel / 10)}</p>
         </div>
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-400 font-mono">ROUNDS COMPLETED</p>
+          <p className="text-xs text-white font-mono">ROUNDS COMPLETED</p>
           <p className="text-lg font-bold text-neon-cyan">10/10</p>
         </div>
       </div>
