@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { GameState, initialGameState } from '@/lib/gameState'
 import { getDifficultyConfig } from '@/lib/difficulty'
+import { calculateHitScore } from '@/lib/scoring'
 
 export function useGameLoop() {
   const [gameState, setGameState] = useState<GameState>(initialGameState)
@@ -30,10 +31,13 @@ export function useGameLoop() {
   }, [])
 
   const recordHit = useCallback((reactionTime: number) => {
+    const hitScore = calculateHitScore(reactionTime)
     setGameState(prev => ({
       ...prev,
       hits: prev.hits + 1,
-      reactionTimes: [...prev.reactionTimes, reactionTime]
+      reactionTimes: [...prev.reactionTimes, reactionTime],
+      score: prev.score + hitScore,
+      hitScores: [...prev.hitScores, hitScore]
     }))
   }, [])
 

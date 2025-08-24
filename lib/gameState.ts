@@ -9,6 +9,8 @@ export interface GameState {
   reactionTimes: number[]
   difficultyLevel?: number // Track current difficulty percentage
   trapHit?: boolean // Track if game ended due to trap
+  score: number // Current score
+  hitScores: number[] // Individual scores for each hit
 }
 
 export const initialGameState: GameState = {
@@ -17,5 +19,7 @@ export const initialGameState: GameState = {
   maxRounds: 10,
   hits: 0,
   misses: 0,
-  reactionTimes: []
+  reactionTimes: [],
+  score: 0,
+  hitScores: []
 }

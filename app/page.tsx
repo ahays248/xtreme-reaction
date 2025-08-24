@@ -6,6 +6,7 @@ import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
+import { calculateAccuracy, calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -17,6 +18,7 @@ export default function Home() {
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
+  const lastTapTime = useRef<number>(0)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
 
@@ -74,6 +76,14 @@ export default function Home() {
   }
 
   const handleTargetClick = useClickHandler(() => {
+    // Prevent double-tap registration (100ms cooldown)
+    const now = Date.now()
+    if (now - lastTapTime.current < 100) {
+      console.log('Double-tap prevented')
+      return
+    }
+    lastTapTime.current = now
+    
     if (targetShowTime.current > 0 && timeoutId.current) {
       // Clear the timeout since target was clicked
       clearTimeout(timeoutId.current)
@@ -132,29 +142,42 @@ export default function Home() {
     : getDifficultyConfig(1, gameState.maxRounds)
 
   return (
-    <main className="min-h-screen bg-black text-green-500 flex flex-col items-center justify-center p-4 gap-8">
-      <div className="text-center">
+    <main className="min-h-screen bg-black text-green-500 flex flex-col items-center justify-between p-4">
+      <div className="text-center mt-8">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Xtreme Reaction</h1>
-        <p className="text-xl mb-2">Phase 7: Trap Targets</p>
+        <p className="text-xl mb-2">Phase 8: Scoring System</p>
         <p className="text-sm opacity-70">
           Test your reflexes. Compete with the world. Share on X.
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6 flex-grow justify-center">
         {/* Game status display */}
         {gameState.status === 'idle' && (
           <div className="text-center space-y-4">
             <p className="text-2xl">Ready to test your reflexes?</p>
             <p className="text-sm opacity-70">Hit 10 targets as fast as you can!</p>
+            {getHighScore() > 0 && (
+              <p className="text-lg font-mono">
+                High Score: <span className="text-yellow-400">{formatScore(getHighScore())}</span>
+              </p>
+            )}
           </div>
         )}
 
         {gameState.status === 'playing' && (
           <>
-            {/* Round counter */}
-            <div className="text-xl font-mono">
-              Round {gameState.currentRound} / {gameState.maxRounds}
+            {/* Game stats header */}
+            <div className="flex justify-between items-center w-full max-w-md">
+              <div className="text-lg font-mono">
+                Score: <span className="text-yellow-400">{formatScore(gameState.score)}</span>
+              </div>
+              <div className="text-xl font-mono">
+                Round {gameState.currentRound} / {gameState.maxRounds}
+              </div>
+              <div className="text-lg font-mono">
+                Accuracy: <span className="text-green-400">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
+              </div>
             </div>
 
             {/* Stats display */}
@@ -190,26 +213,62 @@ export default function Home() {
           </>
         )}
 
-        {gameState.status === 'gameOver' && (
-          <div className="text-center space-y-4">
-            <p className="text-3xl font-bold">
-              {gameState.trapHit ? 'TRAP HIT!' : 'Game Over!'}
-            </p>
-            {gameState.trapHit && (
-              <p className="text-xl text-red-500">You clicked a red trap target!</p>
-            )}
-            <div className="space-y-2">
-              <p className="text-xl">Final Score</p>
-              <div className="text-lg font-mono">
-                <p>Hits: <span className="text-green-400">{gameState.hits}</span></p>
-                <p>Misses: <span className="text-red-400">{gameState.misses}</span></p>
-                {gameState.reactionTimes.length > 0 && (
-                  <p>Avg Time: <span className="text-yellow-400">{formatTime(calculateAverage(gameState.reactionTimes))}</span></p>
+        {gameState.status === 'gameOver' && (() => {
+          const accuracy = calculateAccuracy(gameState.hits, gameState.misses)
+          const avgReactionTime = gameState.reactionTimes.length > 0 
+            ? calculateAverage(gameState.reactionTimes) 
+            : 0
+          const finalScore = calculateFinalScore(
+            gameState.hitScores,
+            accuracy,
+            gameState.difficultyLevel || 0
+          )
+          const grade = getScoreGrade(avgReactionTime, accuracy)
+          const highScore = getHighScore()
+          const isNewHigh = isNewHighScore(finalScore)
+          
+          // Save high score if new
+          if (isNewHigh) {
+            setHighScore(finalScore)
+          }
+          
+          return (
+            <div className="text-center space-y-4">
+              <p className="text-3xl font-bold">
+                {gameState.trapHit ? 'TRAP HIT!' : 'Game Over!'}
+              </p>
+              {gameState.trapHit && (
+                <p className="text-xl text-red-500">You clicked a red trap target!</p>
+              )}
+              
+              {/* Final Score Display */}
+              <div className="space-y-2">
+                <p className="text-xl">Final Score</p>
+                <p className="text-5xl font-bold text-yellow-400">
+                  {formatScore(finalScore)}
+                </p>
+                <p className="text-2xl font-bold">Grade: {grade}</p>
+                {isNewHigh && (
+                  <p className="text-xl text-green-400 animate-pulse">NEW HIGH SCORE!</p>
+                )}
+                {!isNewHigh && highScore > 0 && (
+                  <p className="text-sm opacity-70">High Score: {formatScore(highScore)}</p>
                 )}
               </div>
+              
+              {/* Detailed Stats */}
+              <div className="text-lg font-mono space-y-1">
+                <p>Hits: <span className="text-green-400">{gameState.hits}</span></p>
+                <p>Misses: <span className="text-red-400">{gameState.misses}</span></p>
+                <p>Accuracy: <span className="text-blue-400">{accuracy}%</span></p>
+                {avgReactionTime > 0 && (
+                  <p>Avg Time: <span className="text-yellow-400">{formatTime(avgReactionTime)}</span></p>
+                )}
+                <p>Difficulty Reached: <span className="text-purple-400">{gameState.difficultyLevel || 0}%</span></p>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         <Target 
           isVisible={showTarget && gameState.status === 'playing'} 
@@ -217,9 +276,10 @@ export default function Home() {
           size={currentDifficulty.targetSize}
           variant={isTrapTarget ? 'trap' : 'normal'}
         />
-        
-        {/* Game controls */}
-        <div className="flex gap-4">
+      </div>
+
+      {/* Game controls - moved to bottom */}
+      <div className="flex gap-4 mb-8">
           {gameState.status === 'idle' && (
             <button
               onClick={handleStartGame}
@@ -249,12 +309,11 @@ export default function Home() {
           {gameState.status === 'playing' && (
             <button
               onClick={handleReset}
-              className="px-6 py-3 bg-gray-700 text-white font-bold rounded hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors opacity-70"
             >
               End Game
             </button>
           )}
-        </div>
       </div>
     </main>
   )
