@@ -144,13 +144,26 @@ class AudioManager {
    * Play background music
    */
   async playMusic(music: MusicType): Promise<void> {
-    if (!this.initialized || !this.audioContext || this.musicMuted) return
+    if (!this.initialized || !this.audioContext) return
+
+    // Always track what music should be playing
+    this.currentMusic = music
+
+    // Don't actually play if muted
+    if (this.musicMuted) return
 
     // Ensure AudioContext is resumed (for mobile)
     await this.ensureResumed()
 
-    // Stop current music if playing
-    this.stopMusic()
+    // Stop current music if playing (but keep currentMusic tracked)
+    if (this.currentMusicSource) {
+      try {
+        this.currentMusicSource.stop()
+      } catch (error) {
+        // Ignore error if already stopped
+      }
+      this.currentMusicSource = null
+    }
 
     const buffer = this.musicBuffers.get(music)
     if (!buffer) return
@@ -161,7 +174,7 @@ class AudioManager {
       this.currentMusicSource.loop = true // Loop the music
       this.currentMusicSource.connect(this.musicGainNode!)
       this.currentMusicSource.start(0)
-      this.currentMusic = music
+      // currentMusic already set above
     } catch (error) {
       console.error(`Failed to play music: ${music}`, error)
     }
@@ -170,7 +183,7 @@ class AudioManager {
   /**
    * Stop background music
    */
-  stopMusic(): void {
+  stopMusic(clearCurrent: boolean = true): void {
     if (this.currentMusicSource) {
       try {
         this.currentMusicSource.stop()
@@ -178,7 +191,10 @@ class AudioManager {
         // Ignore error if already stopped
       }
       this.currentMusicSource = null
-      this.currentMusic = null
+      // Only clear currentMusic if explicitly stopping (not just muting)
+      if (clearCurrent) {
+        this.currentMusic = null
+      }
     }
   }
 
@@ -251,8 +267,14 @@ class AudioManager {
     this.musicMuted = !this.musicMuted
     localStorage.setItem('musicMuted', this.musicMuted.toString())
     
-    if (this.musicMuted && this.currentMusicSource) {
-      this.stopMusic()
+    if (this.musicMuted) {
+      // Stop music but keep track of what was playing
+      if (this.currentMusicSource) {
+        this.stopMusic(false) // false = don't clear currentMusic
+      }
+    } else if (this.currentMusic) {
+      // Resume the music that was playing before mute
+      this.playMusic(this.currentMusic)
     }
     
     return this.musicMuted
