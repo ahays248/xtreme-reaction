@@ -7,6 +7,7 @@ export interface GameState {
   hits: number
   misses: number
   reactionTimes: number[]
+  difficultyLevel?: number // Track current difficulty percentage
 }
 
 export const initialGameState: GameState = {

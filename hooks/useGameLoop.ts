@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { GameState, initialGameState } from '@/lib/gameState'
+import { getDifficultyConfig } from '@/lib/difficulty'
 
 export function useGameLoop() {
   const [gameState, setGameState] = useState<GameState>(initialGameState)
@@ -18,7 +19,13 @@ export function useGameLoop() {
       if (nextRound > prev.maxRounds) {
         return { ...prev, status: 'gameOver' }
       }
-      return { ...prev, currentRound: nextRound }
+      // Calculate difficulty for the next round
+      const difficulty = getDifficultyConfig(nextRound, prev.maxRounds)
+      return { 
+        ...prev, 
+        currentRound: nextRound,
+        difficultyLevel: difficulty.difficultyPercent
+      }
     })
   }, [])
 

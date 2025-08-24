@@ -5,8 +5,8 @@ import Target from '@/components/Target'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
+import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 
-const TARGET_TIMEOUT = 2000 // 2 seconds to react
 const ROUND_DELAY = 1500 // Delay between rounds
 
 export default function Home() {
@@ -42,7 +42,10 @@ export default function Home() {
     setLastMissed(false)
     targetShowTime.current = Date.now()
     
-    // Set timeout for auto-hide
+    // Get difficulty settings for current round
+    const difficulty = getDifficultyConfig(gameState.currentRound, gameState.maxRounds)
+    
+    // Set timeout for auto-hide with progressive difficulty
     timeoutId.current = setTimeout(() => {
       setShowTarget(false)
       recordMiss()
@@ -51,7 +54,7 @@ export default function Home() {
       targetShowTime.current = 0
       nextRound()
       console.log('Target missed - too slow!')
-    }, TARGET_TIMEOUT)
+    }, difficulty.timeout)
   }
 
   const handleTargetClick = useClickHandler(() => {
@@ -95,12 +98,17 @@ export default function Home() {
 
   const last5Times = getLastNTimes(gameState.reactionTimes, 5)
   const averageTime = calculateAverage(last5Times)
+  
+  // Get current difficulty settings
+  const currentDifficulty = gameState.status === 'playing' 
+    ? getDifficultyConfig(gameState.currentRound, gameState.maxRounds)
+    : getDifficultyConfig(1, gameState.maxRounds)
 
   return (
     <main className="min-h-screen bg-black text-green-500 flex flex-col items-center justify-center p-4 gap-8">
       <div className="text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Xtreme Reaction</h1>
-        <p className="text-xl mb-2">Phase 5: Game Loop</p>
+        <p className="text-xl mb-2">Phase 6: Progressive Difficulty</p>
         <p className="text-sm opacity-70">
           Test your reflexes. Compete with the world. Share on X.
         </p>
@@ -141,12 +149,17 @@ export default function Home() {
               )}
             </div>
 
-            {/* Timeout indicator */}
+            {/* Timeout indicator with dynamic value */}
             {showTarget && (
               <div className="text-xs font-mono opacity-50">
-                React within {TARGET_TIMEOUT / 1000} seconds!
+                React within {(currentDifficulty.timeout / 1000).toFixed(1)} seconds!
               </div>
             )}
+            
+            {/* Difficulty indicator */}
+            <div className="text-sm font-mono opacity-70">
+              Difficulty: {currentDifficulty.difficultyPercent}%
+            </div>
           </>
         )}
 
@@ -166,7 +179,11 @@ export default function Home() {
           </div>
         )}
 
-        <Target isVisible={showTarget && gameState.status === 'playing'} onTargetClick={handleTargetClick} />
+        <Target 
+          isVisible={showTarget && gameState.status === 'playing'} 
+          onTargetClick={handleTargetClick}
+          size={currentDifficulty.targetSize}
+        />
         
         {/* Game controls */}
         <div className="flex gap-4">
