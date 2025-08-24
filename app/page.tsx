@@ -509,8 +509,8 @@ export default function Home() {
           )}
       </motion.div>
 
-      {/* Volume Control - positioned at bottom right, mobile-friendly */}
-      <div className="fixed bottom-4 right-4 z-20">
+      {/* Volume Control - positioned to avoid button overlap on mobile */}
+      <div className="fixed bottom-20 sm:bottom-4 right-4 z-20">
         <VolumeControl
           volume={volume}
           muted={muted}

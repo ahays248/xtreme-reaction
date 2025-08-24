@@ -110,17 +110,25 @@ export default function VolumeControl({
               onChange={(e) => onMusicVolumeChange(parseInt(e.target.value))}
               disabled={musicMuted}
               className="flex-1 h-2 bg-green-900/50 rounded-lg appearance-none cursor-pointer 
+                [&::-webkit-slider-track]:bg-green-900/50
+                [&::-webkit-slider-track]:rounded-lg
+                [&::-webkit-slider-track]:h-2
                 [&::-webkit-slider-thumb]:appearance-none 
                 [&::-webkit-slider-thumb]:w-4 sm:w-3 
                 [&::-webkit-slider-thumb]:h-4 sm:h-3 
                 [&::-webkit-slider-thumb]:bg-green-400 
                 [&::-webkit-slider-thumb]:rounded-full 
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-moz-range-track]:bg-green-900/50
+                [&::-moz-range-track]:rounded-lg
+                [&::-moz-range-track]:h-2
                 [&::-moz-range-thumb]:w-4 sm:w-3
                 [&::-moz-range-thumb]:h-4 sm:h-3
                 [&::-moz-range-thumb]:bg-green-400
                 [&::-moz-range-thumb]:rounded-full
                 [&::-moz-range-thumb]:border-0
-                disabled:opacity-50"
+                [&::-moz-range-thumb]:cursor-pointer
+                disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <span className="text-green-400 text-xs font-mono min-w-[25px] sm:min-w-[30px] text-right">
               {musicMuted ? '0' : musicVolume}%
@@ -144,17 +152,25 @@ export default function VolumeControl({
               onChange={(e) => onVolumeChange(parseInt(e.target.value))}
               disabled={muted}
               className="flex-1 h-2 bg-green-900/50 rounded-lg appearance-none cursor-pointer 
+                [&::-webkit-slider-track]:bg-green-900/50
+                [&::-webkit-slider-track]:rounded-lg
+                [&::-webkit-slider-track]:h-2
                 [&::-webkit-slider-thumb]:appearance-none 
                 [&::-webkit-slider-thumb]:w-4 sm:w-3 
                 [&::-webkit-slider-thumb]:h-4 sm:h-3 
                 [&::-webkit-slider-thumb]:bg-green-400 
                 [&::-webkit-slider-thumb]:rounded-full 
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-moz-range-track]:bg-green-900/50
+                [&::-moz-range-track]:rounded-lg
+                [&::-moz-range-track]:h-2
                 [&::-moz-range-thumb]:w-4 sm:w-3
                 [&::-moz-range-thumb]:h-4 sm:h-3
                 [&::-moz-range-thumb]:bg-green-400
                 [&::-moz-range-thumb]:rounded-full
                 [&::-moz-range-thumb]:border-0
-                disabled:opacity-50"
+                [&::-moz-range-thumb]:cursor-pointer
+                disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <span className="text-green-400 text-xs font-mono min-w-[25px] sm:min-w-[30px] text-right">
               {muted ? '0' : volume}%
