@@ -46,6 +46,8 @@ After experiencing complexity spiral with the previous implementation, we've ado
 2. **IMPLEMENTATION_PLAN.md** - How we're building it (20 phases)
 3. **DATABASE_SCHEMA.md** - Database structure and relationships
 4. **PROJECT_STATUS.md** - Current development status
+5. **MOBILE_GUIDELINES.md** - 📱 CRITICAL: Mobile-first development rules
+6. **PHASE_10_CHANGES.md** - Major gameplay improvements made
 
 ## 🚀 HOW TO START DEVELOPMENT
 
@@ -152,6 +154,7 @@ git push
 3. **DO NOT** create complex state management
 4. **DO NOT** skip testing between phases
 5. **DO NOT** write more than 200 lines per phase
+6. **DO NOT** forget mobile-first design (see MOBILE_GUIDELINES.md)
 
 ### What TO Do
 1. **DO** follow the IMPLEMENTATION_PLAN.md exactly
@@ -159,6 +162,31 @@ git push
 3. **DO** keep code simple and readable
 4. **DO** commit and push to GitHub for live testing
 5. **DO** update PROJECT_STATUS.md after completing phases
+6. **DO** test on mobile viewport (375x667) FIRST
+
+## 📱 MOBILE-FIRST DEVELOPMENT
+
+### Quick Reference (ALWAYS USE)
+```jsx
+// Text sizing
+className="text-base sm:text-lg md:text-xl"
+
+// Spacing
+className="p-2 sm:p-4 md:p-6"
+
+// Buttons (min 44x44px touch target)
+className="px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px]"
+
+// Layout
+className="min-h-screen" // NOT h-screen
+className="pb-safe"       // For iOS safe areas
+```
+
+### Before EVERY Commit
+- [ ] Test at 375x667 (iPhone SE)
+- [ ] Buttons are tappable
+- [ ] Text is readable
+- [ ] Nothing cut off
 
 ## Game Mechanics (From Design Doc)
 1. One target appears at a time
