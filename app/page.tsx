@@ -29,6 +29,7 @@ export default function Home() {
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
   const lastTapTime = useRef<number>(0)
   const gameAreaRef = useRef<HTMLDivElement>(null)
+  const processingMiss = useRef<boolean>(false)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
   const { 
@@ -125,10 +126,12 @@ export default function Home() {
 
   const handleTargetClick = useClickHandler((e: React.PointerEvent) => {
     e.stopPropagation() // Prevent game area click handler
+    e.preventDefault() // Prevent default behavior
+    
     // Prevent double-tap registration (100ms cooldown)
     const now = Date.now()
     if (now - lastTapTime.current < 100) {
-      console.log('Double-tap prevented')
+      console.log('Double-tap prevented on target')
       return
     }
     lastTapTime.current = now
@@ -161,7 +164,11 @@ export default function Home() {
   })
   
   // Handle clicks on the game area (for miss detection)
-  const handleGameAreaClick = useClickHandler((e: React.PointerEvent) => {
+  // Don't use useClickHandler wrapper here to avoid double processing
+  const handleGameAreaClick = (e: React.PointerEvent) => {
+    // Only handle primary pointer (main mouse button or first touch)
+    if (!e.isPrimary) return
+    
     // Prevent double-tap registration (100ms cooldown)
     const now = Date.now()
     if (now - lastTapTime.current < 100) {
@@ -171,14 +178,16 @@ export default function Home() {
     
     // Only count as miss if game is playing and target is visible
     if (gameState.status === 'playing' && showTarget && targetShowTime.current > 0) {
-      // Prevent double registration if we're already showing miss feedback
-      if (showMissFeedback) return
+      // Prevent double registration with multiple checks
+      if (showMissFeedback || processingMiss.current) return
       
       // Check if click is in play area but not on target
       const clientX = e.clientX
       const clientY = e.clientY
       
       if (isClickInPlayArea(clientX, clientY)) {
+        // Set processing flag immediately
+        processingMiss.current = true
         // Update last tap time to prevent double registration
         lastTapTime.current = now
         
@@ -187,11 +196,17 @@ export default function Home() {
         if (soundEnabled) playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
-        setTimeout(() => setShowMissFeedback(false), 500)
+        
+        // Clear feedback and processing flag after delay
+        setTimeout(() => {
+          setShowMissFeedback(false)
+          processingMiss.current = false
+        }, 500)
+        
         console.log('Missed target - clicked wrong area')
       }
     }
-  })
+  }
 
   const handleEnableSound = async () => {
     // Initialize audio on user interaction
