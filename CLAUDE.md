@@ -100,17 +100,19 @@ XtremeReaction/
 # Install dependencies
 npm install
 
-# Run development server (port 3000)
-npm run dev
-
-# Build for production
+# Build for production (to check for errors)
 npm run build
 
 # Run type checking
 npm run typecheck
 
-# Run linting
-npm run lint
+# Push to GitHub for live testing
+git add .
+git commit -m "Phase X: Description"
+git push
+
+# The app will auto-deploy to Vercel
+# Test live at: https://xtreme-reaction.vercel.app
 ```
 
 ## Database Configuration
@@ -139,9 +141,9 @@ npm run lint
 
 ### What TO Do
 1. **DO** follow the IMPLEMENTATION_PLAN.md exactly
-2. **DO** test on mobile and desktop after each phase
+2. **DO** build and typecheck before committing
 3. **DO** keep code simple and readable
-4. **DO** commit after each successful phase
+4. **DO** commit and push to GitHub for live testing
 5. **DO** update PROJECT_STATUS.md after completing phases
 
 ## Game Mechanics (From Design Doc)
@@ -189,10 +191,11 @@ npm run lint
 ## Tips for AI Assistants
 - **ALWAYS** check which phase we're on before coding
 - **NEVER** implement features from future phases
-- **ALWAYS** test mobile touch events
-- **KEEP** state management minimal
+- **BUILD** and typecheck before committing
+- **PUSH** to GitHub for live testing via Vercel
 - **UPDATE** PROJECT_STATUS.md after completing work
 - **FOLLOW** the incremental approach strictly
+- **SKIP** local dev server testing - use Vercel deployment
 
 ## Lessons Learned from Previous Attempt
 1. **Complex timeout chains** → Use simple, linear logic

@@ -6,7 +6,8 @@ import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
-import { calculateAccuracy, calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
+import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
+import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -15,6 +16,7 @@ export default function Home() {
   const [lastReaction, setLastReaction] = useState<number | null>(null)
   const [lastMissed, setLastMissed] = useState(false)
   const [isTrapTarget, setIsTrapTarget] = useState(false)
+  const [showMissFeedback, setShowMissFeedback] = useState(false)
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -67,8 +69,11 @@ export default function Home() {
         // Missed a real target
         recordMiss()
         setLastMissed(true)
+        setShowMissFeedback(true)
         setLastReaction(null)
         targetShowTime.current = 0
+        // Clear miss feedback after 500ms
+        setTimeout(() => setShowMissFeedback(false), 500)
         nextRound()
         console.log('Target missed - too slow!')
       }
@@ -145,13 +150,15 @@ export default function Home() {
     <main className="min-h-screen bg-black text-green-500 flex flex-col items-center justify-between p-4">
       <div className="text-center mt-8">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Xtreme Reaction</h1>
-        <p className="text-xl mb-2">Phase 8: Scoring System</p>
+        <p className="text-xl mb-2">Phase 9: Accuracy & Streaks</p>
         <p className="text-sm opacity-70">
           Test your reflexes. Compete with the world. Share on X.
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-6 flex-grow justify-center">
+      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 ${
+        showMissFeedback ? 'border-4 border-red-500 animate-pulse' : ''
+      }`}>
         {/* Game status display */}
         {gameState.status === 'idle' && (
           <div className="text-center space-y-4">
@@ -187,6 +194,13 @@ export default function Home() {
                 <span>Misses: <span className="text-red-400">{gameState.misses}</span></span>
               </div>
               
+              {/* Streak display */}
+              {gameState.currentStreak > 0 && (
+                <div className="text-lg font-mono">
+                  Streak: <span className="text-orange-400">{gameState.currentStreak}</span> {getStreakMultiplier(gameState.currentStreak)}
+                </div>
+              )}
+              
               {/* Feedback message */}
               {lastMissed ? (
                 <div className="text-xl font-mono text-red-500">
@@ -218,13 +232,15 @@ export default function Home() {
           const avgReactionTime = gameState.reactionTimes.length > 0 
             ? calculateAverage(gameState.reactionTimes) 
             : 0
+          const streakBonus = calculateStreakBonus(gameState.bestStreak) * gameState.bestStreak
           // If trap hit, score is 0 (penalty for hitting trap)
           const finalScore = gameState.trapHit 
             ? 0 
             : calculateFinalScore(
                 gameState.hitScores,
                 accuracy,
-                gameState.difficultyLevel || 0
+                gameState.difficultyLevel || 0,
+                streakBonus
               )
           const grade = gameState.trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
           const highScore = getHighScore()
@@ -266,6 +282,12 @@ export default function Home() {
                 <p>Accuracy: <span className="text-blue-400">{accuracy}%</span></p>
                 {avgReactionTime > 0 && (
                   <p>Avg Time: <span className="text-yellow-400">{formatTime(avgReactionTime)}</span></p>
+                )}
+                {gameState.bestStreak > 0 && (
+                  <p>Best Streak: <span className="text-orange-400">{gameState.bestStreak} {getStreakMultiplier(gameState.bestStreak)}</span></p>
+                )}
+                {streakBonus > 0 && (
+                  <p>Streak Bonus: <span className="text-orange-400">+{streakBonus}</span></p>
                 )}
                 <p>Difficulty Reached: <span className="text-purple-400">{gameState.difficultyLevel || 0}%</span></p>
               </div>

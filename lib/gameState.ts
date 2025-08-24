@@ -11,6 +11,8 @@ export interface GameState {
   trapHit?: boolean // Track if game ended due to trap
   score: number // Current score
   hitScores: number[] // Individual scores for each hit
+  currentStreak: number // Current consecutive hits
+  bestStreak: number // Best streak this game
 }
 
 export const initialGameState: GameState = {
@@ -21,5 +23,7 @@ export const initialGameState: GameState = {
   misses: 0,
   reactionTimes: [],
   score: 0,
-  hitScores: []
+  hitScores: [],
+  currentStreak: 0,
+  bestStreak: 0
 }

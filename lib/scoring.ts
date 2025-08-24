@@ -13,26 +13,23 @@ export function calculateHitScore(reactionTime: number): number {
   return Math.round(baseScore)
 }
 
-/**
- * Calculate accuracy percentage
- */
-export function calculateAccuracy(hits: number, misses: number): number {
-  const total = hits + misses
-  if (total === 0) return 100 // No attempts yet
-  return Math.round((hits / total) * 100)
-}
+// Accuracy calculation moved to statistics.ts for Phase 9
 
 /**
- * Calculate final score with accuracy and difficulty multipliers
- * Formula: Final Score = Sum of Hit Scores * (accuracy / 100) * difficulty_multiplier
+ * Calculate final score with accuracy, difficulty, and streak multipliers
+ * Formula: Final Score = (Sum of Hit Scores + Streak Bonus) * (accuracy / 100) * difficulty_multiplier
  */
 export function calculateFinalScore(
   hitScores: number[],
   accuracy: number,
-  difficultyReached: number
+  difficultyReached: number,
+  streakBonus: number = 0
 ): number {
   // Sum all individual hit scores
   const totalHitScore = hitScores.reduce((sum, score) => sum + score, 0)
+  
+  // Add streak bonus to base score
+  const baseScore = totalHitScore + streakBonus
   
   // Apply accuracy multiplier (0.0 to 1.0)
   const accuracyMultiplier = accuracy / 100
@@ -41,7 +38,7 @@ export function calculateFinalScore(
   const difficultyMultiplier = 1 + (difficultyReached / 100) * 0.5
   
   // Calculate final score
-  const finalScore = totalHitScore * accuracyMultiplier * difficultyMultiplier
+  const finalScore = baseScore * accuracyMultiplier * difficultyMultiplier
   
   return Math.round(finalScore)
 }

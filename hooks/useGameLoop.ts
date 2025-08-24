@@ -32,19 +32,26 @@ export function useGameLoop() {
 
   const recordHit = useCallback((reactionTime: number) => {
     const hitScore = calculateHitScore(reactionTime)
-    setGameState(prev => ({
-      ...prev,
-      hits: prev.hits + 1,
-      reactionTimes: [...prev.reactionTimes, reactionTime],
-      score: prev.score + hitScore,
-      hitScores: [...prev.hitScores, hitScore]
-    }))
+    setGameState(prev => {
+      const newStreak = prev.currentStreak + 1
+      const bestStreak = Math.max(newStreak, prev.bestStreak)
+      return {
+        ...prev,
+        hits: prev.hits + 1,
+        reactionTimes: [...prev.reactionTimes, reactionTime],
+        score: prev.score + hitScore,
+        hitScores: [...prev.hitScores, hitScore],
+        currentStreak: newStreak,
+        bestStreak
+      }
+    })
   }, [])
 
   const recordMiss = useCallback(() => {
     setGameState(prev => ({
       ...prev,
-      misses: prev.misses + 1
+      misses: prev.misses + 1,
+      currentStreak: 0 // Reset streak on miss
     }))
   }, [])
 
