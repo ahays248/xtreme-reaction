@@ -31,7 +31,22 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
-  const { playSound, playMusic, switchMusic, stopMusic, volume, setVolume, muted, toggleMute, initializeAudio, initialized } = useSound()
+  const { 
+    playSound, 
+    playMusic, 
+    switchMusic, 
+    stopMusic, 
+    volume, 
+    setVolume, 
+    musicVolume,
+    setMusicVolume,
+    muted, 
+    toggleMute,
+    musicMuted,
+    toggleMusicMute,
+    initializeAudio, 
+    initialized 
+  } = useSound()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -499,8 +514,12 @@ export default function Home() {
         <VolumeControl
           volume={volume}
           muted={muted}
+          musicVolume={musicVolume}
+          musicMuted={musicMuted}
           onVolumeChange={setVolume}
           onToggleMute={toggleMute}
+          onMusicVolumeChange={setMusicVolume}
+          onToggleMusicMute={toggleMusicMute}
         />
       </div>
     </main>
