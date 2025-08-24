@@ -325,16 +325,27 @@ components/
 
 ### Tasks
 - [ ] Verify Supabase project exists (already created)
+- [ ] Add environment variables to Vercel (see below)
 - [ ] Apply migration 004_align_with_new_design.sql
 - [ ] Generate TypeScript types from database
 - [ ] Test database connection
-- [ ] Configure environment variables
+- [ ] Verify Vercel deployment can connect to database
+
+### Required Environment Variables for Vercel
+Add these in Vercel Dashboard > Settings > Environment Variables:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xhcfjhzfyozzuicubqmh.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<get_from_.env.local>
+SUPABASE_SERVICE_ROLE_KEY=<get_from_.env.local>
+```
+⚠️ Service role key is SECRET - never expose to client!
 
 ### Success Criteria
 - Database accessible from application
 - All migrations applied successfully
 - TypeScript types match schema
 - Basic CRUD operations work
+- Vercel deployment can connect to Supabase
 
 ### Database Tables Used
 - `profiles` - User profile data
@@ -358,10 +369,34 @@ lib/
 
 ### Tasks
 - [ ] Configure X OAuth in Supabase dashboard
+- [ ] Set up X Developer App for OAuth credentials
+- [ ] Add environment variables to Vercel
 - [ ] Add login button with X branding
 - [ ] Handle auth flow and callbacks
 - [ ] Auto-create profile on first login
 - [ ] Display username when logged in
+
+### X OAuth Setup Instructions
+1. **Create X Developer App**:
+   - Go to https://developer.x.com/en/apps
+   - Click "Create an app"
+   - Name: "Xtreme Reaction"
+   - App permissions: Read only
+   - Callback URL: `https://xhcfjhzfyozzuicubqmh.supabase.co/auth/v1/callback`
+
+2. **Configure in Supabase Dashboard**:
+   - Go to Authentication > Providers
+   - Enable "Twitter" provider
+   - Add API Key (Client ID) from X
+   - Add API Secret (Client Secret) from X
+   - Save configuration
+
+3. **Add Environment Variables to Vercel**:
+   ```
+   NEXT_PUBLIC_X_CLIENT_ID=<your_x_api_key>
+   X_CLIENT_SECRET=<your_x_api_secret>
+   ```
+   Note: Client secret should NOT have NEXT_PUBLIC prefix for security
 
 ### Success Criteria
 - Successful X login
