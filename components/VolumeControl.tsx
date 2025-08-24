@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 
 interface VolumeControlProps {
@@ -40,13 +40,14 @@ export default function VolumeControl({
   }
 
   return (
-    <motion.div 
-      className={`${expanded ? 'flex-col gap-2 sm:gap-3 min-w-[180px] sm:min-w-[280px]' : 'flex-row gap-1 sm:gap-4'} flex bg-black/90 sm:backdrop-blur-sm rounded-lg px-2 sm:px-4 py-1 sm:py-2 border border-green-500/30`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-    >
-      <div className="flex items-center gap-1 sm:gap-4">
+    <div className="relative">
+      <motion.div 
+        className="flex flex-row gap-1 sm:gap-4 bg-black/90 sm:backdrop-blur-sm rounded-lg px-2 sm:px-4 py-1 sm:py-2 border border-green-500/30"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <div className="flex items-center gap-1 sm:gap-4">
         {/* Quick Mute Button - Smaller on mobile */}
         <button
           onClick={handleQuickMute}
@@ -88,11 +89,19 @@ export default function VolumeControl({
             {allMuted ? 'MUTED' : `${Math.round((musicVolume + volume) / 2)}%`}
           </span>
         )}
-      </div>
+        </div>
+      </motion.div>
 
-      {/* Expanded controls - Compact on mobile */}
-      {expanded && (
-        <div className="flex flex-col gap-1 sm:gap-2 w-full">
+      {/* Expanded controls - Dropdown on mobile, inline on desktop */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div 
+          className="absolute top-full mt-1 right-0 sm:static sm:mt-0 bg-black/95 border border-green-500/30 rounded-lg p-2 sm:p-3 z-50 min-w-[160px] sm:min-w-[280px]"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+        >
+          <div className="flex flex-col gap-1 sm:gap-2 w-full">
           {/* Music Volume */}
           <div className="flex items-center gap-1 sm:gap-2 w-full">
             <span className="text-green-400 text-[10px] sm:text-xs font-mono min-w-[35px] sm:min-w-[50px]">Music:</span>
@@ -176,8 +185,10 @@ export default function VolumeControl({
               {muted ? '0' : volume}%
             </span>
           </div>
-        </div>
-      )}
-    </motion.div>
+          </div>
+        </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
