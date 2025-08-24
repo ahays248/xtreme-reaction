@@ -183,7 +183,10 @@ export default function Home() {
             transition={{ duration: 0.3 }}
           >
             <p className="text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
-            <p className="text-sm opacity-70 font-mono">Hit 10 targets as fast as you can!</p>
+            <div className="space-y-2">
+              <p className="text-sm opacity-70 font-mono">Hit 10 GREEN targets as fast as you can!</p>
+              <p className="text-sm text-neon-red font-mono">⚠️ Don't click the RED targets! ⚠️</p>
+            </div>
             {getHighScore() > 0 && (
               <motion.p 
                 className="text-lg font-mono"
@@ -267,14 +270,14 @@ export default function Home() {
 
             {/* Timeout indicator with dynamic value */}
             <AnimatePresence>
-              {showTarget && (
+              {showTarget && !isTrapTarget && (
                 <motion.div 
                   className="text-xs font-mono opacity-70 text-neon-cyan"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {isTrapTarget ? "⚠️ DON'T CLICK THE RED! ⚠️" : `React within ${(currentDifficulty.timeout / 1000).toFixed(1)} seconds!`}
+                  React within {(currentDifficulty.timeout / 1000).toFixed(1)} seconds!
                 </motion.div>
               )}
             </AnimatePresence>
