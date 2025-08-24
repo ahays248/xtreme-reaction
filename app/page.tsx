@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Target from '@/components/Target'
+import MatrixRain from '@/components/MatrixRain'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
@@ -147,82 +149,139 @@ export default function Home() {
     : getDifficultyConfig(1, gameState.maxRounds)
 
   return (
-    <main className="min-h-screen bg-black text-green-500 flex flex-col items-center justify-between p-4">
-      <div className="text-center mt-8">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">Xtreme Reaction</h1>
-        <p className="text-xl mb-2">Phase 9: Accuracy & Streaks</p>
-        <p className="text-sm opacity-70">
+    <main className="min-h-screen bg-black text-neon-green flex flex-col items-center justify-between p-4 relative overflow-hidden">
+      <MatrixRain />
+      
+      {/* Scanline effect */}
+      <div className="scanline" />
+      
+      {/* Header with cyberpunk styling */}
+      <motion.div 
+        className="text-center mt-8 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl md:text-6xl font-orbitron font-black mb-4 text-glow-green animate-flicker">
+          XTREME REACTION
+        </h1>
+        <p className="text-xl mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
+        <p className="text-sm opacity-70 font-rajdhani">
           Test your reflexes. Compete with the world. Share on X.
         </p>
-      </div>
+      </motion.div>
 
-      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 ${
-        showMissFeedback ? 'border-4 border-red-500 animate-pulse' : ''
+      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 z-10 ${
+        showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
       }`}>
         {/* Game status display */}
         {gameState.status === 'idle' && (
-          <div className="text-center space-y-4">
-            <p className="text-2xl">Ready to test your reflexes?</p>
-            <p className="text-sm opacity-70">Hit 10 targets as fast as you can!</p>
+          <motion.div 
+            className="text-center space-y-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
+            <p className="text-sm opacity-70 font-mono">Hit 10 targets as fast as you can!</p>
             {getHighScore() > 0 && (
-              <p className="text-lg font-mono">
-                High Score: <span className="text-yellow-400">{formatScore(getHighScore())}</span>
-              </p>
+              <motion.p 
+                className="text-lg font-mono"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                High Score: <span className="text-neon-yellow text-glow">{formatScore(getHighScore())}</span>
+              </motion.p>
             )}
-          </div>
+          </motion.div>
         )}
 
         {gameState.status === 'playing' && (
           <>
             {/* Game stats header */}
-            <div className="flex justify-between items-center w-full max-w-md">
+            <motion.div 
+              className="flex justify-between items-center w-full max-w-md px-4 py-2 border-2 border-neon-green/30 bg-black/50 backdrop-blur-sm shadow-neon-green rounded-lg"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <div className="text-lg font-mono">
-                Score: <span className="text-yellow-400">{formatScore(gameState.score)}</span>
+                Score: <span className="text-neon-yellow font-bold">{formatScore(gameState.score)}</span>
               </div>
-              <div className="text-xl font-mono">
-                Round {gameState.currentRound} / {gameState.maxRounds}
+              <div className="text-xl font-orbitron font-bold text-neon-cyan">
+                {gameState.currentRound}/{gameState.maxRounds}
               </div>
               <div className="text-lg font-mono">
-                Accuracy: <span className="text-green-400">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
+                Accuracy: <span className="text-neon-green font-bold">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Stats display */}
             <div className="text-center space-y-2">
               <div className="text-lg font-mono space-x-4">
-                <span>Hits: <span className="text-green-400">{gameState.hits}</span></span>
-                <span>Misses: <span className="text-red-400">{gameState.misses}</span></span>
+                <span>Hits: <span className="text-neon-green font-bold">{gameState.hits}</span></span>
+                <span>Misses: <span className="text-neon-red font-bold">{gameState.misses}</span></span>
               </div>
               
               {/* Streak display */}
-              {gameState.currentStreak > 0 && (
-                <div className="text-lg font-mono">
-                  Streak: <span className="text-orange-400">{gameState.currentStreak}</span> {getStreakMultiplier(gameState.currentStreak)}
-                </div>
-              )}
+              <AnimatePresence>
+                {gameState.currentStreak > 0 && (
+                  <motion.div 
+                    className="text-lg font-mono"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    transition={{ type: "spring", stiffness: 500 }}
+                  >
+                    Streak: <span className="text-orange-400 text-glow font-bold">{gameState.currentStreak}</span> {getStreakMultiplier(gameState.currentStreak)}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               {/* Feedback message */}
-              {lastMissed ? (
-                <div className="text-xl font-mono text-red-500">
-                  MISSED! Too slow!
-                </div>
-              ) : lastReaction !== null && (
-                <div className="text-xl font-mono">
-                  Last: <span className="text-yellow-400">{formatTime(lastReaction)}</span>
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {lastMissed ? (
+                  <motion.div 
+                    key="missed"
+                    className="text-xl font-mono text-neon-red text-glow-red"
+                    initial={{ scale: 1.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    MISSED! Too slow!
+                  </motion.div>
+                ) : lastReaction !== null && (
+                  <motion.div 
+                    key="reaction"
+                    className="text-xl font-mono"
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 10, opacity: 0 }}
+                  >
+                    Last: <span className="text-neon-yellow font-bold">{formatTime(lastReaction)}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Timeout indicator with dynamic value */}
-            {showTarget && (
-              <div className="text-xs font-mono opacity-50">
-                {isTrapTarget ? "DON'T CLICK THE RED!" : `React within ${(currentDifficulty.timeout / 1000).toFixed(1)} seconds!`}
-              </div>
-            )}
+            <AnimatePresence>
+              {showTarget && (
+                <motion.div 
+                  className="text-xs font-mono opacity-70 text-neon-cyan"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {isTrapTarget ? "⚠️ DON'T CLICK THE RED! ⚠️" : `React within ${(currentDifficulty.timeout / 1000).toFixed(1)} seconds!`}
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             {/* Difficulty indicator */}
-            <div className="text-sm font-mono opacity-70">
-              Difficulty: {currentDifficulty.difficultyPercent}%
+            <div className="text-sm font-mono opacity-70 text-neon-cyan">
+              Difficulty: <span className="font-bold">{currentDifficulty.difficultyPercent}%</span>
             </div>
           </>
         )}
@@ -252,46 +311,66 @@ export default function Home() {
           }
           
           return (
-            <div className="text-center space-y-4">
-              <p className="text-3xl font-bold">
-                {gameState.trapHit ? 'TRAP HIT!' : 'Game Over!'}
-              </p>
+            <motion.div 
+              className="text-center space-y-4 p-6 border-2 border-neon-green/50 bg-black/70 backdrop-blur-sm rounded-lg shadow-neon-intense"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <motion.p 
+                className={`text-3xl font-orbitron font-bold ${gameState.trapHit ? 'text-neon-red glitch' : 'text-neon-green'}`}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                {gameState.trapHit ? 'TRAP HIT!' : 'GAME OVER!'}
+              </motion.p>
               {gameState.trapHit && (
-                <p className="text-xl text-red-500">You clicked a red trap target!</p>
+                <p className="text-xl text-neon-red text-glow-red">You clicked a red trap target!</p>
               )}
               
               {/* Final Score Display */}
               <div className="space-y-2">
-                <p className="text-xl">Final Score</p>
-                <p className="text-5xl font-bold text-yellow-400">
+                <p className="text-xl font-rajdhani">Final Score</p>
+                <motion.p 
+                  className="text-5xl font-orbitron font-black text-neon-yellow text-glow"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, delay: 0.2 }}
+                >
                   {formatScore(finalScore)}
-                </p>
-                <p className="text-2xl font-bold">Grade: {grade}</p>
+                </motion.p>
+                <p className="text-2xl font-bold font-mono text-neon-cyan">Grade: <span className="text-glow">{grade}</span></p>
                 {isNewHigh && (
-                  <p className="text-xl text-green-400 animate-pulse">NEW HIGH SCORE!</p>
+                  <motion.p 
+                    className="text-xl text-neon-green text-glow-green"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  >
+                    NEW HIGH SCORE!
+                  </motion.p>
                 )}
                 {!isNewHigh && highScore > 0 && (
-                  <p className="text-sm opacity-70">High Score: {formatScore(highScore)}</p>
+                  <p className="text-sm opacity-70 font-mono">High Score: {formatScore(highScore)}</p>
                 )}
               </div>
               
               {/* Detailed Stats */}
-              <div className="text-lg font-mono space-y-1">
-                <p>Hits: <span className="text-green-400">{gameState.hits}</span></p>
-                <p>Misses: <span className="text-red-400">{gameState.misses}</span></p>
-                <p>Accuracy: <span className="text-blue-400">{accuracy}%</span></p>
+              <div className="text-lg font-mono space-y-1 pt-4 border-t border-neon-green/30">
+                <p>Hits: <span className="text-neon-green font-bold">{gameState.hits}</span></p>
+                <p>Misses: <span className="text-neon-red font-bold">{gameState.misses}</span></p>
+                <p>Accuracy: <span className="text-neon-cyan font-bold">{accuracy}%</span></p>
                 {avgReactionTime > 0 && (
-                  <p>Avg Time: <span className="text-yellow-400">{formatTime(avgReactionTime)}</span></p>
+                  <p>Avg Time: <span className="text-neon-yellow font-bold">{formatTime(avgReactionTime)}</span></p>
                 )}
                 {gameState.bestStreak > 0 && (
-                  <p>Best Streak: <span className="text-orange-400">{gameState.bestStreak} {getStreakMultiplier(gameState.bestStreak)}</span></p>
+                  <p>Best Streak: <span className="text-orange-400 font-bold">{gameState.bestStreak} {getStreakMultiplier(gameState.bestStreak)}</span></p>
                 )}
                 {streakBonus > 0 && (
-                  <p>Streak Bonus: <span className="text-orange-400">+{streakBonus}</span></p>
+                  <p>Streak Bonus: <span className="text-orange-400 font-bold">+{streakBonus}</span></p>
                 )}
-                <p>Difficulty Reached: <span className="text-purple-400">{gameState.difficultyLevel || 0}%</span></p>
+                <p>Difficulty Reached: <span className="text-purple-400 font-bold">{gameState.difficultyLevel || 0}%</span></p>
               </div>
-            </div>
+            </motion.div>
           )
         })()}
 
@@ -304,42 +383,55 @@ export default function Home() {
       </div>
 
       {/* Game controls - moved to bottom */}
-      <div className="flex gap-4 mb-8">
+      <motion.div 
+        className="flex gap-4 mb-8 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
           {gameState.status === 'idle' && (
-            <button
+            <motion.button
               onClick={handleStartGame}
-              className="px-8 py-4 bg-green-500 text-black font-bold text-xl rounded hover:bg-green-400 transition-colors"
+              className="px-8 py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-xl rounded-lg hover:bg-neon-green hover:text-black transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Start Game
-            </button>
+              START GAME
+            </motion.button>
           )}
           
           {gameState.status === 'gameOver' && (
             <>
-              <button
+              <motion.button
                 onClick={handleStartGame}
-                className="px-6 py-3 bg-green-500 text-black font-bold rounded hover:bg-green-400 transition-colors"
+                className="px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green hover:text-black transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                Play Again
-              </button>
-              <button
+                PLAY AGAIN
+              </motion.button>
+              <motion.button
                 onClick={handleReset}
-                className="px-6 py-3 bg-gray-700 text-white font-bold rounded hover:bg-gray-600 transition-colors"
+                className="px-6 py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                Back to Menu
-              </button>
+                MENU
+              </motion.button>
             </>
           )}
           
           {gameState.status === 'playing' && (
-            <button
+            <motion.button
               onClick={handleReset}
-              className="px-4 py-2 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors opacity-70"
+              className="px-4 py-2 bg-black border border-gray-600 text-gray-400 font-mono text-sm rounded hover:border-red-500 hover:text-red-500 transition-all duration-200 opacity-70"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              End Game
-            </button>
+              END GAME
+            </motion.button>
           )}
-      </div>
+      </motion.div>
     </main>
   )
 }

@@ -1,23 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Orbitron, Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
   subsets: ["latin"],
+  weight: ["400", "700", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const rajdhani = Rajdhani({
+  variable: "--font-rajdhani",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const shareTechMono = Share_Tech_Mono({
+  variable: "--font-share-tech",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
   title: "Xtreme Reaction - Test Your Reflexes",
   description: "Challenge your reaction time with this fast-paced reflex game. Compete on leaderboards and share your scores!",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  themeColor: "#111827",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#000000',
 };
 
 export default function RootLayout({
@@ -28,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${orbitron.variable} ${rajdhani.variable} ${shareTechMono.variable} antialiased`}
       >
         {children}
       </body>

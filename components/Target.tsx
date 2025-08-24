@@ -1,3 +1,6 @@
+'use client'
+
+import { motion, AnimatePresence } from 'framer-motion'
 import { getTargetSizeClass } from '@/lib/difficulty'
 
 interface TargetProps {
@@ -8,24 +11,65 @@ interface TargetProps {
 }
 
 export default function Target({ isVisible, onTargetClick, size = 96, variant = 'normal' }: TargetProps) {
-  if (!isVisible) return null
-
   // Get appropriate Tailwind class for size
   const sizeClass = getTargetSizeClass(size)
   
   // Determine colors based on variant
   const isTrap = variant === 'trap'
   const bgColor = isTrap ? 'bg-red-500' : 'bg-green-500'
-  const hoverColor = isTrap ? 'hover:bg-red-400' : 'hover:bg-green-400'
-  const shadowColor = isTrap ? 'shadow-red-500/50' : 'shadow-green-500/50'
+  const glowColor = isTrap ? '#ff0000' : '#00ff00'
+  const pulseGlow = isTrap 
+    ? ['0 0 20px rgba(255, 0, 0, 0.5)', '0 0 40px rgba(255, 0, 0, 0.8)', '0 0 20px rgba(255, 0, 0, 0.5)']
+    : ['0 0 20px rgba(0, 255, 0, 0.5)', '0 0 40px rgba(0, 255, 0, 0.8)', '0 0 20px rgba(0, 255, 0, 0.5)']
 
   return (
-    <div 
-      className={`${sizeClass} ${bgColor} rounded-full shadow-lg ${shadowColor} cursor-pointer ${hoverColor} transition-all duration-200`}
-      onPointerDown={onTargetClick}
-      aria-label={isTrap ? "Trap circle - don't click!" : "Target circle"}
-      role="button"
-      tabIndex={0}
-    />
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div 
+          className={`${sizeClass} ${bgColor} rounded-full cursor-pointer relative`}
+          onPointerDown={onTargetClick}
+          aria-label={isTrap ? "Trap circle - don't click!" : "Target circle"}
+          role="button"
+          tabIndex={0}
+          // Spawn animation
+          initial={{ 
+            scale: 0,
+            filter: `drop-shadow(0 0 0px ${glowColor})`
+          }}
+          animate={{ 
+            scale: [0, 1.2, 1],
+            filter: [
+              `drop-shadow(0 0 0px ${glowColor})`,
+              `drop-shadow(0 0 30px ${glowColor})`,
+              `drop-shadow(0 0 20px ${glowColor})`
+            ],
+            boxShadow: pulseGlow
+          }}
+          exit={{ 
+            scale: 0,
+            filter: `drop-shadow(0 0 40px ${glowColor})`,
+            transition: { duration: 0.2 }
+          }}
+          transition={{
+            scale: { duration: 0.3, ease: "backOut" },
+            filter: { duration: 0.3 },
+            boxShadow: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+          }}
+          whileHover={{
+            scale: 1.05,
+            filter: `drop-shadow(0 0 35px ${glowColor})`,
+            transition: { duration: 0.1 }
+          }}
+          whileTap={{
+            scale: 0.95,
+            filter: `drop-shadow(0 0 50px ${glowColor})`
+          }}
+        >
+          {/* Inner glow effect */}
+          <div className="absolute inset-0 rounded-full animate-ping opacity-30"
+               style={{ backgroundColor: glowColor }} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
