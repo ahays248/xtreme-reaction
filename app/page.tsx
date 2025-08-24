@@ -10,6 +10,7 @@ import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } fr
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
+import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -19,10 +20,12 @@ export default function Home() {
   const [lastMissed, setLastMissed] = useState(false)
   const [isTrapTarget, setIsTrapTarget] = useState(false)
   const [showMissFeedback, setShowMissFeedback] = useState(false)
+  const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
   const lastTapTime = useRef<number>(0)
+  const gameAreaRef = useRef<HTMLDivElement>(null)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
 
@@ -48,6 +51,10 @@ export default function Home() {
     // 25% chance of trap target (increases slightly with difficulty)
     const trapChance = 0.20 + (gameState.currentRound / gameState.maxRounds) * 0.10 // 20-30%
     const isCurrentTrap = Math.random() < trapChance
+    
+    // Generate random position for this target
+    const newPosition = generateRandomPosition()
+    setTargetPosition(newPosition)
     
     setIsTrapTarget(isCurrentTrap)
     setShowTarget(true)
@@ -82,7 +89,8 @@ export default function Home() {
     }, difficulty.timeout)
   }
 
-  const handleTargetClick = useClickHandler(() => {
+  const handleTargetClick = useClickHandler((e: React.PointerEvent) => {
+    e.stopPropagation() // Prevent game area click handler
     // Prevent double-tap registration (100ms cooldown)
     const now = Date.now()
     if (now - lastTapTime.current < 100) {
@@ -112,6 +120,25 @@ export default function Home() {
         targetShowTime.current = 0
         nextRound()
         console.log(`Reaction time: ${reactionTime}ms`)
+      }
+    }
+  })
+  
+  // Handle clicks on the game area (for miss detection)
+  const handleGameAreaClick = useClickHandler((e: React.PointerEvent) => {
+    // Only count as miss if game is playing and target is visible
+    if (gameState.status === 'playing' && showTarget && targetShowTime.current > 0) {
+      // Check if click is in play area but not on target
+      const clientX = e.clientX
+      const clientY = e.clientY
+      
+      if (isClickInPlayArea(clientX, clientY)) {
+        // This is a miss - clicked in play area but not on target
+        recordMiss()
+        setLastMissed(true)
+        setShowMissFeedback(true)
+        setTimeout(() => setShowMissFeedback(false), 500)
+        console.log('Missed target - clicked wrong area')
       }
     }
   })
@@ -171,9 +198,13 @@ export default function Home() {
         </p>
       </motion.div>
 
-      <div className={`flex flex-col items-center gap-4 md:gap-6 flex-grow justify-center transition-all duration-200 z-10 w-full max-w-2xl ${
-        showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
-      }`}>
+      <div 
+        ref={gameAreaRef}
+        className={`flex flex-col items-center gap-4 md:gap-6 flex-grow justify-center transition-all duration-200 z-10 w-full max-w-2xl relative ${
+          showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
+        }`}
+        onPointerDown={handleGameAreaClick}
+      >
         {/* Game status display */}
         {gameState.status === 'idle' && (
           <motion.div 
@@ -377,14 +408,26 @@ export default function Home() {
           )
         })()}
 
-        <div className="h-24 md:h-32 flex items-center justify-center">
-          <Target 
-            isVisible={showTarget && gameState.status === 'playing'} 
-            onTargetClick={handleTargetClick}
-            size={currentDifficulty.targetSize}
-            variant={isTrapTarget ? 'trap' : 'normal'}
+        {/* Play area visualization (optional - for debugging) */}
+        {gameState.status === 'playing' && (
+          <div 
+            className="absolute border-2 border-neon-green/10 pointer-events-none z-0"
+            style={{
+              left: `${getPlayAreaBounds().minX}%`,
+              right: `${100 - getPlayAreaBounds().maxX}%`,
+              top: `${getPlayAreaBounds().minY}%`,
+              bottom: `${100 - getPlayAreaBounds().maxY}%`
+            }}
           />
-        </div>
+        )}
+        
+        <Target 
+          isVisible={showTarget && gameState.status === 'playing'} 
+          onTargetClick={handleTargetClick}
+          size={currentDifficulty.targetSize}
+          variant={isTrapTarget ? 'trap' : 'normal'}
+          position={targetPosition}
+        />
       </div>
 
       {/* Game controls - moved to bottom */}

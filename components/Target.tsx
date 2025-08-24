@@ -8,9 +8,10 @@ interface TargetProps {
   onTargetClick?: (e: React.PointerEvent) => void
   size?: number
   variant?: 'normal' | 'trap'
+  position?: { x: number; y: number } // Position in percentages
 }
 
-export default function Target({ isVisible, onTargetClick, size = 96, variant = 'normal' }: TargetProps) {
+export default function Target({ isVisible, onTargetClick, size = 96, variant = 'normal', position }: TargetProps) {
   // Get appropriate Tailwind class for size
   const sizeClass = getTargetSizeClass(size)
   
@@ -21,12 +22,21 @@ export default function Target({ isVisible, onTargetClick, size = 96, variant = 
   const pulseGlow = isTrap 
     ? ['0 0 20px rgba(255, 0, 0, 0.5)', '0 0 40px rgba(255, 0, 0, 0.8)', '0 0 20px rgba(255, 0, 0, 0.5)']
     : ['0 0 20px rgba(0, 255, 0, 0.5)', '0 0 40px rgba(0, 255, 0, 0.8)', '0 0 20px rgba(0, 255, 0, 0.5)']
+  
+  // Calculate position styles
+  const positionStyle = position ? {
+    position: 'fixed' as const,
+    left: `${position.x}%`,
+    top: `${position.y}%`,
+    transform: 'translate(-50%, -50%)'
+  } : {}
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div 
           className={`${sizeClass} ${bgColor} rounded-full cursor-pointer relative`}
+          style={positionStyle}
           onPointerDown={onTargetClick}
           aria-label={isTrap ? "Trap circle - don't click!" : "Target circle"}
           role="button"
