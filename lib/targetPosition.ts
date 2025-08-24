@@ -35,16 +35,20 @@ export function getPlayAreaBounds(): { minX: number; maxX: number; minY: number;
 /**
  * Generate a random position within the play area
  * Ensures targets don't spawn too close to edges
+ * IMPORTANT: Targets must spawn within the same bounds used by isClickInPlayArea
  */
 export function generateRandomPosition(): TargetPosition {
   const bounds = getPlayAreaBounds()
   
-  // Add 5% padding to prevent targets from being cut off at edges
-  const paddedMinX = bounds.minX + 5
-  const paddedMaxX = bounds.maxX - 5
-  const paddedMinY = bounds.minY + 5
-  const paddedMaxY = bounds.maxY - 5
+  // Add padding to account for target size (roughly 3% of viewport on each side)
+  // This ensures the entire target is clickable and within the play area
+  const targetPadding = 3
+  const paddedMinX = bounds.minX + targetPadding
+  const paddedMaxX = bounds.maxX - targetPadding
+  const paddedMinY = bounds.minY + targetPadding
+  const paddedMaxY = bounds.maxY - targetPadding
   
+  // Generate position within the padded bounds
   const x = Math.random() * (paddedMaxX - paddedMinX) + paddedMinX
   const y = Math.random() * (paddedMaxY - paddedMinY) + paddedMinY
   
