@@ -46,9 +46,6 @@ export default function PerformanceCard({
   const speedBar = Math.max(0, Math.min(100, (500 - avgReactionTime) / 5)) // 0ms = 100%, 500ms = 0%
   const streakBar = Math.min(bestStreak * 10, 100) // 10 streak = 100%
   
-  // Debug accuracy
-  console.log('Accuracy:', accuracy, 'AccuracyBar:', accuracyBar)
-  
   return (
     <motion.div 
       className="w-full max-w-lg mx-auto p-4 sm:p-6 space-y-4"
@@ -122,7 +119,7 @@ export default function PerformanceCard({
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-neon-green"
+              className="h-full bg-green-500"
               initial={{ width: "0%" }}
               animate={{ width: `${accuracyBar}%` }}
               transition={{ duration: 0.5, delay: 0.5 }}
