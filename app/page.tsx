@@ -218,12 +218,15 @@ export default function Home() {
           const avgReactionTime = gameState.reactionTimes.length > 0 
             ? calculateAverage(gameState.reactionTimes) 
             : 0
-          const finalScore = calculateFinalScore(
-            gameState.hitScores,
-            accuracy,
-            gameState.difficultyLevel || 0
-          )
-          const grade = getScoreGrade(avgReactionTime, accuracy)
+          // If trap hit, score is 0 (penalty for hitting trap)
+          const finalScore = gameState.trapHit 
+            ? 0 
+            : calculateFinalScore(
+                gameState.hitScores,
+                accuracy,
+                gameState.difficultyLevel || 0
+              )
+          const grade = gameState.trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
           const highScore = getHighScore()
           const isNewHigh = isNewHighScore(finalScore)
           
