@@ -73,7 +73,7 @@ After experiencing complexity spiral with the previous implementation, we've ado
 # - This is expected at 50% completion
 ```
 
-### Phase 11 Complete + Audio Enhancements!
+### Phase 11 Complete + Major Bug Fixes (August 24, 2025)!
 ```bash
 # DONE: Sound Effects Implementation
 # - Web Audio API for instant playback
@@ -83,12 +83,19 @@ After experiencing complexity spiral with the previous implementation, we've ado
 # - Mobile header bar with compact volume controls
 # - Desktop volume controls in top-right corner
 
-# Key Lessons from Audio Implementation:
+# CRITICAL BUG FIXES TODAY:
+# 1. Title no longer shows during gameplay (was overlapping)
+# 2. Sound requires explicit opt-in (no auto-enable)
+# 3. Targets spawn within visual container bounds
+# 4. Fixed double miss registration (race condition)
+# 5. Desktop play area properly calculated for max-w-2xl
+
+# Key Lessons Learned:
 # 1. Mobile browsers require user interaction to play audio
-# 2. AudioContext can be suspended and needs resuming
-# 3. Music should track what's playing even when muted
-# 4. Mobile UI needs dropdown design to avoid overflow
-# 5. Header bar solves mobile control placement issues
+# 2. Use processingMiss flags to prevent concurrent events
+# 3. Don't wrap all handlers in useClickHandler
+# 4. Desktop containers need special bounds calculations
+# 5. Clear state immediately in timeout handlers
 ```
 
 ### Phase 12 Quick Start

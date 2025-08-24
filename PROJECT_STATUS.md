@@ -1,6 +1,6 @@
 # PROJECT STATUS - Xtreme Reaction
 
-**Last Updated**: December 2024
+**Last Updated**: August 24, 2025
 **Current Phase**: 11 Complete → Ready for Phase 12
 
 ## ✅ COMPLETED PHASES (1-11)
@@ -55,16 +55,37 @@
 - All music/sounds work after initialization
 - Dropdown volume controls to save space
 
-## 🐛 RECENT FIXES
+## 🐛 RECENT FIXES (August 24, 2025)
 
-### Audio System
+### Title Display Issues
+- **FIXED**: Title now hidden during gameplay to prevent overlap
+- **FIXED**: Round counter no longer overlaps with title on mobile
+- **FIXED**: Streak indicator positioning on desktop
+
+### Sound Behavior
+- **FIXED**: Sound only plays if explicitly enabled via button
+- **FIXED**: Starting game no longer auto-enables sound
+- **FIXED**: User must opt-in to audio
+
+### Target Spawning & Play Area
+- **FIXED**: Targets now spawn within visual container bounds
+- **FIXED**: Desktop play area properly calculated for max-w-2xl
+- **FIXED**: Mobile bounds adjusted for full-width gameplay
+
+### Double Miss Registration
+- **FIXED**: Multiple miss registration on single click
+- **FIXED**: Added processingMiss flag to prevent concurrent misses
+- **FIXED**: Timeout handler race condition with click handler
+- **FIXED**: Both green and red targets now register misses correctly
+
+### Previous Audio System Fixes
 - Fixed menu music not playing initially
 - Fixed unmute not resuming music
 - Fixed volume controls not affecting audio
 - Fixed mobile slider visibility issues
 - Fixed dropdown overflow on mobile
 
-### UI/UX
+### Previous UI/UX Fixes
 - Fixed volume control overlapping title
 - Fixed controls blocking play area
 - Fixed expand/collapse button visibility
@@ -78,6 +99,7 @@
 2. AudioContext can suspend - must check and resume
 3. Track what music should be playing even when muted
 4. Separate music and SFX volume controls needed
+5. Don't auto-enable sound - let users opt-in explicitly
 
 ### Mobile UI
 1. Fixed headers solve positioning issues
@@ -85,6 +107,20 @@
 3. Compact controls essential for small screens
 4. Test at 375x667 (iPhone SE) minimum
 5. Touch targets must be 44x44px minimum
+6. Hide non-essential UI during gameplay to maximize space
+
+### Event Handling & Race Conditions
+1. Use processingMiss flags to prevent concurrent operations
+2. Don't wrap all handlers in useClickHandler - can cause double processing
+3. Clear timeouts immediately when state changes
+4. Add cooldowns to prevent rapid double-clicks
+5. Check multiple conditions before recording game events
+
+### Play Area Calculations
+1. Desktop containers (max-w-2xl) need special bounds calculation
+2. Convert pixel offsets to percentages for responsive positioning
+3. Account for target size when setting spawn boundaries
+4. Test spawn areas match visual feedback areas
 
 ## 🚀 NEXT: Phase 12 - Performance Card
 - Detailed post-game statistics
