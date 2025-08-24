@@ -162,6 +162,13 @@ export default function Home() {
   
   // Handle clicks on the game area (for miss detection)
   const handleGameAreaClick = useClickHandler((e: React.PointerEvent) => {
+    // Prevent double-tap registration (100ms cooldown)
+    const now = Date.now()
+    if (now - lastTapTime.current < 100) {
+      console.log('Double-tap prevented on game area')
+      return
+    }
+    
     // Only count as miss if game is playing and target is visible
     if (gameState.status === 'playing' && showTarget && targetShowTime.current > 0) {
       // Prevent double registration if we're already showing miss feedback
@@ -172,6 +179,9 @@ export default function Home() {
       const clientY = e.clientY
       
       if (isClickInPlayArea(clientX, clientY)) {
+        // Update last tap time to prevent double registration
+        lastTapTime.current = now
+        
         // This is a miss - clicked in play area but not on target
         recordMiss()
         if (soundEnabled) playSound('miss')
