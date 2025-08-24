@@ -14,20 +14,20 @@ export function getPlayAreaBounds(): { minX: number; maxX: number; minY: number;
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
   
   if (isMobile) {
-    // Mobile: Use 80% of screen, centered
+    // Mobile: Use most of screen, avoid UI elements
     return {
       minX: 10,  // 10% from left
       maxX: 90,  // 90% from left (80% width)
-      minY: 20,  // 20% from top (leave room for header)
-      maxY: 70   // 70% from top (leave room for buttons)
+      minY: 25,  // 25% from top (below header)
+      maxY: 75   // 75% from top (above buttons)
     }
   } else {
-    // Desktop: Use 60% of screen, centered
+    // Desktop: Use center area of screen
     return {
       minX: 20,  // 20% from left
       maxX: 80,  // 80% from left (60% width)
-      minY: 25,  // 25% from top
-      maxY: 65   // 65% from top (40% height)
+      minY: 30,  // 30% from top (below header)
+      maxY: 70   // 70% from top (above buttons)
     }
   }
 }

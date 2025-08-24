@@ -233,90 +233,61 @@ export default function Home() {
 
         {gameState.status === 'playing' && (
           <>
-            {/* Game stats header */}
+            {/* Minimal game info - just round counter and score */}
             <motion.div 
-              className="flex justify-between items-center w-full max-w-md px-2 md:px-4 py-2 border-2 border-neon-green/30 bg-black/50 backdrop-blur-sm shadow-neon-green rounded-lg"
-              initial={{ opacity: 0, y: -10 }}
+              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center"
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="text-sm md:text-lg font-mono">
-                Score: <span className="text-neon-yellow font-bold">{formatScore(gameState.score)}</span>
+              <div className="text-lg md:text-xl font-orbitron font-bold text-neon-cyan">
+                Round {gameState.currentRound}/{gameState.maxRounds}
               </div>
-              <div className="text-base md:text-xl font-orbitron font-bold text-neon-cyan">
-                {gameState.currentRound}/{gameState.maxRounds}
-              </div>
-              <div className="text-sm md:text-lg font-mono">
-                Acc: <span className="text-neon-green font-bold">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
+              <div className="text-lg md:text-xl font-mono text-neon-yellow font-bold">
+                {formatScore(gameState.score)}
               </div>
             </motion.div>
 
-            {/* Stats display */}
-            <div className="text-center space-y-2">
-              <div className="text-lg font-mono space-x-4">
-                <span>Hits: <span className="text-neon-green font-bold">{gameState.hits}</span></span>
-                <span>Misses: <span className="text-neon-red font-bold">{gameState.misses}</span></span>
-              </div>
-              
-              {/* Streak display */}
-              <AnimatePresence>
-                {gameState.currentStreak > 0 && (
-                  <motion.div 
-                    className="text-lg font-mono"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    transition={{ type: "spring", stiffness: 500 }}
-                  >
-                    Streak: <span className="text-orange-400 text-glow font-bold">{gameState.currentStreak}</span> {getStreakMultiplier(gameState.currentStreak)}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              
-              {/* Feedback message */}
-              <AnimatePresence mode="wait">
-                {lastMissed ? (
-                  <motion.div 
-                    key="missed"
-                    className="text-xl font-mono text-neon-red text-glow-red"
-                    initial={{ scale: 1.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    MISSED! Too slow!
-                  </motion.div>
-                ) : lastReaction !== null && (
-                  <motion.div 
-                    key="reaction"
-                    className="text-xl font-mono"
-                    initial={{ y: -10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 10, opacity: 0 }}
-                  >
-                    Last: <span className="text-neon-yellow font-bold">{formatTime(lastReaction)}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Timeout indicator with dynamic value */}
+            {/* Streak display - floating */}
             <AnimatePresence>
-              {showTarget && !isTrapTarget && (
+              {gameState.currentStreak >= 3 && (
                 <motion.div 
-                  className="text-xs font-mono opacity-70 text-neon-cyan"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  className="fixed top-16 left-1/2 transform -translate-x-1/2 z-20 text-lg font-mono"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 500 }}
                 >
-                  React within {(currentDifficulty.timeout / 1000).toFixed(1)} seconds!
+                  <span className="text-orange-400 text-glow font-bold">{gameState.currentStreak} {getStreakMultiplier(gameState.currentStreak)}</span>
                 </motion.div>
               )}
             </AnimatePresence>
-            
-            {/* Difficulty indicator */}
-            <div className="text-sm font-mono opacity-70 text-neon-cyan">
-              Difficulty: <span className="font-bold">{currentDifficulty.difficultyPercent}%</span>
-            </div>
+              
+            {/* Feedback messages - floating */}
+            <AnimatePresence mode="wait">
+              {lastMissed ? (
+                <motion.div 
+                  key="missed"
+                  className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full z-20 text-2xl font-mono text-neon-red text-glow-red pointer-events-none"
+                  initial={{ scale: 1.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  MISS!
+                </motion.div>
+              ) : lastReaction !== null && (
+                <motion.div 
+                  key="reaction"
+                  className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full z-20 text-2xl font-mono pointer-events-none"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="text-neon-green font-bold">{formatTime(lastReaction)}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </>
         )}
 
@@ -408,18 +379,7 @@ export default function Home() {
           )
         })()}
 
-        {/* Play area visualization (optional - for debugging) */}
-        {gameState.status === 'playing' && (
-          <div 
-            className="absolute border-2 border-neon-green/10 pointer-events-none z-0"
-            style={{
-              left: `${getPlayAreaBounds().minX}%`,
-              right: `${100 - getPlayAreaBounds().maxX}%`,
-              top: `${getPlayAreaBounds().minY}%`,
-              bottom: `${100 - getPlayAreaBounds().maxY}%`
-            }}
-          />
-        )}
+        {/* Removed play area visualization - no longer needed */}
         
         <Target 
           isVisible={showTarget && gameState.status === 'playing'} 
