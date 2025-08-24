@@ -232,9 +232,33 @@ export default function Home() {
       {/* Scanline effect */}
       <div className="scanline" />
       
-      {/* Header with cyberpunk styling */}
+      {/* Mobile Header Bar - Only on menu screen */}
+      {gameState.status === 'idle' && (
+        <div className="fixed top-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-b border-green-500/30 z-30 sm:hidden">
+          <div className="flex items-center justify-between px-4 py-2 h-12">
+            {/* Left: Future username/profile */}
+            <div className="text-xs text-green-400 font-mono">
+              <span className="opacity-50">Guest</span>
+            </div>
+            
+            {/* Right: Volume Control for mobile */}
+            <VolumeControl
+              volume={volume}
+              muted={muted}
+              musicVolume={musicVolume}
+              musicMuted={musicMuted}
+              onVolumeChange={setVolume}
+              onToggleMute={toggleMute}
+              onMusicVolumeChange={setMusicVolume}
+              onToggleMusicMute={toggleMusicMute}
+            />
+          </div>
+        </div>
+      )}
+      
+      {/* Header with cyberpunk styling - Add padding-top on mobile for header bar */}
       <motion.div 
-        className="text-center mt-2 sm:mt-4 md:mt-8 z-10 flex-shrink-0"
+        className={`text-center mt-2 sm:mt-4 md:mt-8 z-10 flex-shrink-0 ${gameState.status === 'idle' ? 'pt-14 sm:pt-0' : ''}`}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -509,9 +533,9 @@ export default function Home() {
           )}
       </motion.div>
 
-      {/* Volume Control - only show on menu, positioned at top right */}
+      {/* Desktop Volume Control - only show on menu, positioned at top right */}
       {gameState.status === 'idle' && (
-        <div className="fixed top-4 right-4 z-20">
+        <div className="hidden sm:block fixed top-4 right-4 z-20">
           <VolumeControl
             volume={volume}
             muted={muted}
