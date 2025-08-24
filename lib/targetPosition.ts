@@ -11,23 +11,37 @@ export interface TargetPosition {
  * Mobile: 80% of screen width/height
  */
 export function getPlayAreaBounds(): { minX: number; maxX: number; minY: number; maxY: number } {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+  if (typeof window === 'undefined') {
+    // Default bounds for SSR
+    return { minX: 10, maxX: 90, minY: 25, maxY: 75 }
+  }
+  
+  const windowWidth = window.innerWidth
+  const isMobile = windowWidth < 768
+  
+  // Calculate the actual game area width (max-w-2xl = 672px on desktop)
+  const gameAreaWidth = Math.min(windowWidth, isMobile ? windowWidth : 672)
+  const gameAreaOffset = (windowWidth - gameAreaWidth) / 2
+  
+  // Convert pixel offsets to percentages
+  const leftOffsetPercent = (gameAreaOffset / windowWidth) * 100
+  const rightOffsetPercent = 100 - leftOffsetPercent
   
   if (isMobile) {
     // Mobile: Use most of screen, avoid UI elements
     return {
-      minX: 10,  // 10% from left
-      maxX: 90,  // 90% from left (80% width)
-      minY: 25,  // 25% from top (below header)
-      maxY: 75   // 75% from top (above buttons)
+      minX: 5,   // 5% padding from left
+      maxX: 95,  // 5% padding from right
+      minY: 20,  // Below header
+      maxY: 75   // Above buttons
     }
   } else {
-    // Desktop: Use center area of screen
+    // Desktop: Constrain to the max-w-2xl container
     return {
-      minX: 20,  // 20% from left
-      maxX: 80,  // 80% from left (60% width)
-      minY: 30,  // 30% from top (below header)
-      maxY: 70   // 70% from top (above buttons)
+      minX: leftOffsetPercent + 5,   // Container left edge + padding
+      maxX: rightOffsetPercent - 5,   // Container right edge - padding
+      minY: 25,  // Below header
+      maxY: 70   // Above buttons
     }
   }
 }

@@ -164,6 +164,9 @@ export default function Home() {
   const handleGameAreaClick = useClickHandler((e: React.PointerEvent) => {
     // Only count as miss if game is playing and target is visible
     if (gameState.status === 'playing' && showTarget && targetShowTime.current > 0) {
+      // Prevent double registration if we're already showing miss feedback
+      if (showMissFeedback) return
+      
       // Check if click is in play area but not on target
       const clientX = e.clientX
       const clientY = e.clientY
