@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Target from '@/components/Target'
 import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
+import PerformanceCard from '@/components/PerformanceCard'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { useSound } from '@/hooks/useSound'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
-import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
+import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
 
@@ -438,7 +439,6 @@ export default function Home() {
                 gameState.difficultyLevel || 0,
                 streakBonus
               )
-          const grade = gameState.trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
           const highScore = getHighScore()
           const isNewHigh = isNewHighScore(finalScore)
           
@@ -448,66 +448,19 @@ export default function Home() {
           }
           
           return (
-            <motion.div 
-              className="text-center space-y-2 md:space-y-4 p-4 md:p-6 border-2 border-neon-green/50 bg-black/70 backdrop-blur-sm rounded-lg shadow-neon-intense max-w-sm md:max-w-md"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-            >
-              <motion.p 
-                className={`text-3xl font-orbitron font-bold ${gameState.trapHit ? 'text-neon-red glitch' : 'text-neon-green'}`}
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              >
-                {gameState.trapHit ? 'TRAP HIT!' : 'GAME OVER!'}
-              </motion.p>
-              {gameState.trapHit && (
-                <p className="text-xl text-neon-red text-glow-red">You clicked a red trap target!</p>
-              )}
-              
-              {/* Final Score Display */}
-              <div className="space-y-2">
-                <p className="text-xl font-rajdhani">Final Score</p>
-                <motion.p 
-                  className="text-5xl font-orbitron font-black text-neon-yellow text-glow"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 0.2 }}
-                >
-                  {formatScore(finalScore)}
-                </motion.p>
-                <p className="text-2xl font-bold font-mono text-neon-cyan">Grade: <span className="text-glow">{grade}</span></p>
-                {isNewHigh && (
-                  <motion.p 
-                    className="text-xl text-neon-green text-glow-green"
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 0.5, repeat: Infinity }}
-                  >
-                    NEW HIGH SCORE!
-                  </motion.p>
-                )}
-                {!isNewHigh && highScore > 0 && (
-                  <p className="text-sm opacity-70 font-mono">High Score: {formatScore(highScore)}</p>
-                )}
-              </div>
-              
-              {/* Detailed Stats */}
-              <div className="text-lg font-mono space-y-1 pt-4 border-t border-neon-green/30">
-                <p>Hits: <span className="text-neon-green font-bold">{gameState.hits}</span></p>
-                <p>Misses: <span className="text-neon-red font-bold">{gameState.misses}</span></p>
-                <p>Accuracy: <span className="text-neon-cyan font-bold">{accuracy}%</span></p>
-                {avgReactionTime > 0 && (
-                  <p>Avg Time: <span className="text-neon-yellow font-bold">{formatTime(avgReactionTime)}</span></p>
-                )}
-                {gameState.bestStreak > 0 && (
-                  <p>Best Streak: <span className="text-orange-400 font-bold">{gameState.bestStreak} {getStreakMultiplier(gameState.bestStreak)}</span></p>
-                )}
-                {streakBonus > 0 && (
-                  <p>Streak Bonus: <span className="text-orange-400 font-bold">+{streakBonus}</span></p>
-                )}
-                <p>Difficulty Reached: <span className="text-purple-400 font-bold">{gameState.difficultyLevel || 0}%</span></p>
-              </div>
-            </motion.div>
+            <PerformanceCard
+              finalScore={finalScore}
+              accuracy={accuracy}
+              avgReactionTime={avgReactionTime}
+              hits={gameState.hits}
+              misses={gameState.misses}
+              bestStreak={gameState.bestStreak}
+              difficultyLevel={gameState.difficultyLevel || 0}
+              trapHit={gameState.trapHit || false}
+              isNewHighScore={isNewHigh}
+              previousHighScore={highScore}
+              reactionTimes={gameState.reactionTimes}
+            />
           )
         })()}
 
