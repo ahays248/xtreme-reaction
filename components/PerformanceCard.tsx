@@ -41,8 +41,8 @@ export default function PerformanceCard({
     ? Math.round((1 - (slowestTime - fastestTime) / avgReactionTime) * 100)
     : 100
   
-  // Visual bar widths (percentage)
-  const accuracyBar = accuracy // Already a percentage 0-100
+  // Visual bar widths (percentage) - ensure they're valid numbers
+  const accuracyBar = Math.max(0, Math.min(100, accuracy || 0))
   const speedBar = Math.max(0, Math.min(100, (500 - avgReactionTime) / 5)) // 0ms = 100%, 500ms = 0%
   const streakBar = Math.min(bestStreak * 10, 100) // 10 streak = 100%
   
@@ -114,18 +114,18 @@ export default function PerformanceCard({
         {/* Accuracy */}
         <div className="space-y-1">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400 font-mono">Accuracy</span>
+            <span className="text-white font-mono">Accuracy</span>
             <span className="text-neon-cyan font-bold">{accuracy}%</span>
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-neon-green to-neon-cyan"
-              initial={{ width: 0 }}
+              initial={{ width: "0%" }}
               animate={{ width: `${accuracyBar}%` }}
               transition={{ duration: 0.5, delay: 0.5 }}
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white/70">
             {hits} hits · {misses} misses
           </p>
         </div>
@@ -133,18 +133,18 @@ export default function PerformanceCard({
         {/* Speed */}
         <div className="space-y-1">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400 font-mono">Avg Speed</span>
+            <span className="text-white font-mono">Avg Speed</span>
             <span className="text-neon-yellow font-bold">{formatTime(avgReactionTime)}</span>
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-yellow-500 to-orange-500"
-              initial={{ width: 0 }}
+              initial={{ width: "0%" }}
               animate={{ width: `${speedBar}%` }}
               transition={{ duration: 0.5, delay: 0.6 }}
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white/70">
             Fastest: {formatTime(fastestTime)} · Slowest: {formatTime(slowestTime)}
           </p>
         </div>
@@ -152,13 +152,13 @@ export default function PerformanceCard({
         {/* Streak */}
         <div className="space-y-1">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400 font-mono">Best Streak</span>
+            <span className="text-white font-mono">Best Streak</span>
             <span className="text-orange-400 font-bold">{bestStreak} {getStreakMultiplier(bestStreak)}</span>
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-orange-500 to-red-500"
-              initial={{ width: 0 }}
+              initial={{ width: "0%" }}
               animate={{ width: `${streakBar}%` }}
               transition={{ duration: 0.5, delay: 0.7 }}
             />
@@ -168,18 +168,18 @@ export default function PerformanceCard({
         {/* Consistency */}
         <div className="space-y-1">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400 font-mono">Consistency</span>
+            <span className="text-white font-mono">Consistency</span>
             <span className="text-purple-400 font-bold">{consistency}%</span>
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-              initial={{ width: 0 }}
+              initial={{ width: "0%" }}
               animate={{ width: `${consistency}%` }}
               transition={{ duration: 0.5, delay: 0.8 }}
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white/70">
             How similar your reaction times were
           </p>
         </div>
@@ -188,8 +188,8 @@ export default function PerformanceCard({
       {/* Additional Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-400 font-mono">DIFFICULTY</p>
-          <p className="text-lg font-bold text-purple-400">{difficultyLevel}%</p>
+          <p className="text-xs text-gray-400 font-mono">MAX DIFFICULTY</p>
+          <p className="text-lg font-bold text-purple-400">Level {Math.round(difficultyLevel / 10)}</p>
         </div>
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
           <p className="text-xs text-gray-400 font-mono">ROUNDS COMPLETED</p>
