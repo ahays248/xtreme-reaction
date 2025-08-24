@@ -110,7 +110,7 @@ export default function Home() {
       } else {
         // Missed a real target
         recordMiss()
-        playSound('miss')
+        if (soundEnabled) playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
         setLastReaction(null)
@@ -143,13 +143,13 @@ export default function Home() {
         setShowTarget(false)
         targetShowTime.current = 0
         recordTrapHit()
-        playSound('trap')
+        if (soundEnabled) playSound('trap')
         console.log('TRAP HIT! Game Over!')
       } else {
         // Hit a normal target
         const reactionTime = calculateReactionTime(targetShowTime.current, Date.now())
         recordHit(reactionTime)
-        playSound('hit')
+        if (soundEnabled) playSound('hit')
         setLastReaction(reactionTime)
         setLastMissed(false)
         setShowTarget(false)
@@ -171,7 +171,7 @@ export default function Home() {
       if (isClickInPlayArea(clientX, clientY)) {
         // This is a miss - clicked in play area but not on target
         recordMiss()
-        playSound('miss')
+        if (soundEnabled) playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
         setTimeout(() => setShowMissFeedback(false), 500)
@@ -188,10 +188,12 @@ export default function Home() {
   }
 
   const handleStartGame = async () => {
-    // Initialize audio if not already done
-    if (!soundEnabled) {
-      await initializeAudio()
-      setSoundEnabled(true)
+    // Only initialize audio if user explicitly enabled it
+    // Don't auto-enable sound when starting game
+    if (!soundEnabled && initialized) {
+      // Audio is initialized but not enabled - keep it that way
+    } else if (!initialized && !soundEnabled) {
+      // Audio not initialized and not enabled - don't initialize
     }
     
     // Clear any existing timeouts
