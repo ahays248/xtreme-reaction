@@ -24,6 +24,16 @@ body {
   font-family: var(--font-rajdhani), system-ui, sans-serif;
   position: relative;
   overflow-x: hidden;
+  /* Prevent iOS bounce scrolling */
+  overscroll-behavior: none;
+  /* Ensure full height on mobile */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Safe area padding for mobile devices with notches */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* Cyberpunk text glow with black outline for readability */

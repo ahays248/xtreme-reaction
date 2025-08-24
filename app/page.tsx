@@ -176,7 +176,7 @@ export default function Home() {
     : getDifficultyConfig(1, gameState.maxRounds)
 
   return (
-    <main className="min-h-screen h-screen bg-black text-neon-green flex flex-col items-center p-4 relative overflow-hidden">
+    <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative">
       <MatrixRain />
       
       {/* Scanline effect */}
@@ -184,23 +184,23 @@ export default function Home() {
       
       {/* Header with cyberpunk styling */}
       <motion.div 
-        className="text-center mt-4 md:mt-8 z-10 flex-shrink-0"
+        className="text-center mt-2 sm:mt-4 md:mt-8 z-10 flex-shrink-0"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-orbitron font-black mb-2 md:mb-4 text-glow-soft animate-flicker">
+        <h1 className="text-2xl sm:text-3xl md:text-6xl font-orbitron font-black mb-1 sm:mb-2 md:mb-4 text-glow-soft animate-flicker">
           XTREME REACTION
         </h1>
-        <p className="text-lg md:text-xl mb-1 md:mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
-        <p className="text-xs md:text-sm opacity-70 font-rajdhani">
+        <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
+        <p className="text-xs md:text-sm opacity-70 font-rajdhani hidden sm:block">
           Test your reflexes. Compete with the world. Share on X.
         </p>
       </motion.div>
 
       <div 
         ref={gameAreaRef}
-        className={`flex flex-col items-center gap-4 md:gap-6 flex-grow justify-center transition-all duration-200 z-10 w-full max-w-2xl relative ${
+        className={`flex flex-col items-center gap-2 sm:gap-4 md:gap-6 flex-grow justify-center transition-all duration-200 z-10 w-full max-w-2xl relative min-h-[300px] ${
           showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
         }`}
         onPointerDown={handleGameAreaClick}
@@ -208,15 +208,15 @@ export default function Home() {
         {/* Game status display */}
         {gameState.status === 'idle' && (
           <motion.div 
-            className="text-center space-y-2 md:space-y-4 px-4"
+            className="text-center space-y-1 sm:space-y-2 md:space-y-4 px-2 sm:px-4"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
-            <div className="space-y-1 md:space-y-2">
-              <p className="text-xs md:text-sm opacity-70 font-mono">Hit 10 GREEN targets as fast as you can!</p>
-              <p className="text-xs md:text-sm text-neon-red font-mono">⚠️ Don't click the RED targets! ⚠️</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
+            <div className="space-y-0.5 sm:space-y-1 md:space-y-2">
+              <p className="text-xs sm:text-sm opacity-70 font-mono">Hit 10 GREEN targets fast!</p>
+              <p className="text-xs sm:text-sm text-neon-red font-mono">⚠️ Avoid RED targets! ⚠️</p>
             </div>
             {getHighScore() > 0 && (
               <motion.p 
@@ -392,7 +392,7 @@ export default function Home() {
 
       {/* Game controls - moved to bottom */}
       <motion.div 
-        className="flex gap-4 mb-4 md:mb-8 z-10 flex-shrink-0"
+        className="flex gap-2 sm:gap-4 pb-safe mb-2 sm:mb-4 md:mb-8 z-10 flex-shrink-0"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -400,7 +400,7 @@ export default function Home() {
           {gameState.status === 'idle' && (
             <motion.button
               onClick={handleStartGame}
-              className="px-6 md:px-8 py-3 md:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-lg md:text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+              className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
