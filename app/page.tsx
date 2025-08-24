@@ -4,8 +4,10 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Target from '@/components/Target'
 import MatrixRain from '@/components/MatrixRain'
+import VolumeControl from '@/components/VolumeControl'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
+import { useSound } from '@/hooks/useSound'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore, getScoreGrade } from '@/lib/scoring'
@@ -28,6 +30,7 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
+  const { playSound, volume, setVolume, muted, toggleMute } = useSound()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -46,6 +49,13 @@ export default function Home() {
       }, ROUND_DELAY)
     }
   }, [gameState.currentRound, gameState.status, showTarget])
+
+  // Play game over sound when game ends
+  useEffect(() => {
+    if (gameState.status === 'gameOver') {
+      playSound('gameover')
+    }
+  }, [gameState.status, playSound])
 
   const showNextTarget = () => {
     // 25% chance of trap target (increases slightly with difficulty)
@@ -77,6 +87,7 @@ export default function Home() {
       } else {
         // Missed a real target
         recordMiss()
+        playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
         setLastReaction(null)
@@ -109,11 +120,13 @@ export default function Home() {
         setShowTarget(false)
         targetShowTime.current = 0
         recordTrapHit()
+        playSound('trap')
         console.log('TRAP HIT! Game Over!')
       } else {
         // Hit a normal target
         const reactionTime = calculateReactionTime(targetShowTime.current, Date.now())
         recordHit(reactionTime)
+        playSound('hit')
         setLastReaction(reactionTime)
         setLastMissed(false)
         setShowTarget(false)
@@ -135,6 +148,7 @@ export default function Home() {
       if (isClickInPlayArea(clientX, clientY)) {
         // This is a miss - clicked in play area but not on target
         recordMiss()
+        playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
         setTimeout(() => setShowMissFeedback(false), 500)
@@ -192,7 +206,7 @@ export default function Home() {
         <h1 className="text-2xl sm:text-3xl md:text-6xl font-orbitron font-black mb-1 sm:mb-2 md:mb-4 text-glow-soft animate-flicker">
           XTREME REACTION
         </h1>
-        <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
+        <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">Phase 11: Sound Effects</p>
         <p className="text-xs md:text-sm opacity-70 font-rajdhani hidden sm:block">
           Test your reflexes. Compete with the world. Share on X.
         </p>
@@ -440,6 +454,16 @@ export default function Home() {
             </motion.button>
           )}
       </motion.div>
+
+      {/* Volume Control - positioned at bottom right, mobile-friendly */}
+      <div className="fixed bottom-4 right-4 z-20">
+        <VolumeControl
+          volume={volume}
+          muted={muted}
+          onVolumeChange={setVolume}
+          onToggleMute={toggleMute}
+        />
+      </div>
     </main>
   )
 }
