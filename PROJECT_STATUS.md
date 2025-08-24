@@ -1,6 +1,6 @@
 # Xtreme Reaction - Project Status
 **Date**: August 24, 2025  
-**Status**: Phase 6 Complete - Ready for Phase 7 (Trap Targets)
+**Status**: Phase 7 Complete - Ready for Phase 8 (Scoring System)
 
 ---
 
@@ -15,6 +15,7 @@
 8. **Phase 4: Auto-Hide Targets** - 2-second timeout, miss tracking, cleanup (159 lines total)
 9. **Phase 5: Game Loop** - 10-round sessions, auto-spawn, game over screen (279 lines total)
 10. **Phase 6: Progressive Difficulty** - Dynamic timeout/size, difficulty curve (354 lines total)
+11. **Phase 7: Trap Targets** - Red trap targets, instant game over, 20-30% spawn rate (444 lines total)
 
 ---
 
@@ -27,7 +28,7 @@ XtremeReaction/
 │   ├── layout.tsx         # Root layout with metadata
 │   └── globals.css        # Global styles (Tailwind)
 ├── components/            # React components
-│   └── Target.tsx         # Green circle target component
+│   └── Target.tsx         # Green/red target component with variant
 ├── hooks/                 # Custom React hooks
 │   ├── useClickHandler.ts # Unified pointer event handling
 │   └── useGameLoop.ts     # Game state management
@@ -48,20 +49,20 @@ XtremeReaction/
 
 ---
 
-## 🎯 NEXT STEPS - Phase 7: Trap Targets
+## 🎯 NEXT STEPS - Phase 8: Scoring System
 
-According to the Implementation Plan, Phase 7 involves:
+According to the Implementation Plan, Phase 8 involves:
 
-1. Create red target variant
-2. Random chance of red target
-3. End game if red target clicked
-4. Show different message for trap hit
+1. Implement score formula
+2. Add score display during game
+3. Show final score calculation
+4. Add high score tracking (local storage)
 
-**Goal**: Add red targets that end game  
-**Expected Time**: 4 hours  
-**Files to Create/Update**: 
-- Update `components/Target.tsx` (add variant prop)
-- Create `components/TrapTarget.tsx` (red target component)
+**Goal**: Calculate and display scores  
+**Expected Time**: 3 hours  
+**Files to Create**: 
+- `lib/scoring.ts` (score calculations)
+- `hooks/useScore.ts` (score state management)
 
 ---
 
@@ -94,8 +95,8 @@ According to the Implementation Plan, Phase 7 involves:
 
 The dev server is currently running on port 3001.
 - Visit: http://localhost:3001
-- Shows: Phase 6 Progressive Difficulty game
-- Ready for Phase 7 implementation
+- Shows: Phase 7 Trap Targets game
+- Ready for Phase 8 implementation
 
 ---
 

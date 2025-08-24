@@ -44,6 +44,14 @@ export function useGameLoop() {
     }))
   }, [])
 
+  const recordTrapHit = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      status: 'gameOver',
+      trapHit: true
+    }))
+  }, [])
+
   const resetGame = useCallback(() => {
     setGameState(initialGameState)
   }, [])
@@ -54,6 +62,7 @@ export function useGameLoop() {
     nextRound,
     recordHit,
     recordMiss,
+    recordTrapHit,
     resetGame
   }
 }

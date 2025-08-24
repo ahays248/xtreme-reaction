@@ -8,6 +8,7 @@ export interface GameState {
   misses: number
   reactionTimes: number[]
   difficultyLevel?: number // Track current difficulty percentage
+  trapHit?: boolean // Track if game ended due to trap
 }
 
 export const initialGameState: GameState = {
