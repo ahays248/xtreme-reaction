@@ -70,10 +70,10 @@ export default function VolumeControl({
           )}
         </button>
 
-        {/* Expand/Collapse button for detailed controls */}
+        {/* Expand/Collapse button - now visible on mobile too */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="hidden sm:flex min-w-[30px] min-h-[30px] items-center justify-center text-green-400 hover:text-green-300 transition-colors"
+          className="flex min-w-[30px] min-h-[30px] items-center justify-center text-green-400 hover:text-green-300 transition-colors"
           aria-label={expanded ? 'Collapse' : 'Expand'}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,18 +82,20 @@ export default function VolumeControl({
           </svg>
         </button>
 
-        {/* Simple indicator for mobile */}
-        <span className="sm:hidden text-green-400 text-xs font-mono uppercase">
-          {allMuted ? 'MUTED' : 'SOUND ON'}
-        </span>
+        {/* Status indicator - shown when not expanded */}
+        {!expanded && (
+          <span className="text-green-400 text-xs font-mono uppercase">
+            {allMuted ? 'MUTED' : `${Math.round((musicVolume + volume) / 2)}%`}
+          </span>
+        )}
       </div>
 
-      {/* Expanded controls - Only on desktop */}
+      {/* Expanded controls - Now works on mobile and desktop */}
       {expanded && (
-        <div className="hidden sm:flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           {/* Music Volume */}
           <div className="flex items-center gap-2">
-            <span className="text-green-400 text-xs font-mono min-w-[50px]">Music:</span>
+            <span className="text-green-400 text-xs font-mono min-w-[45px] sm:min-w-[50px]">Music:</span>
             <button
               onClick={onToggleMusicMute}
               className="min-w-[24px] min-h-[24px] flex items-center justify-center text-green-400 hover:text-green-300"
@@ -109,20 +111,25 @@ export default function VolumeControl({
               disabled={musicMuted}
               className="flex-1 h-2 bg-green-900/50 rounded-lg appearance-none cursor-pointer 
                 [&::-webkit-slider-thumb]:appearance-none 
-                [&::-webkit-slider-thumb]:w-3 
-                [&::-webkit-slider-thumb]:h-3 
+                [&::-webkit-slider-thumb]:w-4 sm:w-3 
+                [&::-webkit-slider-thumb]:h-4 sm:h-3 
                 [&::-webkit-slider-thumb]:bg-green-400 
                 [&::-webkit-slider-thumb]:rounded-full 
+                [&::-moz-range-thumb]:w-4 sm:w-3
+                [&::-moz-range-thumb]:h-4 sm:h-3
+                [&::-moz-range-thumb]:bg-green-400
+                [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:border-0
                 disabled:opacity-50"
             />
-            <span className="text-green-400 text-xs font-mono min-w-[30px] text-right">
+            <span className="text-green-400 text-xs font-mono min-w-[25px] sm:min-w-[30px] text-right">
               {musicMuted ? '0' : musicVolume}%
             </span>
           </div>
 
           {/* SFX Volume */}
           <div className="flex items-center gap-2">
-            <span className="text-green-400 text-xs font-mono min-w-[50px]">SFX:</span>
+            <span className="text-green-400 text-xs font-mono min-w-[45px] sm:min-w-[50px]">SFX:</span>
             <button
               onClick={onToggleMute}
               className="min-w-[24px] min-h-[24px] flex items-center justify-center text-green-400 hover:text-green-300"
@@ -138,13 +145,18 @@ export default function VolumeControl({
               disabled={muted}
               className="flex-1 h-2 bg-green-900/50 rounded-lg appearance-none cursor-pointer 
                 [&::-webkit-slider-thumb]:appearance-none 
-                [&::-webkit-slider-thumb]:w-3 
-                [&::-webkit-slider-thumb]:h-3 
+                [&::-webkit-slider-thumb]:w-4 sm:w-3 
+                [&::-webkit-slider-thumb]:h-4 sm:h-3 
                 [&::-webkit-slider-thumb]:bg-green-400 
                 [&::-webkit-slider-thumb]:rounded-full 
+                [&::-moz-range-thumb]:w-4 sm:w-3
+                [&::-moz-range-thumb]:h-4 sm:h-3
+                [&::-moz-range-thumb]:bg-green-400
+                [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:border-0
                 disabled:opacity-50"
             />
-            <span className="text-green-400 text-xs font-mono min-w-[30px] text-right">
+            <span className="text-green-400 text-xs font-mono min-w-[25px] sm:min-w-[30px] text-right">
               {muted ? '0' : volume}%
             </span>
           </div>
