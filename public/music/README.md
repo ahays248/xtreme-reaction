@@ -1,19 +1,38 @@
-# Music Files
+# Background Music
 
-Place your background music file here as `background.mp3`
+This directory contains the background music tracks for different game states.
 
-## Recommended Music Specifications:
+## Files Required:
+- `gameplay.mp3` - Plays during active gameplay (looped)
+- `results.mp3` - Plays on the game over/results screen (looped)
+
+## Music Specifications:
 - Format: MP3
 - Bitrate: 128-192 kbps (for web optimization)
-- Duration: 2-3 minutes (will loop)
+- Duration: 60-120 seconds (will loop seamlessly)
 - Volume: Normalized to prevent clipping
+- Loop Point: Must loop smoothly without gaps
 
-## ElevenLabs Music Prompt:
-"Create an intense, high-energy electronic track with a fast tempo (140-160 BPM) that builds tension and urgency. The music should have a dark, competitive edge with pulsing bass, sharp synthetic percussion, and rising synthesizer sweeps that create anxiety. Include subtle glitch effects and digital artifacts that mirror the punishment effects in the game. The track should loop seamlessly and maintain constant pressure without being overwhelming. Think cyberpunk arcade meets reaction-time challenge - something that makes players lean forward and focus intensely. Add occasional staccato hits and electronic stabs that sync with a heartbeat-like rhythm to enhance the feeling of time pressure."
+## AI Music Generation Prompts:
 
-## Alternative Music Options:
-1. **Calm Focus Mode**: Ambient electronic with subtle pulse
-2. **Extreme Mode**: Drum & bass with aggressive breaks
-3. **Retro Mode**: 8-bit chiptune style arcade music
+### Gameplay Music (gameplay.mp3)
+**For ElevenLabs/Suno AI:**
+```
+Create a high-energy cyberpunk arcade track. 120-140 BPM. Matrix-inspired electronic music with pulsing bass, digital arpeggios, and glitchy percussion. Should maintain tension without being overwhelming. Include subtle build-ups and electronic sweeps. Loop seamlessly. Think retro arcade meets The Matrix - neon green digital sounds, synthetic drums, and futuristic atmosphere. Duration: 90-120 seconds, perfect loop point.
+```
 
-Place your chosen file as `background.mp3` in this directory.
+### Results Music (results.mp3)
+**For ElevenLabs/Suno AI:**
+```
+Create a cyberpunk victory/results screen music. 90-100 BPM. Atmospheric and reflective but still electronic. Blend accomplishment with anticipation for the next round. Use ambient pads, soft arpeggios, and gentle percussion. Include Matrix-style digital rain sounds in background. Should feel like a brief respite between intense sessions. Smooth loop. Duration: 60-90 seconds.
+```
+
+## Implementation Notes:
+- Music automatically plays based on game state
+- Separate volume control from sound effects
+- Music can be muted independently
+- Loops seamlessly during gameplay
+- Switches tracks when transitioning to results screen
+
+## Legacy File:
+- `background.mp3` - Original placeholder (no longer used)

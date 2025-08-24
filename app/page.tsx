@@ -30,7 +30,7 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
-  const { playSound, volume, setVolume, muted, toggleMute } = useSound()
+  const { playSound, playMusic, switchMusic, stopMusic, volume, setVolume, muted, toggleMute } = useSound()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -50,12 +50,16 @@ export default function Home() {
     }
   }, [gameState.currentRound, gameState.status, showTarget])
 
-  // Play game over sound when game ends
+  // Handle background music based on game state
   useEffect(() => {
-    if (gameState.status === 'gameOver') {
-      playSound('gameover')
+    if (gameState.status === 'playing') {
+      playMusic('gameplay')
+    } else if (gameState.status === 'gameOver') {
+      switchMusic('results')
+    } else if (gameState.status === 'idle') {
+      stopMusic()
     }
-  }, [gameState.status, playSound])
+  }, [gameState.status, playMusic, switchMusic, stopMusic])
 
   const showNextTarget = () => {
     // 25% chance of trap target (increases slightly with difficulty)

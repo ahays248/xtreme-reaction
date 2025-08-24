@@ -6,7 +6,6 @@ This directory contains the game sound effects. For now, these are placeholder f
 - `hit.mp3` - Success sound when hitting green target (short beep/ding)
 - `miss.mp3` - Error sound when missing or clicking empty space (buzz/error)
 - `trap.mp3` - Warning sound when hitting red trap target (alarm/warning)
-- `gameover.mp3` - Game over fanfare (completion sound)
 
 ## Recommended sources:
 1. **Freesound.org** - Free sound effects (requires attribution)
@@ -16,7 +15,7 @@ This directory contains the game sound effects. For now, these are placeholder f
 
 ## Audio specifications:
 - Format: MP3 (for compatibility)
-- Duration: 0.5-2 seconds (except gameover can be longer)
+- Duration: 0.5-1 seconds (short feedback sounds)
 - Sample rate: 44.1kHz
 - Bit rate: 128kbps minimum
 - Volume: Normalized to prevent clipping
