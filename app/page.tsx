@@ -149,7 +149,7 @@ export default function Home() {
     : getDifficultyConfig(1, gameState.maxRounds)
 
   return (
-    <main className="min-h-screen bg-black text-neon-green flex flex-col items-center justify-between p-4 relative overflow-hidden">
+    <main className="min-h-screen h-screen bg-black text-neon-green flex flex-col items-center p-4 relative overflow-hidden">
       <MatrixRain />
       
       {/* Scanline effect */}
@@ -157,35 +157,35 @@ export default function Home() {
       
       {/* Header with cyberpunk styling */}
       <motion.div 
-        className="text-center mt-8 z-10"
+        className="text-center mt-4 md:mt-8 z-10 flex-shrink-0"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl md:text-6xl font-orbitron font-black mb-4 text-glow-soft animate-flicker">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-orbitron font-black mb-2 md:mb-4 text-glow-soft animate-flicker">
           XTREME REACTION
         </h1>
-        <p className="text-xl mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
-        <p className="text-sm opacity-70 font-rajdhani">
+        <p className="text-lg md:text-xl mb-1 md:mb-2 font-mono text-neon-cyan">Phase 10: UI Polish</p>
+        <p className="text-xs md:text-sm opacity-70 font-rajdhani">
           Test your reflexes. Compete with the world. Share on X.
         </p>
       </motion.div>
 
-      <div className={`flex flex-col items-center gap-6 flex-grow justify-center transition-all duration-200 z-10 min-h-[500px] ${
+      <div className={`flex flex-col items-center gap-4 md:gap-6 flex-grow justify-center transition-all duration-200 z-10 w-full max-w-2xl ${
         showMissFeedback ? 'border-4 border-neon-red animate-pulse shadow-neon-red' : ''
       }`}>
         {/* Game status display */}
         {gameState.status === 'idle' && (
           <motion.div 
-            className="text-center space-y-4"
+            className="text-center space-y-2 md:space-y-4 px-4"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
-            <div className="space-y-2">
-              <p className="text-sm opacity-70 font-mono">Hit 10 GREEN targets as fast as you can!</p>
-              <p className="text-sm text-neon-red font-mono">⚠️ Don't click the RED targets! ⚠️</p>
+            <p className="text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
+            <div className="space-y-1 md:space-y-2">
+              <p className="text-xs md:text-sm opacity-70 font-mono">Hit 10 GREEN targets as fast as you can!</p>
+              <p className="text-xs md:text-sm text-neon-red font-mono">⚠️ Don't click the RED targets! ⚠️</p>
             </div>
             {getHighScore() > 0 && (
               <motion.p 
@@ -204,18 +204,18 @@ export default function Home() {
           <>
             {/* Game stats header */}
             <motion.div 
-              className="flex justify-between items-center w-full max-w-md px-4 py-2 border-2 border-neon-green/30 bg-black/50 backdrop-blur-sm shadow-neon-green rounded-lg"
+              className="flex justify-between items-center w-full max-w-md px-2 md:px-4 py-2 border-2 border-neon-green/30 bg-black/50 backdrop-blur-sm shadow-neon-green rounded-lg"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="text-lg font-mono">
+              <div className="text-sm md:text-lg font-mono">
                 Score: <span className="text-neon-yellow font-bold">{formatScore(gameState.score)}</span>
               </div>
-              <div className="text-xl font-orbitron font-bold text-neon-cyan">
+              <div className="text-base md:text-xl font-orbitron font-bold text-neon-cyan">
                 {gameState.currentRound}/{gameState.maxRounds}
               </div>
-              <div className="text-lg font-mono">
-                Accuracy: <span className="text-neon-green font-bold">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
+              <div className="text-sm md:text-lg font-mono">
+                Acc: <span className="text-neon-green font-bold">{calculateAccuracy(gameState.hits, gameState.misses)}%</span>
               </div>
             </motion.div>
 
@@ -315,7 +315,7 @@ export default function Home() {
           
           return (
             <motion.div 
-              className="text-center space-y-4 p-6 border-2 border-neon-green/50 bg-black/70 backdrop-blur-sm rounded-lg shadow-neon-intense"
+              className="text-center space-y-2 md:space-y-4 p-4 md:p-6 border-2 border-neon-green/50 bg-black/70 backdrop-blur-sm rounded-lg shadow-neon-intense max-w-sm md:max-w-md"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
@@ -377,7 +377,7 @@ export default function Home() {
           )
         })()}
 
-        <div className="h-32 flex items-center justify-center">
+        <div className="h-24 md:h-32 flex items-center justify-center">
           <Target 
             isVisible={showTarget && gameState.status === 'playing'} 
             onTargetClick={handleTargetClick}
@@ -389,7 +389,7 @@ export default function Home() {
 
       {/* Game controls - moved to bottom */}
       <motion.div 
-        className="flex gap-4 mb-8 z-10"
+        className="flex gap-4 mb-4 md:mb-8 z-10 flex-shrink-0"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -397,7 +397,7 @@ export default function Home() {
           {gameState.status === 'idle' && (
             <motion.button
               onClick={handleStartGame}
-              className="px-8 py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+              className="px-6 md:px-8 py-3 md:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-lg md:text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -409,7 +409,7 @@ export default function Home() {
             <>
               <motion.button
                 onClick={handleStartGame}
-                className="px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm md:text-base rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -417,7 +417,7 @@ export default function Home() {
               </motion.button>
               <motion.button
                 onClick={handleReset}
-                className="px-6 py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
+                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold text-sm md:text-base rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
