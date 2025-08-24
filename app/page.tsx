@@ -23,6 +23,7 @@ export default function Home() {
   const [isTrapTarget, setIsTrapTarget] = useState(false)
   const [showMissFeedback, setShowMissFeedback] = useState(false)
   const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
+  const [soundEnabled, setSoundEnabled] = useState(false)
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -30,7 +31,7 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
-  const { playSound, playMusic, switchMusic, stopMusic, volume, setVolume, muted, toggleMute, initializeAudio } = useSound()
+  const { playSound, playMusic, switchMusic, stopMusic, volume, setVolume, muted, toggleMute, initializeAudio, initialized } = useSound()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -52,14 +53,17 @@ export default function Home() {
 
   // Handle background music based on game state
   useEffect(() => {
+    // Only play music if audio has been initialized
+    if (!initialized || !soundEnabled) return
+    
     if (gameState.status === 'idle') {
-      playMusic('menu')
+      switchMusic('menu')  // Use switchMusic consistently
     } else if (gameState.status === 'playing') {
       switchMusic('gameplay')
     } else if (gameState.status === 'gameOver') {
       switchMusic('results')
     }
-  }, [gameState.status, playMusic, switchMusic])
+  }, [gameState.status, switchMusic, initialized, soundEnabled])
 
   const showNextTarget = () => {
     // 25% chance of trap target (increases slightly with difficulty)
@@ -161,9 +165,19 @@ export default function Home() {
     }
   })
 
-  const handleStartGame = async () => {
-    // Initialize audio on user interaction (for mobile)
+  const handleEnableSound = async () => {
+    // Initialize audio on user interaction
     await initializeAudio()
+    setSoundEnabled(true)
+    // Menu music will start playing via the useEffect
+  }
+
+  const handleStartGame = async () => {
+    // Initialize audio if not already done
+    if (!soundEnabled) {
+      await initializeAudio()
+      setSoundEnabled(true)
+    }
     
     // Clear any existing timeouts
     if (timeoutId.current) clearTimeout(timeoutId.current)
@@ -234,6 +248,24 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Enable Sound Button - shows when audio not enabled */}
+            {!soundEnabled && (
+              <motion.button
+                onClick={handleEnableSound}
+                className="mb-4 px-6 sm:px-8 py-3 sm:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense animate-pulse"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: [1, 1.05, 1], opacity: 1 }}
+                transition={{ 
+                  scale: { duration: 2, repeat: Infinity },
+                  opacity: { duration: 0.5 }
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                🔊 ENABLE SOUND
+              </motion.button>
+            )}
+            
             <p className="text-lg sm:text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
             <div className="space-y-0.5 sm:space-y-1 md:space-y-2">
               <p className="text-xs sm:text-sm opacity-70 font-mono">Hit 10 GREEN targets fast!</p>
