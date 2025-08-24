@@ -27,6 +27,8 @@ After experiencing complexity spiral with the previous implementation, we've ado
 - ✅ **IMPLEMENTATION_PLAN.md** - 20 phases of incremental development
 - ✅ **DATABASE_SCHEMA.md** - Full database documentation
 - ✅ **Phases 1-11 COMPLETE** - Fully playable game with scoring and sound
+- ✅ **Audio System Enhanced** - Menu music, mobile-safe initialization, volume controls
+- ✅ **Mobile Header Bar** - Clean UI with guest/auth placeholder and volume controls
 - ✅ Database migration 004 ready (for Phase 13)
 - 🎮 Live on Vercel with automatic deployments
 - **→ Ready for Phase 12: Performance Card**
@@ -71,14 +73,22 @@ After experiencing complexity spiral with the previous implementation, we've ado
 # - This is expected at 50% completion
 ```
 
-### Phase 11 Complete!
+### Phase 11 Complete + Audio Enhancements!
 ```bash
 # DONE: Sound Effects Implementation
 # - Web Audio API for instant playback
-# - Hit/miss/trap/gameover sounds
-# - Volume control with mute toggle
-# - Mobile-safe audio initialization
-# - Placeholder MP3 files (need real sounds)
+# - Hit/miss/trap sounds + background music (menu/gameplay/results)
+# - Separate volume controls for music and SFX
+# - Mobile-safe audio with "Enable Sound" button
+# - Mobile header bar with compact volume controls
+# - Desktop volume controls in top-right corner
+
+# Key Lessons from Audio Implementation:
+# 1. Mobile browsers require user interaction to play audio
+# 2. AudioContext can be suspended and needs resuming
+# 3. Music should track what's playing even when muted
+# 4. Mobile UI needs dropdown design to avoid overflow
+# 5. Header bar solves mobile control placement issues
 ```
 
 ### Phase 12 Quick Start
