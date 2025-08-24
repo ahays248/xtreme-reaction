@@ -256,21 +256,23 @@ export default function Home() {
         </div>
       )}
       
-      {/* Header with cyberpunk styling - Add padding-top on mobile for header bar */}
-      <motion.div 
-        className={`text-center mt-2 sm:mt-4 md:mt-8 z-10 flex-shrink-0 ${gameState.status === 'idle' ? 'pt-14 sm:pt-0' : ''}`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-2xl sm:text-3xl md:text-6xl font-orbitron font-black mb-1 sm:mb-2 md:mb-4 text-glow-soft animate-flicker">
-          XTREME REACTION
-        </h1>
-        <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">Phase 11: Sound Effects</p>
-        <p className="text-xs md:text-sm opacity-70 font-rajdhani hidden sm:block">
-          Test your reflexes. Compete with the world. Share on X.
-        </p>
-      </motion.div>
+      {/* Header with cyberpunk styling - Only show on menu and results screens */}
+      {gameState.status !== 'playing' && (
+        <motion.div 
+          className={`text-center mt-2 sm:mt-4 md:mt-8 z-10 flex-shrink-0 ${gameState.status === 'idle' ? 'pt-14 sm:pt-0' : ''}`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-2xl sm:text-3xl md:text-6xl font-orbitron font-black mb-1 sm:mb-2 md:mb-4 text-glow-soft animate-flicker">
+            XTREME REACTION
+          </h1>
+          <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">Phase 11: Sound Effects</p>
+          <p className="text-xs md:text-sm opacity-70 font-rajdhani hidden sm:block">
+            Test your reflexes. Compete with the world. Share on X.
+          </p>
+        </motion.div>
+      )}
 
       <div 
         ref={gameAreaRef}
