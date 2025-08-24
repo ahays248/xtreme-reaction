@@ -82,6 +82,9 @@ export default function Home() {
   }, [gameState.status, switchMusic, initialized, soundEnabled])
 
   const showNextTarget = () => {
+    // Reset processing flag for new round
+    processingMiss.current = false
+    
     // 25% chance of trap target (increases slightly with difficulty)
     const trapChance = 0.20 + (gameState.currentRound / gameState.maxRounds) * 0.10 // 20-30%
     const isCurrentTrap = Math.random() < trapChance
@@ -101,25 +104,30 @@ export default function Home() {
     // Set timeout for auto-hide with progressive difficulty
     timeoutId.current = setTimeout(() => {
       setShowTarget(false)
+      targetShowTime.current = 0  // Clear this immediately to prevent click handler from firing
       
       if (isCurrentTrap) {
         // Successfully avoided trap - continue game
         setLastReaction(null)
-        targetShowTime.current = 0
         nextRound()
         console.log('Trap avoided - good job!')
       } else {
-        // Missed a real target
-        recordMiss()
-        if (soundEnabled) playSound('miss')
-        setLastMissed(true)
-        setShowMissFeedback(true)
-        setLastReaction(null)
-        targetShowTime.current = 0
-        // Clear miss feedback after 500ms
-        setTimeout(() => setShowMissFeedback(false), 500)
-        nextRound()
-        console.log('Target missed - too slow!')
+        // Missed a real target - but check if we're not already processing a miss
+        if (!processingMiss.current) {
+          processingMiss.current = true
+          recordMiss()
+          if (soundEnabled) playSound('miss')
+          setLastMissed(true)
+          setShowMissFeedback(true)
+          setLastReaction(null)
+          // Clear miss feedback and processing flag after 500ms
+          setTimeout(() => {
+            setShowMissFeedback(false)
+            processingMiss.current = false
+          }, 500)
+          nextRound()
+          console.log('Target missed - too slow!')
+        }
       }
     }, difficulty.timeout)
   }
