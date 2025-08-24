@@ -42,7 +42,7 @@ export default function PerformanceCard({
     : 100
   
   // Visual bar widths (percentage)
-  const accuracyBar = Math.min(accuracy, 100)
+  const accuracyBar = accuracy // Already a percentage 0-100
   const speedBar = Math.max(0, Math.min(100, (500 - avgReactionTime) / 5)) // 0ms = 100%, 500ms = 0%
   const streakBar = Math.min(bestStreak * 10, 100) // 10 streak = 100%
   
@@ -179,6 +179,9 @@ export default function PerformanceCard({
               transition={{ duration: 0.5, delay: 0.8 }}
             />
           </div>
+          <p className="text-xs text-gray-500">
+            How similar your reaction times were
+          </p>
         </div>
       </div>
 
@@ -189,25 +192,10 @@ export default function PerformanceCard({
           <p className="text-lg font-bold text-purple-400">{difficultyLevel}%</p>
         </div>
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-400 font-mono">ROUNDS</p>
-          <p className="text-lg font-bold text-neon-cyan">{hits + misses}/10</p>
+          <p className="text-xs text-gray-400 font-mono">ROUNDS COMPLETED</p>
+          <p className="text-lg font-bold text-neon-cyan">10/10</p>
         </div>
       </div>
-
-      {/* Performance Summary */}
-      <motion.div 
-        className="text-center text-sm text-gray-400 font-mono p-3 bg-black/30 rounded-lg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        {grade === 'S' && "LEGENDARY PERFORMANCE! You're a reaction master!"}
-        {grade === 'A' && "Excellent reflexes! Keep up the great work!"}
-        {grade === 'B' && "Good job! With practice, you'll reach the top!"}
-        {grade === 'C' && "Not bad! Focus on speed and accuracy."}
-        {grade === 'D' && "Keep practicing! You'll improve with time."}
-        {grade === 'F' && trapHit ? "Avoid the red traps next time!" : "Don't give up! Every expert was once a beginner."}
-      </motion.div>
     </motion.div>
   )
 }
