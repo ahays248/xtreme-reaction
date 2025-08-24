@@ -93,16 +93,18 @@ lib/
 
 ---
 
-## PHASE 4: Auto-Hide Targets
+## PHASE 4: Auto-Hide Targets ✅ COMPLETE
 **Goal**: Targets disappear after timeout  
 **Time Estimate**: 3 hours  
+**Actual Time**: 10 minutes  
 **Dependencies**: Phase 3 complete
+**Files Updated**: page.tsx only (159 lines total)
 
 ### Tasks
-- [ ] Add timeout when target appears
-- [ ] Target disappears after 2 seconds
-- [ ] Show "missed" message if timeout occurs
-- [ ] Clear timeout if clicked
+- [x] Add timeout when target appears
+- [x] Target disappears after 2 seconds
+- [x] Show "missed" message if timeout occurs
+- [x] Clear timeout if clicked
 
 ### Success Criteria
 - Target disappears exactly after timeout
