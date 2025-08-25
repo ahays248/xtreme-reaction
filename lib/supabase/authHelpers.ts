@@ -11,10 +11,17 @@ export async function signInWithX() {
   const supabase = createClient()
   
   try {
-    console.log('Initiating X OAuth with config:')
-    console.log('- Provider: twitter')
-    console.log('- Redirect URL:', `${window.location.origin}/`)
-    console.log('- Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    // Store debug info in localStorage to persist across redirects
+    const debugInfo = {
+      timestamp: new Date().toISOString(),
+      provider: 'twitter',
+      redirectUrl: `${window.location.origin}/`,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      stage: 'initiating'
+    }
+    
+    localStorage.setItem('oauth_debug', JSON.stringify(debugInfo))
+    console.log('Initiating X OAuth with config:', debugInfo)
     
     // Use the app URL as redirect after successful auth
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -25,11 +32,18 @@ export async function signInWithX() {
     })
 
     if (error) {
-      console.error('OAuth Error Details:', {
-        message: error.message,
-        status: error.status,
-        details: error
-      })
+      const errorInfo = {
+        timestamp: new Date().toISOString(),
+        stage: 'error',
+        error: {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        }
+      }
+      
+      localStorage.setItem('oauth_error', JSON.stringify(errorInfo))
+      console.error('OAuth Error Details:', errorInfo)
       
       // Check for common error patterns
       if (error.message?.includes('Provider not found') || error.message?.includes('provider')) {
@@ -41,9 +55,18 @@ export async function signInWithX() {
     }
 
     // Enhanced debugging for OAuth URL
+    const responseInfo = {
+      timestamp: new Date().toISOString(),
+      stage: 'response',
+      hasData: !!data,
+      hasUrl: !!data?.url,
+      url: data?.url,
+      provider: data?.provider
+    }
+    
+    localStorage.setItem('oauth_response', JSON.stringify(responseInfo))
     console.log('✅ OAuth request successful')
-    console.log('OAuth data:', data)
-    console.log('OAuth URL:', data?.url)
+    console.log('OAuth Response:', responseInfo)
     
     // Validate the OAuth URL
     if (data?.url) {
@@ -66,7 +89,17 @@ export async function signInWithX() {
     
     return { data, error: null }
   } catch (err) {
-    console.error('❌ Unexpected error during sign in:', err)
+    const catchError = {
+      timestamp: new Date().toISOString(),
+      stage: 'catch',
+      error: {
+        message: (err as Error).message,
+        name: (err as Error).name,
+        stack: (err as Error).stack
+      }
+    }
+    localStorage.setItem('oauth_catch_error', JSON.stringify(catchError))
+    console.error('❌ Unexpected error during sign in:', catchError)
     return { error: err as Error }
   }
 }

@@ -7,6 +7,7 @@ import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
 import AuthButton from '@/components/AuthButton'
+import OAuthDebug from '@/components/OAuthDebug'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { useSound } from '@/hooks/useSound'
@@ -549,6 +550,9 @@ export default function Home() {
           />
         </div>
       )}
+      
+      {/* OAuth Debug Component - Shows errors in localStorage */}
+      <OAuthDebug />
     </main>
   )
 }
