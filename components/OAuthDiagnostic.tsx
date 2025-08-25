@@ -14,6 +14,7 @@ export default function OAuthDiagnostic() {
   const [isOpen, setIsOpen] = useState(false)
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
+  const [debugMode, setDebugMode] = useState(false)
   
   // Check for errors in URL params on mount
   useEffect(() => {
@@ -22,7 +23,17 @@ export default function OAuthDiagnostic() {
     if (authError) {
       setIsOpen(true)
     }
+    
+    // Check if debug mode is enabled
+    const savedDebugMode = localStorage.getItem('oauth_debug_mode') === 'true'
+    setDebugMode(savedDebugMode)
   }, [])
+  
+  const toggleDebugMode = () => {
+    const newMode = !debugMode
+    setDebugMode(newMode)
+    localStorage.setItem('oauth_debug_mode', newMode.toString())
+  }
   
   const runDiagnostics = async () => {
     setIsRunning(true)
@@ -265,6 +276,75 @@ export default function OAuthDiagnostic() {
                     <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded">
                       <div className="text-red-400 font-bold mb-1">Authentication Error</div>
                       <div className="text-sm text-red-300">{authError}</div>
+                    </div>
+                  )
+                }
+                return null
+              })()}
+              
+              {/* Debug Mode Toggle */}
+              <div className="mb-4 p-3 bg-blue-900/50 border border-blue-500 rounded">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-blue-400 font-bold">Debug Mode</div>
+                    <div className="text-xs text-blue-300">
+                      When enabled, clicking "Sign in with X" won't redirect - it will show the OAuth URL instead
+                    </div>
+                  </div>
+                  <button
+                    onClick={toggleDebugMode}
+                    className={`px-4 py-2 rounded-lg font-mono text-sm transition-colors ${
+                      debugMode 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    }`}
+                  >
+                    {debugMode ? 'ON' : 'OFF'}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Stored OAuth Data Display */}
+              {(() => {
+                const oauthDebug = localStorage.getItem('oauth_debug')
+                const oauthResponse = localStorage.getItem('oauth_response')
+                const oauthError = localStorage.getItem('oauth_error')
+                const oauthResult = localStorage.getItem('oauth_debug_result')
+                
+                if (oauthDebug || oauthResponse || oauthError || oauthResult) {
+                  return (
+                    <div className="mb-4 p-3 bg-yellow-900/50 border border-yellow-500 rounded">
+                      <div className="text-yellow-400 font-bold mb-2">Stored OAuth Data</div>
+                      {oauthResult && (
+                        <div className="mb-2">
+                          <div className="text-xs text-gray-400">Debug Result:</div>
+                          <pre className="text-xs text-yellow-300 overflow-x-auto">
+                            {JSON.stringify(JSON.parse(oauthResult), null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                      {oauthError && (
+                        <div className="mb-2">
+                          <div className="text-xs text-gray-400">Last Error:</div>
+                          <pre className="text-xs text-red-300 overflow-x-auto">
+                            {JSON.stringify(JSON.parse(oauthError), null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem('oauth_debug')
+                          localStorage.removeItem('oauth_response')
+                          localStorage.removeItem('oauth_error')
+                          localStorage.removeItem('oauth_debug_result')
+                          localStorage.removeItem('oauth_catch_error')
+                          localStorage.removeItem('oauth_redirect')
+                          window.location.reload()
+                        }}
+                        className="mt-2 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded"
+                      >
+                        Clear Stored Data
+                      </button>
                     </div>
                   )
                 }

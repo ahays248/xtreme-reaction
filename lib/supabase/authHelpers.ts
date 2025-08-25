@@ -11,13 +11,17 @@ export async function signInWithX() {
   const supabase = createClient()
   
   try {
+    // Check for debug mode
+    const debugMode = localStorage.getItem('oauth_debug_mode') === 'true'
+    
     // Store debug info in localStorage to persist across redirects
     const debugInfo = {
       timestamp: new Date().toISOString(),
       provider: 'twitter',
       redirectUrl: `${window.location.origin}/auth/callback`,
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      stage: 'initiating'
+      stage: 'initiating',
+      debugMode
     }
     
     localStorage.setItem('oauth_debug', JSON.stringify(debugInfo))
@@ -29,7 +33,7 @@ export async function signInWithX() {
       provider: 'twitter',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        skipBrowserRedirect: false, // Ensure browser redirect happens
+        skipBrowserRedirect: debugMode, // Skip redirect in debug mode
       },
     })
 
@@ -63,12 +67,36 @@ export async function signInWithX() {
       hasData: !!data,
       hasUrl: !!data?.url,
       url: data?.url,
-      provider: data?.provider
+      provider: data?.provider,
+      debugMode
     }
     
     localStorage.setItem('oauth_response', JSON.stringify(responseInfo))
     console.log('✅ OAuth request successful')
     console.log('OAuth Response:', responseInfo)
+    
+    // In debug mode, show the URL but don't redirect
+    if (debugMode) {
+      const debugResult = {
+        success: !!data?.url,
+        url: data?.url,
+        isTwitterUrl: data?.url && (data.url.includes('twitter.com') || data.url.includes('x.com')),
+        provider: data?.provider,
+        message: data?.url ? 
+          (data.url.includes('twitter.com') || data.url.includes('x.com') ? 
+            '✅ OAuth URL points to Twitter!' : 
+            '❌ OAuth URL does not point to Twitter') : 
+          '❌ No OAuth URL returned'
+      }
+      
+      localStorage.setItem('oauth_debug_result', JSON.stringify(debugResult))
+      console.log('Debug Mode Result:', debugResult)
+      
+      // Show alert with the URL for debugging
+      alert(`OAuth Debug Mode:\n\n${debugResult.message}\n\nURL: ${data?.url || 'No URL returned'}\n\nCheck console and localStorage for details.`)
+      
+      return { data, error: null }
+    }
     
     // Validate the OAuth URL
     if (data?.url) {
@@ -78,6 +106,20 @@ export async function signInWithX() {
       } else {
         console.error('❌ Invalid OAuth URL - not redirecting to Twitter:', data.url)
         console.error('📋 This suggests Twitter provider is not properly configured')
+        
+        // Store error before attempting redirect
+        const errorData = {
+          timestamp: new Date().toISOString(),
+          stage: 'invalid_url',
+          url: data.url,
+          message: 'OAuth URL does not point to Twitter'
+        }
+        localStorage.setItem('oauth_error', JSON.stringify(errorData))
+        
+        // Still attempt redirect to see what happens
+        console.log('Attempting redirect anyway to debug...')
+        window.location.href = data.url
+        
         return { 
           error: new Error('Invalid OAuth URL: Twitter provider may not be enabled in Supabase Dashboard') 
         }
