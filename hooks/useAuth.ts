@@ -21,6 +21,8 @@ interface AuthState {
 }
 
 export function useAuth() {
+  // Start with loading state to prevent hydration mismatch
+  // The server always renders loading state, client will update after mount
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     profile: null,

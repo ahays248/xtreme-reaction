@@ -112,7 +112,10 @@ export async function getUser(): Promise<User | null> {
   const { data: { user }, error } = await supabase.auth.getUser()
   
   if (error) {
-    console.error('Error getting user:', error)
+    // Don't log "Auth session missing" errors - these are expected when not logged in
+    if (!error.message?.includes('Auth session missing')) {
+      console.error('Error getting user:', error)
+    }
     return null
   }
 
