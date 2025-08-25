@@ -1,1 +1,0 @@
-~/.local/bin/supabase link --project-ref xhcfjhzfyozzuicubqmh --password <your-database-password>
