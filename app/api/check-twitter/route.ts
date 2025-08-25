@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Check if Twitter OAuth is enabled via Management API
+    // Check public auth settings instead of Management API
     const response = await fetch(
-      `https://api.supabase.com/v1/projects/xhcfjhzfyozzuicubqmh/config/auth`,
+      `https://xhcfjhzfyozzuicubqmh.supabase.co/auth/v1/settings`,
       {
         headers: {
-          'Authorization': `Bearer ${process.env.SUPABASE_MANAGEMENT_TOKEN || 'sbp_4dd96bebb1eb7b8c1232f5ef1ddf89848a86632d'}`,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
           'Content-Type': 'application/json',
         },
       }
@@ -15,21 +15,23 @@ export async function GET() {
 
     if (!response.ok) {
       return NextResponse.json({ 
-        error: 'Failed to fetch config',
+        error: 'Failed to fetch settings',
         status: response.status 
       })
     }
 
-    const config = await response.json()
+    const settings = await response.json()
+    
+    // Check if twitter is in the external providers
+    const twitterEnabled = settings?.external?.twitter === true
     
     return NextResponse.json({
-      twitter_enabled: config.external_twitter_enabled || false,
-      twitter_client_id: config.external_twitter_client_id ? 'Configured' : 'Not configured',
-      twitter_secret: config.external_twitter_secret ? 'Configured' : 'Not configured',
-      raw_config: {
-        external_twitter_enabled: config.external_twitter_enabled,
-        has_client_id: !!config.external_twitter_client_id,
-        has_secret: !!config.external_twitter_secret,
+      twitter_enabled: twitterEnabled,
+      twitter_client_id: twitterEnabled ? 'Check Dashboard' : 'Not configured',
+      twitter_secret: twitterEnabled ? 'Check Dashboard' : 'Not configured',
+      public_settings: {
+        providers: settings?.external || {},
+        twitter_specifically: settings?.external?.twitter
       }
     })
   } catch (error) {
