@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -18,7 +18,12 @@ export async function GET(request: Request) {
 
   if (code) {
     try {
-      const supabase = createClient()
+      // Create Supabase client directly for server-side
+      const supabase = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      
       const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
       
       if (sessionError) {

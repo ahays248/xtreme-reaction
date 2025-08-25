@@ -10,23 +10,35 @@ type Profile = Database['public']['Tables']['profiles']['Row']
 export async function signInWithX() {
   const supabase = createClient()
   
-  // Use the app URL as redirect, Supabase will handle the OAuth flow
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'twitter',
-    options: {
-      redirectTo: 'https://xtreme-reaction.vercel.app/',
-    },
-  })
+  try {
+    // Use the app URL as redirect after successful auth
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'twitter',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    })
 
-  if (error) {
-    console.error('Error signing in with X:', error)
-    return { error }
+    if (error) {
+      console.error('Error signing in with X:', error)
+      return { error }
+    }
+
+    // Log the URL being used for debugging
+    console.log('OAuth data:', data)
+    console.log('OAuth URL:', data?.url)
+    
+    // The signInWithOAuth should automatically redirect if successful
+    // But if not, we can manually redirect
+    if (data?.url) {
+      window.location.href = data.url
+    }
+    
+    return { data, error: null }
+  } catch (err) {
+    console.error('Unexpected error during sign in:', err)
+    return { error: err as Error }
   }
-
-  // Log the URL being used for debugging
-  console.log('OAuth URL:', data?.url)
-  
-  return { data, error: null }
 }
 
 /**
