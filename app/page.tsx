@@ -6,9 +6,11 @@ import Target from '@/components/Target'
 import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
+import AuthButton from '@/components/AuthButton'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { useSound } from '@/hooks/useSound'
+import { useAuth } from '@/hooks/useAuth'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
@@ -49,6 +51,8 @@ export default function Home() {
     initializeAudio, 
     initialized 
   } = useSound()
+  
+  const { isPracticeMode } = useAuth()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -274,23 +278,25 @@ export default function Home() {
       {/* Mobile Header Bar - Only on menu screen */}
       {gameState.status === 'idle' && (
         <div className="fixed top-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-b border-green-500/30 z-30 sm:hidden">
-          <div className="flex items-center justify-between px-4 py-2 h-12">
-            {/* Left: Future username/profile */}
-            <div className="text-xs text-green-400 font-mono">
-              <span className="opacity-50">Guest</span>
+          <div className="flex items-center justify-between px-2 py-2 min-h-[48px]">
+            {/* Left: Auth Button */}
+            <div className="flex-shrink-0">
+              <AuthButton />
             </div>
             
             {/* Right: Volume Control for mobile */}
-            <VolumeControl
-              volume={volume}
-              muted={muted}
-              musicVolume={musicVolume}
-              musicMuted={musicMuted}
-              onVolumeChange={setVolume}
-              onToggleMute={toggleMute}
-              onMusicVolumeChange={setMusicVolume}
-              onToggleMusicMute={toggleMusicMute}
-            />
+            <div className="flex-shrink-0">
+              <VolumeControl
+                volume={volume}
+                muted={muted}
+                musicVolume={musicVolume}
+                musicMuted={musicMuted}
+                onVolumeChange={setVolume}
+                onToggleMute={toggleMute}
+                onMusicVolumeChange={setMusicVolume}
+                onToggleMusicMute={toggleMusicMute}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -455,6 +461,7 @@ export default function Home() {
               hits={gameState.hits}
               misses={gameState.misses}
               bestStreak={gameState.bestStreak}
+              isPracticeMode={isPracticeMode}
               difficultyLevel={gameState.difficultyLevel || 0}
               trapHit={gameState.trapHit || false}
               isNewHighScore={isNewHigh}
@@ -526,9 +533,10 @@ export default function Home() {
           )}
       </motion.div>
 
-      {/* Desktop Volume Control - only show on menu, positioned at top right */}
+      {/* Desktop Auth and Volume Controls - only show on menu, positioned at top right */}
       {gameState.status === 'idle' && (
-        <div className="hidden sm:block fixed top-4 right-4 z-20">
+        <div className="hidden sm:flex fixed top-4 right-4 z-20 gap-4 items-center">
+          <AuthButton />
           <VolumeControl
             volume={volume}
             muted={muted}

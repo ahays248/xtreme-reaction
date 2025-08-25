@@ -17,6 +17,7 @@ interface PerformanceCardProps {
   isNewHighScore: boolean
   previousHighScore: number
   reactionTimes: number[]
+  isPracticeMode?: boolean
 }
 
 export default function PerformanceCard({
@@ -30,7 +31,8 @@ export default function PerformanceCard({
   trapHit,
   isNewHighScore,
   previousHighScore,
-  reactionTimes
+  reactionTimes,
+  isPracticeMode = false
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -196,6 +198,20 @@ export default function PerformanceCard({
           <p className="text-lg font-bold text-neon-cyan">10/10</p>
         </div>
       </div>
+      
+      {/* Practice Mode Indicator */}
+      {isPracticeMode && (
+        <motion.div 
+          className="mt-4 p-3 bg-amber-900/20 border border-amber-500/50 rounded-lg"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          <p className="text-sm text-amber-400 text-center font-mono">
+            🎮 Practice Mode - Sign in with X to save your scores!
+          </p>
+        </motion.div>
+      )}
     </motion.div>
   )
 }
