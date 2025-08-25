@@ -15,7 +15,7 @@ export async function signInWithX() {
     const debugInfo = {
       timestamp: new Date().toISOString(),
       provider: 'twitter',
-      redirectUrl: `${window.location.origin}/`,
+      redirectUrl: `${window.location.origin}/auth/callback`,
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
       stage: 'initiating'
     }

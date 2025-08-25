@@ -6,6 +6,14 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
   const error = requestUrl.searchParams.get('error')
   const error_description = requestUrl.searchParams.get('error_description')
+  
+  // Log callback parameters for debugging
+  console.log('Auth callback received:', {
+    hasCode: !!code,
+    error,
+    error_description,
+    url: requestUrl.toString()
+  })
 
   // Handle errors from OAuth provider
   if (error) {
