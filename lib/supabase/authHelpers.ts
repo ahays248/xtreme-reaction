@@ -11,6 +11,11 @@ export async function signInWithX() {
   const supabase = createClient()
   
   try {
+    console.log('Initiating X OAuth with config:')
+    console.log('- Provider: twitter')
+    console.log('- Redirect URL:', `${window.location.origin}/`)
+    console.log('- Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    
     // Use the app URL as redirect after successful auth
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'twitter',
@@ -20,23 +25,48 @@ export async function signInWithX() {
     })
 
     if (error) {
-      console.error('Error signing in with X:', error)
+      console.error('OAuth Error Details:', {
+        message: error.message,
+        status: error.status,
+        details: error
+      })
+      
+      // Check for common error patterns
+      if (error.message?.includes('Provider not found') || error.message?.includes('provider')) {
+        console.error('❌ Twitter provider is likely not enabled in Supabase Dashboard')
+        console.error('📋 Check: Authentication > Providers > Twitter in your Supabase dashboard')
+      }
+      
       return { error }
     }
 
-    // Log the URL being used for debugging
+    // Enhanced debugging for OAuth URL
+    console.log('✅ OAuth request successful')
     console.log('OAuth data:', data)
     console.log('OAuth URL:', data?.url)
     
-    // The signInWithOAuth should automatically redirect if successful
-    // But if not, we can manually redirect
+    // Validate the OAuth URL
     if (data?.url) {
-      window.location.href = data.url
+      if (data.url.includes('twitter.com') || data.url.includes('x.com')) {
+        console.log('✅ Valid Twitter OAuth URL detected, redirecting...')
+        window.location.href = data.url
+      } else {
+        console.error('❌ Invalid OAuth URL - not redirecting to Twitter:', data.url)
+        console.error('📋 This suggests Twitter provider is not properly configured')
+        return { 
+          error: new Error('Invalid OAuth URL: Twitter provider may not be enabled in Supabase Dashboard') 
+        }
+      }
+    } else {
+      console.error('❌ No OAuth URL returned from Supabase')
+      return { 
+        error: new Error('No OAuth URL returned - check Twitter provider configuration in Supabase') 
+      }
     }
     
     return { data, error: null }
   } catch (err) {
-    console.error('Unexpected error during sign in:', err)
+    console.error('❌ Unexpected error during sign in:', err)
     return { error: err as Error }
   }
 }
