@@ -10,16 +10,10 @@ type Profile = Database['public']['Tables']['profiles']['Row']
 export async function signInWithX() {
   const supabase = createClient()
   
-  // For production, use the actual domain
-  const redirectUrl = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/auth/callback'
-    : 'https://xtreme-reaction.vercel.app/auth/callback'
-  
+  // Let Supabase use the Site URL configured in the dashboard
+  // It will automatically redirect to the configured Site URL after auth
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitter',
-    options: {
-      redirectTo: redirectUrl,
-    },
   })
 
   if (error) {
