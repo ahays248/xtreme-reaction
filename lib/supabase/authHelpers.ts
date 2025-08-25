@@ -24,10 +24,12 @@ export async function signInWithX() {
     console.log('Initiating X OAuth with config:', debugInfo)
     
     // Use the app URL as redirect after successful auth
+    // Try with explicit auth callback path
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'twitter',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth/callback`,
+        skipBrowserRedirect: false, // Ensure browser redirect happens
       },
     })
 
