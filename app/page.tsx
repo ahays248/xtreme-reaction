@@ -7,7 +7,6 @@ import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
 import AuthButton from '@/components/AuthButton'
-import OAuthDiagnostic from '@/components/OAuthDiagnostic'
 import SupabaseCheck from '@/components/SupabaseCheck'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
@@ -551,9 +550,6 @@ export default function Home() {
           />
         </div>
       )}
-      
-      {/* OAuth Diagnostic Component - Comprehensive OAuth testing */}
-      <OAuthDiagnostic />
     </main>
   )
 }
