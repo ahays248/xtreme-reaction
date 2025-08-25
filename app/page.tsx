@@ -7,7 +7,7 @@ import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
 import AuthButton from '@/components/AuthButton'
-import OAuthDebug from '@/components/OAuthDebug'
+import OAuthDiagnostic from '@/components/OAuthDiagnostic'
 import SupabaseCheck from '@/components/SupabaseCheck'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
@@ -552,11 +552,8 @@ export default function Home() {
         </div>
       )}
       
-      {/* OAuth Debug Component - Shows errors in localStorage */}
-      <OAuthDebug />
-      
-      {/* Supabase Config Check - Shows if env vars are valid */}
-      <SupabaseCheck />
+      {/* OAuth Diagnostic Component - Comprehensive OAuth testing */}
+      <OAuthDiagnostic />
     </main>
   )
 }
