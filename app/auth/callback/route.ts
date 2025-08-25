@@ -4,12 +4,37 @@ import { createClient } from '@/lib/supabase/client'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const error = requestUrl.searchParams.get('error')
+  const error_description = requestUrl.searchParams.get('error_description')
 
-  if (code) {
-    const supabase = createClient()
-    await supabase.auth.exchangeCodeForSession(code)
+  // Handle errors from OAuth provider
+  if (error) {
+    console.error('OAuth error:', error, error_description)
+    // Redirect to home with error in query params
+    const redirectUrl = new URL('/', requestUrl.origin)
+    redirectUrl.searchParams.set('auth_error', error_description || error)
+    return NextResponse.redirect(redirectUrl)
   }
 
-  // Redirect back to the main page after auth
+  if (code) {
+    try {
+      const supabase = createClient()
+      const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+      
+      if (sessionError) {
+        console.error('Session exchange error:', sessionError)
+        const redirectUrl = new URL('/', requestUrl.origin)
+        redirectUrl.searchParams.set('auth_error', 'Failed to create session')
+        return NextResponse.redirect(redirectUrl)
+      }
+    } catch (err) {
+      console.error('Unexpected error during auth:', err)
+      const redirectUrl = new URL('/', requestUrl.origin)
+      redirectUrl.searchParams.set('auth_error', 'Authentication failed')
+      return NextResponse.redirect(redirectUrl)
+    }
+  }
+
+  // Redirect back to the main page after successful auth
   return NextResponse.redirect(new URL('/', requestUrl.origin))
 }
