@@ -23,6 +23,9 @@ export async function signInWithX() {
     return { error }
   }
 
+  // Log the URL being used for debugging
+  console.log('OAuth URL:', data?.url)
+  
   return { data, error: null }
 }
 

@@ -15,8 +15,8 @@ export default function AuthButton() {
 
   if (user && profile) {
     return (
-      <div className="flex items-center gap-4">
-        <div className="text-sm">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <div className="text-xs sm:text-sm">
           <span className="text-gray-400">Playing as</span>{' '}
           <span className="text-neon-green font-bold">
             @{profile.x_username || profile.username}
@@ -24,7 +24,7 @@ export default function AuthButton() {
         </div>
         <button
           onClick={signOut}
-          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-sm text-gray-300 hover:text-white transition-all duration-200"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs sm:text-sm text-gray-300 hover:text-white transition-all duration-200"
         >
           Sign Out
         </button>
@@ -33,18 +33,18 @@ export default function AuthButton() {
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-4">
       {isPracticeMode && (
-        <div className="text-sm text-amber-500">
+        <div className="text-xs sm:text-sm text-amber-500">
           Practice Mode
         </div>
       )}
       <button
         onClick={signInWithX}
-        className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-gray-900 border border-gray-700 rounded-lg text-white transition-all duration-200 group"
+        className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black hover:bg-gray-900 border border-gray-700 rounded-lg text-white transition-all duration-200 group"
       >
         <XLogo />
-        <span className="text-sm font-medium">Sign in with X</span>
+        <span className="text-xs sm:text-sm font-medium">Sign in with X</span>
       </button>
     </div>
   )
