@@ -4,10 +4,16 @@
   "description": "Test your reflexes in this intense reaction time game",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#10b981",
+  "background_color": "#000000",
+  "theme_color": "#00ff00",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "/xr-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
     {
       "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",

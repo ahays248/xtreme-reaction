@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Black background -->
+  <rect width="32" height="32" fill="#000000"/>
+  
+  <!-- Crosshair in background -->
+  <g stroke="#00ff00" stroke-width="0.5" fill="none" opacity="0.3">
+    <line x1="0" y1="16" x2="32" y2="16"/>
+    <line x1="16" y1="0" x2="16" y2="32"/>
+    <circle cx="16" cy="16" r="6"/>
+  </g>
+  
+  <!-- XR Text with glow -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <text x="16" y="20" font-family="monospace" font-size="14" font-weight="bold" 
+        fill="#00ff00" text-anchor="middle" filter="url(#glow)">XR</text>
+</svg>

@@ -24,6 +24,13 @@ export const metadata: Metadata = {
   title: "Xtreme Reaction - Test Your Reflexes",
   description: "Challenge your reaction time with this fast-paced reflex game. Compete on leaderboards and share your scores!",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: '/xr-icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    apple: '/xr-icon.svg',
+  },
 };
 
 export const viewport = {
