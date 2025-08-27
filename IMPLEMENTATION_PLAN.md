@@ -392,59 +392,55 @@ lib/
 
 ---
 
-## PHASE 14: X Authentication
-**Goal**: Implement X OAuth  
+## PHASE 14: Email Authentication ✅ COMPLETE (PIVOTED)
+**Goal**: ~~Implement X OAuth~~ Email/Password Authentication  
 **Time Estimate**: 5 hours  
+**Actual Time**: 4 hours (including OAuth troubleshooting)
 **Dependencies**: Phase 13 complete
+**Status**: PIVOTED from X OAuth due to Supabase configuration bugs
 
-### Tasks
-- [ ] Configure X OAuth in Supabase dashboard
-- [ ] Set up X Developer App for OAuth credentials
-- [ ] Add environment variables to Vercel
-- [ ] Add login button with X branding
-- [ ] Handle auth flow and callbacks
-- [ ] Auto-create profile on first login
-- [ ] Display username when logged in
+### Tasks (Updated for Email Auth)
+- [x] ~~Configure X OAuth in Supabase dashboard~~ Attempted, blocked by Supabase bug
+- [x] Implement email/password authentication instead
+- [x] Create AuthModal component for sign up/sign in
+- [x] Add username field (required)
+- [x] Add optional X handle field (unverified)
+- [x] Handle auth flow with email verification disabled
+- [x] Auto-create profile on sign up
+- [x] Display username when logged in
 
-### X OAuth Setup Instructions
-1. **Create X Developer App**:
-   - Go to https://developer.x.com/en/apps
-   - Click "Create an app"
-   - Name: "Xtreme Reaction"
-   - App permissions: Read only
-   - Callback URL: `https://xhcfjhzfyozzuicubqmh.supabase.co/auth/v1/callback`
+### Implementation Notes
+**Why We Pivoted**: X OAuth configuration in Supabase was not persisting to database despite multiple attempts. After extensive troubleshooting (see docs/OAUTH_TROUBLESHOOTING.md), we pivoted to email authentication to unblock development.
 
-2. **Configure in Supabase Dashboard**:
-   - Go to Authentication > Providers
-   - Enable "Twitter" provider
-   - Add API Key (Client ID) from X
-   - Add API Secret (Client Secret) from X
-   - Save configuration
-
-3. **Add Environment Variables to Vercel**:
-   ```
-   NEXT_PUBLIC_X_CLIENT_ID=<your_x_api_key>
-   X_CLIENT_SECRET=<your_x_api_secret>
-   ```
-   Note: Client secret should NOT have NEXT_PUBLIC prefix for security
+**What We Built Instead**:
+- Email/password authentication with Supabase Auth
+- AuthModal component with sign up/sign in forms
+- Username field for display name (required)
+- Optional X handle field for future social features
+- Hardcoded Supabase credentials to avoid env var issues
+- Profile creation on sign up with username
 
 ### Success Criteria
-- Successful X login
-- Profile created in `profiles` table
-- Username displays correctly
-- Session persists across refreshes
+- ✅ Successful email sign up and sign in
+- ✅ Profile created in `profiles` table
+- ✅ Username displays correctly
+- ✅ Session persists across refreshes
 
 ### Database Operations
-- INSERT into `profiles` on first login (via trigger)
+- INSERT into `profiles` on sign up
 - SELECT from `profiles` to get user data
-- UPDATE `profiles.x_username` from OAuth data
+- Store username and optional x_username
 
-### New Files
+### Files Created
 ```
 components/
-  AuthButton.tsx    (login/logout)
+  AuthButton.tsx    (login/logout) ✅
+  AuthModal.tsx     (sign up/sign in forms) ✅
 hooks/
-  useAuth.ts        (auth state)
+  useAuth.ts        (auth state) ✅
+lib/
+  supabase/
+    authHelpers.ts  (auth functions) ✅
 ```
 
 ---
