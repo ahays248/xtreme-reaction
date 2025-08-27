@@ -8,6 +8,7 @@ import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
 import AuthButton from '@/components/AuthButton'
 import SupabaseCheck from '@/components/SupabaseCheck'
+import Footer from '@/components/Footer'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { useSound } from '@/hooks/useSound'
@@ -550,6 +551,9 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* Footer with legal links - only show on menu and game over screens */}
+      {(gameState.status === 'idle' || gameState.status === 'gameOver') && <Footer />}
     </main>
   )
 }
