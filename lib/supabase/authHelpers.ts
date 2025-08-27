@@ -20,10 +20,20 @@ export async function signUpWithEmail(
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: username,
+          x_username: xHandle,
+        }
+      }
     })
 
     if (authError) {
       console.error('Sign up error:', authError)
+      // Check if user already exists and provide clearer error
+      if (authError.message?.includes('already registered')) {
+        return { error: new Error('This email is already registered. Please sign in instead.') }
+      }
       return { error: authError }
     }
 
@@ -31,11 +41,11 @@ export async function signUpWithEmail(
       return { error: new Error('No user returned from sign up') }
     }
 
-    // Step 2: Create or update the user profile
-    // The profile might already exist from a trigger, so we upsert
+    // Step 2: Create the user profile
+    // Use insert instead of upsert to respect RLS policies
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .upsert({
+      .insert({
         id: authData.user.id,
         username: username,
         x_username: xHandle || null,
