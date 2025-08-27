@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import AuthModal from './AuthModal'
 
 export default function AuthButton() {
-  const { user, profile, loading, isPracticeMode, signInWithX, signOut } = useAuth()
+  const { user, profile, loading, isPracticeMode, signInWithEmail, signUpWithEmail, signOut } = useAuth()
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   if (loading) {
     return (
@@ -19,7 +22,10 @@ export default function AuthButton() {
         <div className="text-xs sm:text-sm">
           <span className="text-gray-400">Playing as</span>{' '}
           <span className="text-neon-green font-bold">
-            @{profile.x_username || profile.username}
+            {profile.username}
+            {profile.x_username && (
+              <span className="text-gray-500 ml-1">(@{profile.x_username})</span>
+            )}
           </span>
         </div>
         <button
@@ -33,33 +39,27 @@ export default function AuthButton() {
   }
 
   return (
-    <div className="flex items-center gap-2 sm:gap-4">
-      {isPracticeMode && (
-        <div className="text-xs sm:text-sm text-amber-500">
-          Practice Mode
-        </div>
-      )}
-      <button
-        onClick={signInWithX}
-        className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black hover:bg-gray-900 border border-gray-700 rounded-lg text-white transition-all duration-200 group"
-      >
-        <XLogo />
-        <span className="text-xs sm:text-sm font-medium">Sign in with X</span>
-      </button>
-    </div>
-  )
-}
-
-function XLogo() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className="group-hover:scale-110 transition-transform"
-    >
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
+    <>
+      <div className="flex items-center gap-2 sm:gap-4">
+        {isPracticeMode && (
+          <div className="text-xs sm:text-sm text-amber-500">
+            Practice Mode
+          </div>
+        )}
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="px-3 sm:px-4 py-1.5 sm:py-2 bg-black hover:bg-gray-900 border border-neon-green rounded-lg text-neon-green font-medium transition-all duration-200 group text-xs sm:text-sm"
+        >
+          Sign In
+        </button>
+      </div>
+      
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSignIn={signInWithEmail}
+        onSignUp={signUpWithEmail}
+      />
+    </>
   )
 }

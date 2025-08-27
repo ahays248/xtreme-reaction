@@ -7,7 +7,8 @@ import {
   getUser, 
   getUserProfile, 
   onAuthStateChange,
-  signInWithX as signIn,
+  signInWithEmail as signIn,
+  signUpWithEmail as signUp,
   signOut as signOutUser
 } from '@/lib/supabase/authHelpers'
 
@@ -80,12 +81,27 @@ export function useAuth() {
     }
   }, [])
 
-  const signInWithX = async () => {
+  const signInWithEmail = async (email: string, password: string) => {
     setAuthState(prev => ({ ...prev, loading: true }))
-    const { error } = await signIn()
+    const { error } = await signIn(email, password)
     if (error) {
-      console.error('Sign in error:', error)
       setAuthState(prev => ({ ...prev, loading: false }))
+      throw error
+    }
+    // Auth state will be updated by the subscription
+  }
+
+  const signUpWithEmail = async (
+    email: string, 
+    password: string, 
+    username: string, 
+    xHandle?: string
+  ) => {
+    setAuthState(prev => ({ ...prev, loading: true }))
+    const { error } = await signUp(email, password, username, xHandle)
+    if (error) {
+      setAuthState(prev => ({ ...prev, loading: false }))
+      throw error
     }
     // Auth state will be updated by the subscription
   }
@@ -105,7 +121,8 @@ export function useAuth() {
     profile: authState.profile,
     loading: authState.loading,
     isPracticeMode: authState.isPracticeMode,
-    signInWithX,
+    signInWithEmail,
+    signUpWithEmail,
     signOut,
   }
 }
