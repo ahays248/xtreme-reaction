@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs sm:text-sm text-gray-500">
-            © 2024 Xtreme Reaction. All rights reserved.
+            © 2025 Xtreme Reaction. All rights reserved.
           </div>
           
           <nav className="flex items-center gap-4 sm:gap-6">
@@ -25,7 +25,7 @@ export default function Footer() {
             </Link>
             
             <a 
-              href="https://x.com/XtremeReaction" 
+              href="https://x.com/DataVisGuy" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-xs sm:text-sm text-gray-400 hover:text-neon-green transition-colors duration-200 flex items-center gap-1"
