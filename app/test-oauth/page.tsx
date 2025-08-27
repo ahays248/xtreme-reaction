@@ -20,7 +20,7 @@ export default function TestOAuthPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'twitter',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://xtreme-reaction.vercel.app'}/auth/callback`,
           skipBrowserRedirect: true // Don't redirect, just get the URL
         }
       })
@@ -81,7 +81,8 @@ export default function TestOAuthPage() {
   const attemptDirectAuth = () => {
     // Try to construct OAuth URL manually
     const baseUrl = 'https://xhcfjhzfyozzuicubqmh.supabase.co'
-    const redirectTo = encodeURIComponent(`${window.location.origin}/auth/callback`)
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://xtreme-reaction.vercel.app'
+    const redirectTo = encodeURIComponent(`${origin}/auth/callback`)
     const oauthUrl = `${baseUrl}/auth/v1/authorize?provider=twitter&redirect_to=${redirectTo}`
     
     setResult({
@@ -163,7 +164,7 @@ export default function TestOAuthPage() {
         <ul className="list-disc list-inside space-y-2">
           <li>Project ID: xhcfjhzfyozzuicubqmh</li>
           <li>Twitter Client ID: iN3FERNVeWJ24G6fvgn1meSzj</li>
-          <li>Callback URL: {window.location.origin}/auth/callback</li>
+          <li>Callback URL: {typeof window !== 'undefined' ? window.location.origin : 'https://xtreme-reaction.vercel.app'}/auth/callback</li>
           <li>Provider: twitter (OAuth 1.0a)</li>
         </ul>
       </div>
