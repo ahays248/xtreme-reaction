@@ -6,6 +6,7 @@ let clientInstance: ReturnType<typeof createSupabaseClient<Database>> | null = n
 
 // Create a single Supabase client instance for the browser
 // This prevents the "Multiple GoTrueClient instances" warning
+// Uses NEXT_PUBLIC_ prefixed env vars for browser access
 export function createClient() {
   // Only create a new instance if we're on the server or don't have one yet
   if (typeof window === 'undefined') {
