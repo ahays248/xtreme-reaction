@@ -79,7 +79,7 @@ export default function ScoreCard({
         fontFamily: 'Orbitron, monospace',
         background: 'linear-gradient(135deg, #000000 0%, #0a0a0a 100%)',
         color: colors.white,
-        lineHeight: 1.2
+        letterSpacing: 'normal'
       }}
     >
       {/* Matrix-style background pattern */}
@@ -99,17 +99,17 @@ export default function ScoreCard({
         {/* Title */}
         <div style={{ textAlign: 'center', marginBottom: '12px' }}>
           <h1 style={{
-            fontSize: '52px',
+            fontSize: '48px',
             fontWeight: 900,
             color: colors.neonGreen,
             textShadow: `0 0 20px rgba(0, 255, 0, 0.5)`,
-            lineHeight: 1,
-            marginBottom: '20px',
-            letterSpacing: '2px'
+            lineHeight: '48px',
+            marginBottom: '24px',
+            letterSpacing: '1px'
           }}>
             XTREME REACTION
           </h1>
-          <p style={{ fontSize: '20px', color: colors.gray400, lineHeight: 1.2 }}>Ultimate Reflex Challenge</p>
+          <p style={{ fontSize: '18px', color: colors.gray400, lineHeight: '24px', marginTop: '0' }}>Ultimate Reflex Challenge</p>
         </div>
         
         {/* Score and Grade/Percentile */}
@@ -117,11 +117,11 @@ export default function ScoreCard({
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>FINAL SCORE</p>
             <p style={{
-              fontSize: '56px',
+              fontSize: '52px',
               fontWeight: 900,
               color: colors.neonYellow,
               textShadow: `0 0 30px rgba(255, 255, 0, 0.5)`,
-              lineHeight: 1,
+              lineHeight: '52px',
               marginTop: '8px'
             }}>
               {formatScore(finalScore)}
@@ -133,11 +133,11 @@ export default function ScoreCard({
               <>
                 <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>TODAY'S RANK</p>
                 <div style={{
-                  fontSize: '48px',
+                  fontSize: '52px',
                   fontWeight: 900,
                   color: colors.cyan400,
                   textShadow: `0 0 25px ${colors.cyan400}`,
-                  lineHeight: 1,
+                  lineHeight: '52px',
                   marginTop: '8px'
                 }}>
                   TOP {100 - scorePercentile}%
@@ -147,11 +147,11 @@ export default function ScoreCard({
               <>
                 <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>GRADE</p>
                 <div style={{
-                  fontSize: '56px',
+                  fontSize: '52px',
                   fontWeight: 900,
                   color: gradeColors[grade],
                   textShadow: `0 0 25px ${gradeColors[grade]}`,
-                  lineHeight: 1,
+                  lineHeight: '52px',
                   marginTop: '8px'
                 }}>
                   {grade}
@@ -164,23 +164,23 @@ export default function ScoreCard({
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginTop: '8px' }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px', lineHeight: 1 }}>ACCURACY</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: colors.green400, lineHeight: 1, marginTop: '4px' }}>{accuracy}%</p>
+            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px' }}>ACCURACY</p>
+            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.green400, lineHeight: '28px', marginTop: '0' }}>{accuracy}%</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px', lineHeight: 1 }}>AVG SPEED</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: colors.yellow400, lineHeight: 1, marginTop: '4px' }}>{formatTime(avgReactionTime)}</p>
+            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px' }}>AVG SPEED</p>
+            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.yellow400, lineHeight: '28px', marginTop: '0' }}>{formatTime(avgReactionTime)}</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px', lineHeight: 1 }}>BEST STREAK</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: colors.orange400, lineHeight: 1, marginTop: '4px' }}>{bestStreak}</p>
+            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px' }}>BEST STREAK</p>
+            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.orange400, lineHeight: '28px', marginTop: '0' }}>{bestStreak}</p>
           </div>
         </div>
         
         {/* Leaderboard Rank */}
         {userRank && (
           <div style={{ textAlign: 'center', marginTop: '8px' }}>
-            <p style={{ fontSize: '22px', fontWeight: 'bold', color: colors.cyan400, lineHeight: 1 }}>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: colors.cyan400, lineHeight: '24px' }}>
               {leaderboardType === 'daily' ? 'Daily' : 'All-Time'} Rank: #{userRank}
             </p>
           </div>
@@ -189,14 +189,14 @@ export default function ScoreCard({
         {/* Player Name */}
         {displayName !== 'Anonymous' && (
           <div style={{ textAlign: 'center', marginTop: '4px' }}>
-            <p style={{ fontSize: '20px', color: colors.gray300, lineHeight: 1 }}>{displayName}</p>
+            <p style={{ fontSize: '18px', color: colors.gray300, lineHeight: '24px' }}>{displayName}</p>
           </div>
         )}
         
         {/* Call to Action */}
         <div style={{ textAlign: 'center', marginTop: '16px', paddingBottom: '8px' }}>
-          <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px', lineHeight: 1.4 }}>Think you can beat this score?</p>
-          <p style={{ fontSize: '20px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: 1.4 }}>
+          <p style={{ fontSize: '17px', color: colors.gray400, marginBottom: '10px', lineHeight: '24px' }}>Think you can beat this score?</p>
+          <p style={{ fontSize: '19px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: '26px' }}>
             Play at XtremeReaction.lol
           </p>
         </div>
