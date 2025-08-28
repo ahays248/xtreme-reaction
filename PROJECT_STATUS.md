@@ -1,10 +1,10 @@
 # PROJECT STATUS - Xtreme Reaction
 
-**Last Updated**: August 27, 2025
-**Current Phase**: Phase 14 COMPLETE - Email Authentication (pivoted from X OAuth)
-**Next Phase**: Phase 15 - Save Scores to Database
+**Last Updated**: December 28, 2024
+**Current Phase**: Phase 16 COMPLETE - Leaderboards
+**Next Phase**: Phase 17 - Share to X
 
-## ✅ COMPLETED PHASES (1-14, 18)
+## ✅ COMPLETED PHASES (1-16, 18)
 
 ### Core Game Mechanics
 - ✅ Phase 1: Static Target Display
@@ -25,6 +25,8 @@
 ### Database & Auth Setup
 - ✅ Phase 13: Database Setup (client, types, environment variables)
 - ✅ Phase 14: Email Authentication (pivoted from X OAuth due to Supabase bugs)
+- ✅ Phase 15: Save Scores (game sessions persist to database)
+- ✅ Phase 16: Leaderboards (daily and all-time rankings)
 - ✅ Phase 18: Practice Mode (implemented early for testing)
 
 ## ✅ AUTHENTICATION PIVOT (August 27, 2025)
@@ -45,9 +47,9 @@
 ## 🎮 CURRENT GAME STATE
 
 ### What Works
-- Complete 10-round gameplay loop
+- **60-second time-based gameplay** (no round limits!)
 - Green targets (hit quickly) and red traps (avoid)
-- Progressive difficulty scaling
+- Progressive difficulty scaling over time
 - Score calculation with streak bonuses
 - Cyberpunk Matrix theme with neon effects
 - Sound effects for all actions
@@ -55,6 +57,9 @@
 - Mobile-optimized controls
 - Detailed performance card with visual metrics
 - High score tracking and display
+- **Database integration** - scores save automatically
+- **Leaderboards** - Daily and All-Time rankings
+- **User profiles** - Track personal stats
 
 ### Audio System Features
 - **Enable Sound Button**: Mobile-safe initialization
@@ -171,17 +176,42 @@
 4. Consider future features when designing (endless mode)
 5. Each metric should have distinct visual identity
 
-## 🚀 NEXT: Phase 15 - Save Scores
+## 🎯 MAJOR IMPROVEMENTS (December 28, 2024)
+
+### 60-Second Time Limit Implementation
+- **REMOVED**: 10-round limit that restricted scoring
+- **ADDED**: Full 60-second gameplay as per design document
+- **BENEFIT**: No more bad luck with red circles limiting score potential
+- **TIMER**: Shows countdown from 60 seconds
+- **DIFFICULTY**: Scales from 0-100% over the 60 seconds
+
+### Score Saving Fixes
+- **FIXED**: Streak bonus calculation now correctly saves to database
+- **FIXED**: Final scores with all bonuses properly persisted
+- **ISSUE**: Was saving base score instead of calculated final score
+- **RESULT**: High scores (10,000+) now save correctly
+
+### Leaderboard System (Phase 16)
+- **Daily Leaderboard**: Today's top 20 players
+- **All-Time Leaderboard**: Best scores ever
+- **User Rank**: Shows your position even if not in top 20
+- **Auto-Refresh**: Updates every 30 seconds
+- **Mobile-Optimized**: Responsive table design
+
+### Audio State Management
+- **FIXED**: Music resumes correctly when returning from leaderboard
+- **ADDED**: Focus/visibility listeners for page navigation
+- **MAINTAINS**: Correct music state across all pages
+
+## 🚀 NEXT: Phase 17 - Share to X
 
 ### Ready to Implement:
-1. Save game sessions to database after each game
-2. Track user statistics and high scores
-3. Update user profiles with gameplay stats
-4. Apply migration 004_align_with_new_design.sql if needed
+1. Generate scorecard image with Canvas API
+2. Create share text with game statistics
+3. Implement X share intent URL
+4. Track shares in database
 
-### Upcoming Phases:
-- **Phase 15**: Save Scores - Persist game data
-- **Phase 16**: Leaderboards - Show top players
+### Remaining Phases:
 - **Phase 17**: Share to X - Social sharing features
 - **Phase 19**: Charts & Analytics - Data visualization
 - **Phase 20**: Final Polish - Production optimizations
