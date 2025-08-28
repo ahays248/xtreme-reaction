@@ -136,6 +136,9 @@ export default function Home() {
           : 0
         const accuracy = calculateAccuracy(gameState.hits, gameState.misses)
         
+        // Calculate streak bonus the same way as PerformanceCard
+        const streakBonus = calculateStreakBonus(gameState.bestStreak) * gameState.bestStreak
+        
         // Calculate final score the same way as PerformanceCard
         const finalScore = gameState.trapHit 
           ? 0 
@@ -143,7 +146,7 @@ export default function Home() {
               gameState.hitScores,
               accuracy,
               gameState.difficultyLevel || 0,
-              gameState.bestStreak
+              streakBonus
             )
         
         const gameResults: GameResults = {
