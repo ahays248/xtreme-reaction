@@ -655,7 +655,7 @@ export default function Home() {
           <>
             {/* Minimal game info - just round counter and score */}
             <motion.div 
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-4 sm:gap-8 items-center"
+              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -664,9 +664,6 @@ export default function Home() {
               </div>
               <div className="text-lg md:text-xl font-mono text-neon-yellow font-bold">
                 {formatScore(gameState.score)}
-              </div>
-              <div className="text-sm md:text-base font-mono text-red-400">
-                Red: {gameState.trapsShown}/5
               </div>
             </motion.div>
 
