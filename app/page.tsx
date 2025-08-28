@@ -18,6 +18,7 @@ import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
+import { saveGameSession, type GameResults } from '@/lib/supabase/gameService'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -29,6 +30,7 @@ export default function Home() {
   const [showMissFeedback, setShowMissFeedback] = useState(false)
   const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
   const [soundEnabled, setSoundEnabled] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -54,7 +56,7 @@ export default function Home() {
     initialized 
   } = useSound()
   
-  const { isPracticeMode } = useAuth()
+  const { user, isPracticeMode } = useAuth()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -87,6 +89,51 @@ export default function Home() {
       switchMusic('results')
     }
   }, [gameState.status, switchMusic, initialized, soundEnabled])
+
+  // Save score when game ends (only for authenticated users)
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gameState.status === 'gameOver' && !isPracticeMode && user) {
+        setSaveStatus('saving')
+        
+        // Calculate game results
+        const avgReactionTime = gameState.reactionTimes.length > 0 
+          ? calculateAverage(gameState.reactionTimes) 
+          : 0
+        const accuracy = calculateAccuracy(gameState.hits, gameState.misses)
+        
+        const gameResults: GameResults = {
+          score: gameState.score,
+          avgReactionTime,
+          successfulHits: gameState.hits,
+          incorrectHits: gameState.trapHit ? 1 : 0,
+          missedCues: gameState.misses,
+          accuracy,
+          totalClicks: gameState.hits + gameState.misses + (gameState.trapHit ? 1 : 0),
+          maxStreak: gameState.bestStreak,
+          roundsCompleted: gameState.currentRound - 1,
+          gameDuration: 30000, // Estimate for 10 rounds
+          targetsShown: gameState.currentRound,
+          trapsAvoided: 0, // Will implement tracking later
+          trapHit: gameState.trapHit,
+          difficultyLevel: gameState.difficultyLevel,
+        }
+        
+        const { error } = await saveGameSession(user.id, gameResults)
+        
+        if (error) {
+          console.error('Failed to save game session:', error)
+          setSaveStatus('error')
+        } else {
+          setSaveStatus('saved')
+        }
+      }
+    }
+    
+    if (gameState.status === 'gameOver') {
+      saveScore()
+    }
+  }, [gameState.status, gameState, user, isPracticeMode])
 
   const showNextTarget = () => {
     // Reset processing flag for new round
@@ -231,6 +278,9 @@ export default function Home() {
   }
 
   const handleStartGame = async () => {
+    // Reset save status for new game
+    setSaveStatus('idle')
+    
     // Only initialize audio if user explicitly enabled it
     // Don't auto-enable sound when starting game
     if (!soundEnabled && initialized) {
@@ -469,6 +519,7 @@ export default function Home() {
               isNewHighScore={isNewHigh}
               previousHighScore={highScore}
               reactionTimes={gameState.reactionTimes}
+              saveStatus={saveStatus}
             />
           )
         })()}

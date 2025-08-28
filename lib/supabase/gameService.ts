@@ -18,6 +18,8 @@ export interface GameResults {
   gameDuration: number
   targetsShown: number
   trapsAvoided: number
+  trapHit?: boolean // Track if game ended due to trap
+  difficultyLevel?: number // Current difficulty percentage
 }
 
 /**
@@ -45,7 +47,7 @@ export async function saveGameSession(
     game_duration: results.gameDuration,
     targets_shown: results.targetsShown,
     fakes_avoided: results.trapsAvoided,
-    difficulty_reached: results.roundsCompleted, // Can be adjusted based on difficulty system
+    difficulty_reached: results.difficultyLevel || results.roundsCompleted,
   }
 
   const { data, error } = await supabase

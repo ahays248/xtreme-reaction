@@ -18,6 +18,7 @@ interface PerformanceCardProps {
   previousHighScore: number
   reactionTimes: number[]
   isPracticeMode?: boolean
+  saveStatus?: 'idle' | 'saving' | 'saved' | 'error'
 }
 
 export default function PerformanceCard({
@@ -32,7 +33,8 @@ export default function PerformanceCard({
   isNewHighScore,
   previousHighScore,
   reactionTimes,
-  isPracticeMode = false
+  isPracticeMode = false,
+  saveStatus = 'idle'
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -199,8 +201,8 @@ export default function PerformanceCard({
         </div>
       </div>
       
-      {/* Practice Mode Indicator */}
-      {isPracticeMode && (
+      {/* Save Status / Practice Mode Indicator */}
+      {isPracticeMode ? (
         <motion.div 
           className="mt-4 p-3 bg-amber-900/20 border border-amber-500/50 rounded-lg"
           initial={{ opacity: 0, y: 10 }}
@@ -208,8 +210,31 @@ export default function PerformanceCard({
           transition={{ delay: 1 }}
         >
           <p className="text-sm text-amber-400 text-center font-mono">
-            🎮 Practice Mode - Sign in with X to save your scores!
+            🎮 Practice Mode - Sign in to save your scores!
           </p>
+        </motion.div>
+      ) : (
+        <motion.div 
+          className="mt-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          {saveStatus === 'saving' && (
+            <p className="text-sm text-yellow-400 text-center font-mono animate-pulse">
+              💾 Saving your score...
+            </p>
+          )}
+          {saveStatus === 'saved' && (
+            <p className="text-sm text-green-400 text-center font-mono">
+              ✅ Score saved to leaderboard!
+            </p>
+          )}
+          {saveStatus === 'error' && (
+            <p className="text-sm text-red-400 text-center font-mono">
+              ❌ Failed to save score (playing offline)
+            </p>
+          )}
         </motion.div>
       )}
     </motion.div>
