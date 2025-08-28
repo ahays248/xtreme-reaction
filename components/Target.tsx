@@ -38,9 +38,14 @@ export default function Target({ isVisible, onTargetClick, size = 96, variant = 
           className={`${sizeClass} ${bgColor} rounded-full cursor-pointer relative`}
           style={positionStyle}
           onPointerDown={onTargetClick}
+          onKeyDown={(e) => {
+            // Prevent keyboard shortcuts from activating the target
+            e.preventDefault()
+            e.stopPropagation()
+          }}
           aria-label={isTrap ? "Trap circle - don't click!" : "Target circle"}
-          role="button"
-          tabIndex={0}
+          role="presentation"
+          tabIndex={-1}
           // Spawn animation
           initial={{ 
             scale: 0,

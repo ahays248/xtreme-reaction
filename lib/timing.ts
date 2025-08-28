@@ -1,5 +1,8 @@
 export function calculateReactionTime(startTime: number, endTime: number): number {
-  return Math.round(endTime - startTime)
+  const rawTime = Math.round(endTime - startTime)
+  // Minimum human reaction time is around 100ms
+  // Anything less is likely a keyboard shortcut or cheating
+  return Math.max(100, rawTime)
 }
 
 export function calculateAverage(times: number[]): number {

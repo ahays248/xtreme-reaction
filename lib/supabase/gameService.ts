@@ -40,6 +40,15 @@ export async function saveGameSession(
     }
   }
   
+  // Validate minimum reaction time (prevent impossible scores)
+  if (results.avgReactionTime < 100) {
+    console.warn('Suspicious reaction time detected:', results.avgReactionTime, 'User:', userId)
+    return {
+      data: null,
+      error: new Error('Invalid game data detected. Scores with average reaction time below 100ms are not allowed.')
+    }
+  }
+  
   const supabase = createClient()
   
   const gameSessionData: GameSessionInsert = {
