@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SimpleCaptcha from './SimpleCaptcha'
 
@@ -20,6 +20,16 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [captchaVerified, setCaptchaVerified] = useState(false)
+
+  // Scroll to top when modal opens to ensure it's visible
+  useEffect(() => {
+    if (isOpen) {
+      // Small delay to ensure modal is rendered
+      setTimeout(() => {
+        window.scrollTo(0, 0)
+      }, 100)
+    }
+  }, [isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,14 +85,15 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
           
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 overflow-y-auto z-50"
+            className="fixed inset-x-0 top-0 bottom-0 overflow-y-auto z-50 pb-safe"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="flex min-h-full items-center justify-center p-4">
+            <div className="flex min-h-full items-start sm:items-center justify-center p-4 pt-8 sm:pt-4">
               <motion.div
-                className="bg-black border-2 border-neon-green rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full shadow-neon-green my-8"
+                className="bg-black border-2 border-neon-green rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full shadow-neon-green"
+                data-modal-content
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
