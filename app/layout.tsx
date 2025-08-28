@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Orbitron, Rajdhani, Share_Tech_Mono } from "next/font/google";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -21,8 +22,22 @@ const shareTechMono = Share_Tech_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Xtreme Reaction - Phase 16 Complete | 60-Second Challenge",
-  description: "Challenge your reaction time with this fast-paced reflex game. Compete on leaderboards and share your scores!",
+  title: "Xtreme Reaction - Test Your Reflexes | 60-Second Challenge",
+  description: "The ultimate reaction time game! Test your reflexes, compete on global leaderboards, and share your scores. How fast can you react?",
+  keywords: ["reaction time", "reflex game", "speed test", "competitive gaming", "leaderboard", "browser game"],
+  authors: [{ name: "XtremeReaction.lol" }],
+  openGraph: {
+    title: "Xtreme Reaction - Test Your Reflexes",
+    description: "Challenge yourself in this 60-second reaction time game. Compete globally!",
+    url: "https://XtremeReaction.lol",
+    siteName: "Xtreme Reaction",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Xtreme Reaction - Test Your Reflexes",
+    description: "How fast are your reflexes? Find out in 60 seconds!",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -58,7 +73,9 @@ export default function RootLayout({
       <body
         className={`${orbitron.variable} ${rajdhani.variable} ${shareTechMono.variable} antialiased`}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

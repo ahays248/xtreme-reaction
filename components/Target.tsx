@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getTargetSizeClass } from '@/lib/difficulty'
 
@@ -11,7 +12,7 @@ interface TargetProps {
   position?: { x: number; y: number } // Position in percentages
 }
 
-export default function Target({ isVisible, onTargetClick, size = 96, variant = 'normal', position }: TargetProps) {
+const Target = memo(function Target({ isVisible, onTargetClick, size = 96, variant = 'normal', position }: TargetProps) {
   // Get appropriate Tailwind class for size
   const sizeClass = getTargetSizeClass(size)
   
@@ -87,4 +88,6 @@ export default function Target({ isVisible, onTargetClick, size = 96, variant = 
       )}
     </AnimatePresence>
   )
-}
+})
+
+export default Target

@@ -10,6 +10,7 @@ import AccuracyChart from '@/components/charts/AccuracyChart'
 import ScoreHistoryChart from '@/components/charts/ScoreHistoryChart'
 import TotalGamesChart from '@/components/charts/TotalGamesChart'
 import StatsOverview from '@/components/charts/StatsOverview'
+import LoadingSpinner from '@/components/LoadingSpinner'
 import type { GameStats, DailyGameCount } from '@/lib/supabase/statsService'
 
 export default function StatsPage() {
@@ -63,7 +64,7 @@ export default function StatsPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-neon-green text-xl">Loading stats...</div>
+        <LoadingSpinner text="Loading stats..." size="lg" />
       </div>
     )
   }

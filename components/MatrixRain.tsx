@@ -62,8 +62,12 @@ export default function MatrixRain() {
       }
     }
 
-    // Animation loop
-    const intervalId = setInterval(draw, 35)
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    
+    // Animation loop - reduce FPS for reduced motion or mobile
+    const fps = prefersReducedMotion ? 10 : 30
+    const intervalId = setInterval(draw, 1000 / fps)
 
     // Cleanup
     return () => {
