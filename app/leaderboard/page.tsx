@@ -31,7 +31,7 @@ export default function LeaderboardPage() {
   }, [initialized, soundEnabled, switchMusic])
 
   return (
-    <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative">
+    <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative overflow-x-hidden">
       <MatrixRain />
       
       {/* Scanline effect */}
@@ -39,21 +39,21 @@ export default function LeaderboardPage() {
 
       {/* Header */}
       <motion.div
-        className="text-center mb-6 sm:mb-8 relative z-10 mt-4 sm:mt-8"
+        className="text-center mb-4 sm:mb-6 md:mb-8 relative z-10 mt-2 sm:mt-4 md:mt-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-orbitron font-black mb-2 text-glow-soft">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-orbitron font-black mb-1 sm:mb-2 text-glow-soft">
           LEADERBOARD
         </h1>
-        <p className="text-sm sm:text-base font-mono text-neon-cyan">
+        <p className="text-xs sm:text-sm md:text-base font-mono text-neon-cyan">
           {type === 'daily' ? "Today's Top Players" : "All-Time Champions"}
         </p>
       </motion.div>
 
       {/* Leaderboard Component */}
       <motion.div
-        className="w-full max-w-4xl relative z-10"
+        className="w-full max-w-4xl relative z-10 flex-1 px-2 sm:px-0"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
@@ -83,20 +83,20 @@ export default function LeaderboardPage() {
 
       {/* Action Buttons */}
       <motion.div
-        className="flex gap-4 mt-8 relative z-10"
+        className="flex gap-2 sm:gap-4 mt-4 sm:mt-6 md:mt-8 relative z-10 pb-safe"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
         <button
           onClick={() => router.push('/')}
-          className="px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200"
+          className="px-3 sm:px-6 py-2 sm:py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm sm:text-base rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200"
         >
           BACK TO GAME
         </button>
         <button
           onClick={refresh}
-          className="px-6 py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
+          className="px-3 sm:px-6 py-2 sm:py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold text-sm sm:text-base rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
         >
           REFRESH
         </button>
@@ -104,7 +104,7 @@ export default function LeaderboardPage() {
 
       {/* Info Text */}
       <motion.div
-        className="mt-8 text-center text-sm text-gray-500 font-mono relative z-10"
+        className="mt-4 sm:mt-6 md:mt-8 mb-4 text-center text-xs sm:text-sm text-gray-500 font-mono relative z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
