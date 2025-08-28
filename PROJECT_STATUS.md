@@ -1,7 +1,7 @@
 # PROJECT STATUS - Xtreme Reaction
 
-**Last Updated**: December 28, 2024
-**Current Phase**: Phase 16 COMPLETE - Leaderboards
+**Last Updated**: December 28, 2024 (Session 2)
+**Current Phase**: Phase 16 COMPLETE - Leaderboards + Major Improvements
 **Next Phase**: Phase 17 - Share to X
 
 ## ✅ COMPLETED PHASES (1-16, 18)
@@ -176,7 +176,26 @@
 4. Consider future features when designing (endless mode)
 5. Each metric should have distinct visual identity
 
-## 🎯 MAJOR IMPROVEMENTS (December 28, 2024)
+## 🎯 MAJOR IMPROVEMENTS (December 28, 2024 - Session 2)
+
+### Critical Bug Fixes
+- **Score Saving Fixed**: Streak bonuses now calculate correctly (was passing raw value instead of calculated bonus)
+- **Database Errors Fixed**: All numeric fields properly rounded to integers
+- **60-Second Timer Fixed**: Game now properly ends at exactly 60 seconds
+- **Difficulty Scaling Fixed**: Properly reaches 100% difficulty (was stuck at 3%)
+- **Post-Game Miss Penalty Fixed**: No more phantom misses after game ends
+- **Rapid Spawning Bug Fixed**: Game no longer breaks after missing targets
+- **Music Transitions Fixed**: Gameplay music properly plays after navigation
+- **Negative Consistency Fixed**: Score now uses proper standard deviation (0-100%)
+
+### Gameplay Improvements
+- **Red Target Penalty Changed**: Now ends game but keeps score (no more 0 score)
+- **Miss Behavior Improved**: Green targets disappear immediately on miss (no double penalty)
+- **Red Circle Rate Reduced**: Lowered from 20-30% to 15-25% for better balance
+- **Target Size Scaling**: Now properly decreases from 96px to 48px over time
+- **Timeout Scaling**: Properly decreases from 2000ms to 800ms
+
+## 🎯 MAJOR IMPROVEMENTS (December 28, 2024 - Session 1)
 
 ### 60-Second Time Limit Implementation
 - **REMOVED**: 10-round limit that restricted scoring
@@ -202,6 +221,27 @@
 - **FIXED**: Music resumes correctly when returning from leaderboard
 - **ADDED**: Focus/visibility listeners for page navigation
 - **MAINTAINS**: Correct music state across all pages
+
+## 📊 CURRENT GAME STATISTICS
+
+### Performance Metrics
+- **Max Possible Score**: ~50,000+ (perfect 60-second run)
+- **Difficulty Progression**: 0% to 100% over 60 seconds
+- **Score Multipliers**:
+  - Accuracy: 0-100% multiplier
+  - Difficulty: 1.0x to 1.5x multiplier
+  - Streak Bonus: 50 points per hit after 5 consecutive
+- **Target Spawn Rate**: 1.5 second delays between targets
+- **Red Circle Frequency**: 15% (start) to 25% (end)
+
+### Known Issues (All Fixed)
+- ✅ Scores not saving correctly to database
+- ✅ Game not ending at 60 seconds
+- ✅ Difficulty stuck at 3% instead of 100%
+- ✅ Post-game penalties ruining scores
+- ✅ Rapid uncontrollable spawning after miss
+- ✅ Music not switching properly
+- ✅ Negative consistency percentages
 
 ## 🚀 NEXT: Phase 17 - Share to X
 
