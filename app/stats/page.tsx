@@ -40,8 +40,8 @@ export default function StatsPage() {
   async function loadStats() {
     setLoading(true)
     
-    // Load user's game stats
-    const { data: userStats } = await getUserGameStats(user!.id, 20)
+    // Load user's game stats (last 50 games)
+    const { data: userStats } = await getUserGameStats(user!.id, 50)
     if (userStats) {
       setGameStats(userStats)
     }

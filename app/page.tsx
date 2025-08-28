@@ -759,6 +759,14 @@ export default function Home() {
                 START GAME
               </motion.button>
               <motion.button
+                onClick={() => router.push('/stats')}
+                className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-purple-500 text-purple-400 font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-purple-500/20 hover:text-purple-300 hover:border-purple-400 transition-all duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                STATS
+              </motion.button>
+              <motion.button
                 onClick={() => router.push('/leaderboard')}
                 className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-cyan-500 text-cyan-400 font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-400 transition-all duration-200"
                 whileHover={{ scale: 1.05 }}
@@ -778,6 +786,14 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
               >
                 PLAY AGAIN
+              </motion.button>
+              <motion.button
+                onClick={() => router.push('/stats')}
+                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-purple-500 text-purple-400 font-orbitron font-bold text-sm md:text-base rounded-lg hover:bg-purple-500/20 hover:text-purple-300 hover:border-purple-400 transition-all duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                STATS
               </motion.button>
               <motion.button
                 onClick={() => router.push('/leaderboard')}
