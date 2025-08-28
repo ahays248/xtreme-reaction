@@ -209,8 +209,11 @@ export default function Home() {
     setLastMissed(false)
     targetShowTime.current = Date.now()
     
-    // Get difficulty settings based on elapsed time
-    const difficultyRound = Math.min(10, Math.floor((gameState.elapsedTime / gameState.maxGameTime) * 10) + 1)
+    // Get difficulty settings based on actual elapsed time
+    const actualElapsedTime = gameState.gameStartTime 
+      ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
+      : 0
+    const difficultyRound = Math.min(10, Math.floor((actualElapsedTime / gameState.maxGameTime) * 10) + 1)
     const difficulty = getDifficultyConfig(difficultyRound, 10)
     
     // Set timeout for auto-hide with progressive difficulty
@@ -373,9 +376,12 @@ export default function Home() {
   const last5Times = getLastNTimes(gameState.reactionTimes, 5)
   const averageTime = calculateAverage(last5Times)
   
-  // Get current difficulty settings
+  // Get current difficulty settings based on actual elapsed time
+  const actualElapsedTime = gameState.gameStartTime && gameState.status === 'playing'
+    ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
+    : 0
   const difficultyRound = gameState.status === 'playing' 
-    ? Math.min(10, Math.floor((gameState.elapsedTime / gameState.maxGameTime) * 10) + 1)
+    ? Math.min(10, Math.floor((actualElapsedTime / gameState.maxGameTime) * 10) + 1)
     : 1
   const currentDifficulty = getDifficultyConfig(difficultyRound, 10)
 
@@ -465,7 +471,7 @@ export default function Home() {
             
             <p className="text-lg sm:text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
             <div className="space-y-0.5 sm:space-y-1 md:space-y-2">
-              <p className="text-xs sm:text-sm opacity-70 font-mono">Hit 10 GREEN targets fast!</p>
+              <p className="text-xs sm:text-sm opacity-70 font-mono">Hit GREEN targets for 60 seconds!</p>
               <p className="text-xs sm:text-sm text-neon-red font-mono">⚠️ Avoid RED targets! ⚠️</p>
             </div>
             {getHighScore() > 0 && (

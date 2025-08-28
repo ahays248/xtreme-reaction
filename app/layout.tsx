@@ -21,7 +21,7 @@ const shareTechMono = Share_Tech_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Xtreme Reaction - Test Your Reflexes",
+  title: "Xtreme Reaction - Phase 16 Complete | 60-Second Challenge",
   description: "Challenge your reaction time with this fast-paced reflex game. Compete on leaderboards and share your scores!",
   manifest: "/manifest.json",
   icons: {
