@@ -560,7 +560,19 @@ export default function Home() {
             gameState.difficultyLevel || 0,
             streakBonus
           )
-          const highScore = getHighScore()
+          
+          // Debug logging
+          console.log('Score calculation:', {
+            hitScores: gameState.hitScores,
+            totalHitScore: gameState.hitScores.reduce((sum, score) => sum + score, 0),
+            accuracy,
+            difficultyLevel: gameState.difficultyLevel,
+            streakBonus,
+            calculatedFinalScore: finalScore,
+            elapsedTime: gameState.elapsedTime
+          })
+          
+          const previousHighScore = getHighScore()
           const isNewHigh = isNewHighScore(finalScore)
           
           // Save high score if new
@@ -580,7 +592,7 @@ export default function Home() {
               difficultyLevel={gameState.difficultyLevel || 0}
               trapHit={gameState.trapHit || false}
               isNewHighScore={isNewHigh}
-              previousHighScore={highScore}
+              previousHighScore={previousHighScore}
               reactionTimes={gameState.reactionTimes}
               saveStatus={saveStatus}
               elapsedTime={gameState.elapsedTime}
