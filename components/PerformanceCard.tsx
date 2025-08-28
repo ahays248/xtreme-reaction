@@ -1,9 +1,12 @@
 'use client'
 
+import { useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { formatTime } from '@/lib/timing'
 import { formatScore, getScoreGrade } from '@/lib/scoring'
 import { getStreakMultiplier } from '@/lib/statistics'
+import ShareButton from '@/components/ShareButton'
+import ScoreCard from '@/components/ScoreCard'
 
 interface PerformanceCardProps {
   finalScore: number
@@ -20,6 +23,10 @@ interface PerformanceCardProps {
   isPracticeMode?: boolean
   saveStatus?: 'idle' | 'saving' | 'saved' | 'error'
   elapsedTime: number // Time played in seconds
+  userRank?: number | null
+  leaderboardType?: 'daily' | 'all-time'
+  username?: string
+  xHandle?: string | null
 }
 
 export default function PerformanceCard({
@@ -36,8 +43,13 @@ export default function PerformanceCard({
   reactionTimes,
   isPracticeMode = false,
   saveStatus = 'idle',
-  elapsedTime
+  elapsedTime,
+  userRank,
+  leaderboardType = 'daily',
+  username,
+  xHandle
 }: PerformanceCardProps) {
+  const scoreCardRef = useRef<HTMLDivElement>(null)
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
   // Calculate performance metrics
@@ -255,6 +267,47 @@ export default function PerformanceCard({
           )}
         </motion.div>
       )}
+      
+      {/* Share Button - Only show after score is saved or in practice mode */}
+      {(saveStatus === 'saved' || isPracticeMode) && (
+        <motion.div
+          className="mt-4 flex justify-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2 }}
+        >
+          <ShareButton
+            finalScore={finalScore}
+            accuracy={accuracy}
+            avgReactionTime={avgReactionTime}
+            bestStreak={bestStreak}
+            trapHit={trapHit}
+            userRank={userRank}
+            leaderboardType={leaderboardType}
+            username={username}
+            xHandle={xHandle}
+            scoreCardElement={scoreCardRef.current}
+          />
+        </motion.div>
+      )}
+      
+      {/* Hidden ScoreCard for image generation */}
+      <div className="hidden">
+        <div ref={scoreCardRef}>
+          <ScoreCard
+            finalScore={finalScore}
+            accuracy={accuracy}
+            avgReactionTime={avgReactionTime}
+            hits={hits}
+            bestStreak={bestStreak}
+            trapHit={trapHit}
+            userRank={userRank}
+            leaderboardType={leaderboardType}
+            username={username}
+            xHandle={xHandle}
+          />
+        </div>
+      </div>
     </motion.div>
   )
 }

@@ -18,7 +18,7 @@ import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
-import { saveGameSession, type GameResults } from '@/lib/supabase/gameService'
+import { saveGameSession, getUserRank, type GameResults } from '@/lib/supabase/gameService'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -31,6 +31,7 @@ export default function Home() {
   const [showMissFeedback, setShowMissFeedback] = useState(false)
   const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [userRank, setUserRank] = useState<number | null>(null)
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -59,7 +60,7 @@ export default function Home() {
     disableSound
   } = useSound()
   
-  const { user, isPracticeMode } = useAuth()
+  const { user, profile, isPracticeMode } = useAuth()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -212,6 +213,14 @@ export default function Home() {
           setSaveStatus('error')
         } else {
           setSaveStatus('saved')
+          
+          // Fetch user rank after successful save
+          try {
+            const { rank } = await getUserRank(user.id, 'daily')
+            setUserRank(rank)
+          } catch (rankError) {
+            console.error('Failed to fetch user rank:', rankError)
+          }
         }
       }
     }
@@ -642,6 +651,10 @@ export default function Home() {
               reactionTimes={gameState.reactionTimes}
               saveStatus={saveStatus}
               elapsedTime={gameState.elapsedTime}
+              userRank={userRank}
+              leaderboardType="daily"
+              username={profile?.username}
+              xHandle={profile?.x_username}
             />
           )
         })()}
