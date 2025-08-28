@@ -141,6 +141,19 @@ export default function StatsPage() {
           {/* Score History */}
           <ScoreHistoryChart data={gameStats} />
         </div>
+
+        {/* Attribution */}
+        <div className="mt-8 text-center text-xs text-gray-500 font-mono">
+          Made with ❤️ by{' '}
+          <a 
+            href="https://x.com/DataVisGuy" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 transition-colors"
+          >
+            @DataVisGuy
+          </a>
+        </div>
       </div>
     </div>
   )

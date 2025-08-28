@@ -115,6 +115,19 @@ export default function LeaderboardPage() {
           <p>Sign in to save your scores and appear on the leaderboard</p>
         )}
       </motion.div>
+
+      {/* Attribution */}
+      <div className="fixed bottom-4 right-4 z-20 text-xs text-gray-500 font-mono">
+        Made with ❤️ by{' '}
+        <a 
+          href="https://x.com/DataVisGuy" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-cyan-400 hover:text-cyan-300 transition-colors"
+        >
+          @DataVisGuy
+        </a>
+      </div>
     </main>
   )
 }
