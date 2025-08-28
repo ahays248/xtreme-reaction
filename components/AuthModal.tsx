@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import SimpleCaptcha from './SimpleCaptcha'
 
@@ -20,14 +21,27 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [captchaVerified, setCaptchaVerified] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Scroll to top when modal opens to ensure it's visible
+  // Ensure we only render portal on client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden'
       // Small delay to ensure modal is rendered
       setTimeout(() => {
         window.scrollTo(0, 0)
       }, 100)
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset'
     }
   }, [isOpen])
 
@@ -70,13 +84,17 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
     setCaptchaVerified(false) // Reset captcha when switching
   }
 
-  return (
+  // Don't render until mounted (client-side only)
+  if (!mounted) return null
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            style={{ zIndex: 9998 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -85,7 +103,8 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
           
           {/* Modal */}
           <motion.div
-            className="fixed inset-x-0 top-0 bottom-0 overflow-y-auto z-50 pb-safe"
+            className="fixed inset-x-0 top-0 bottom-0 overflow-y-auto pb-safe"
+            style={{ zIndex: 9999 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -248,4 +267,7 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
       )}
     </AnimatePresence>
   )
+
+  // Use portal to render at document root level
+  return createPortal(modalContent, document.body)
 }
