@@ -12,7 +12,7 @@ import { useSound } from '@/hooks/useSound'
 export default function LeaderboardPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const { switchMusic, initialized } = useSound()
+  const { switchMusic, initialized, soundEnabled } = useSound()
   const { 
     leaderboard, 
     loading, 
@@ -23,12 +23,12 @@ export default function LeaderboardPage() {
     refresh 
   } = useLeaderboard('daily')
 
-  // Play menu music on leaderboard page
+  // Play menu music on leaderboard page (only if user enabled sound)
   useEffect(() => {
-    if (initialized) {
+    if (initialized && soundEnabled) {
       switchMusic('menu')
     }
-  }, [initialized, switchMusic])
+  }, [initialized, soundEnabled, switchMusic])
 
   return (
     <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative">

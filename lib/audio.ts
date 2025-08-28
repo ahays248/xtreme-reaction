@@ -17,6 +17,7 @@ class AudioManager {
   private initialized = false
   private muted = false
   private musicMuted = false
+  private soundEnabled = false  // User's explicit choice to enable sound
 
   /**
    * Initialize audio context (requires user interaction on mobile)
@@ -55,6 +56,10 @@ class AudioManager {
       
       const savedMusicMute = localStorage.getItem('musicMuted')
       this.musicMuted = savedMusicMute === 'true'
+      
+      // Load sound enabled state (user's choice)
+      const savedSoundEnabled = localStorage.getItem('soundEnabled')
+      this.soundEnabled = savedSoundEnabled === 'true'
 
       // Preload all sounds and music
       await Promise.all([
@@ -149,8 +154,8 @@ class AudioManager {
     // Always track what music should be playing
     this.currentMusic = music
 
-    // Don't actually play if muted
-    if (this.musicMuted) return
+    // Don't actually play if not enabled by user or if muted
+    if (!this.soundEnabled || this.musicMuted) return
 
     // Ensure AudioContext is resumed (for mobile)
     await this.ensureResumed()
@@ -285,6 +290,35 @@ class AudioManager {
    */
   isMusicMuted(): boolean {
     return this.musicMuted
+  }
+
+  /**
+   * Enable sound (user's explicit choice)
+   */
+  enableSound(): void {
+    this.soundEnabled = true
+    localStorage.setItem('soundEnabled', 'true')
+    // If there was music that should be playing, start it now
+    if (this.currentMusic && !this.musicMuted) {
+      this.playMusic(this.currentMusic)
+    }
+  }
+
+  /**
+   * Disable sound (user's explicit choice)
+   */
+  disableSound(): void {
+    this.soundEnabled = false
+    localStorage.setItem('soundEnabled', 'false')
+    // Stop any currently playing music
+    this.stopMusic(false) // Keep track of what was playing
+  }
+
+  /**
+   * Check if sound is enabled by user
+   */
+  isSoundEnabled(): boolean {
+    return this.soundEnabled
   }
 }
 

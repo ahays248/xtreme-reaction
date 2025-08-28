@@ -16,6 +16,9 @@ interface UseSoundReturn {
   toggleMusicMute: () => void
   initialized: boolean
   initializeAudio: () => Promise<void>
+  soundEnabled: boolean
+  enableSound: () => void
+  disableSound: () => void
 }
 
 export function useSound(): UseSoundReturn {
@@ -24,6 +27,7 @@ export function useSound(): UseSoundReturn {
   const [muted, setMuted] = useState(false)
   const [musicMuted, setMusicMuted] = useState(false)
   const [initialized, setInitialized] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(false)
 
   // Initialize audio on mount (requires user interaction on mobile)
   useEffect(() => {
@@ -33,6 +37,7 @@ export function useSound(): UseSoundReturn {
       setMusicVolumeState(audioManager.getMusicVolume())
       setMuted(audioManager.isMuted())
       setMusicMuted(audioManager.isMusicMuted())
+      setSoundEnabled(audioManager.isSoundEnabled())
       setInitialized(true)
     }
 
@@ -98,7 +103,18 @@ export function useSound(): UseSoundReturn {
     setMusicVolumeState(audioManager.getMusicVolume())
     setMuted(audioManager.isMuted())
     setMusicMuted(audioManager.isMusicMuted())
+    setSoundEnabled(audioManager.isSoundEnabled())
     setInitialized(true)
+  }, [])
+
+  const enableSound = useCallback(() => {
+    audioManager.enableSound()
+    setSoundEnabled(true)
+  }, [])
+
+  const disableSound = useCallback(() => {
+    audioManager.disableSound()
+    setSoundEnabled(false)
   }, [])
 
   return {
@@ -115,6 +131,9 @@ export function useSound(): UseSoundReturn {
     musicMuted,
     toggleMusicMute,
     initialized,
-    initializeAudio
+    initializeAudio,
+    soundEnabled,
+    enableSound,
+    disableSound
   }
 }

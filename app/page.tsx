@@ -30,7 +30,6 @@ export default function Home() {
   const [isTrapTarget, setIsTrapTarget] = useState(false)
   const [showMissFeedback, setShowMissFeedback] = useState(false)
   const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
-  const [soundEnabled, setSoundEnabled] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
@@ -54,7 +53,10 @@ export default function Home() {
     musicMuted,
     toggleMusicMute,
     initializeAudio, 
-    initialized 
+    initialized,
+    soundEnabled,
+    enableSound,
+    disableSound
   } = useSound()
   
   const { user, isPracticeMode } = useAuth()
@@ -381,9 +383,9 @@ export default function Home() {
   }
 
   const handleEnableSound = async () => {
-    // Initialize audio on user interaction
+    // Initialize audio on user interaction and enable sound
     await initializeAudio()
-    setSoundEnabled(true)
+    enableSound()  // This sets soundEnabled and saves to localStorage
     // Menu music will start playing via the useEffect
   }
 
