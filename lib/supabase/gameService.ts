@@ -235,12 +235,12 @@ export async function getScorePercentile(score: number): Promise<number | null> 
     const startOfDay = `${today}T00:00:00.000Z`
     const endOfDay = `${today}T23:59:59.999Z`
     
-    // Get all scores from today
+    // Get all scores from today - use played_at not created_at
     const { data: allScores, error } = await supabase
       .from('game_sessions')
       .select('score')
-      .gte('created_at', startOfDay)
-      .lte('created_at', endOfDay)
+      .gte('played_at', startOfDay)
+      .lte('played_at', endOfDay)
       .order('score', { ascending: true })
     
     if (error) {

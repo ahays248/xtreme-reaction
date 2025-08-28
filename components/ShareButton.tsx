@@ -42,17 +42,24 @@ export default function ShareButton({
     
     setCopyStatus('copying')
     
-    const success = await copyScoreCardToClipboard(scoreCardRef.current)
-    
-    if (success) {
-      setCopyStatus('copied')
-      setTimeout(() => {
-        setCopyStatus('idle')
-      }, 3000)
-    } else {
-      // If copy failed, automatically download instead
+    try {
+      const success = await copyScoreCardToClipboard(scoreCardRef.current)
+      
+      if (success) {
+        setCopyStatus('copied')
+        setTimeout(() => {
+          setCopyStatus('idle')
+        }, 3000)
+      } else {
+        // Don't auto-download, just show error
+        setCopyStatus('error')
+        setTimeout(() => {
+          setCopyStatus('idle')
+        }, 3000)
+      }
+    } catch (err) {
+      console.error('Copy failed:', err)
       setCopyStatus('error')
-      handleDownloadImage()
       setTimeout(() => {
         setCopyStatus('idle')
       }, 3000)
@@ -180,7 +187,7 @@ export default function ShareButton({
                         ${copyStatus === 'copied' 
                           ? 'bg-green-900/30 border-2 border-green-500 text-green-400'
                           : copyStatus === 'error'
-                          ? 'bg-orange-900/30 border-2 border-orange-500 text-orange-400'
+                          ? 'bg-red-900/30 border-2 border-red-500 text-red-400'
                           : 'bg-black border-2 border-neon-green text-neon-green hover:bg-neon-green/20'
                         }
                       `}
@@ -203,9 +210,9 @@ export default function ShareButton({
                       ) : copyStatus === 'error' ? (
                         <>
                           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>Downloaded!</span>
+                          <span>Copy Failed</span>
                         </>
                       ) : (
                         <>
@@ -218,32 +225,33 @@ export default function ShareButton({
                     </button>
                     
                     <button
-                      onClick={handleShareText}
-                      className="flex-1 px-4 py-3 bg-black border-2 border-cyan-500 text-cyan-400 font-orbitron font-bold rounded-lg hover:bg-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2"
+                      onClick={handleDownloadImage}
+                      className="flex-1 px-4 py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold rounded-lg hover:bg-gray-600/20 hover:border-gray-400 hover:text-white transition-all duration-200 flex items-center justify-center gap-2"
                     >
-                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      <span>Post to X</span>
+                      <span>Download</span>
                     </button>
                   </div>
                   
-                  {/* Alternative download option */}
                   <button
-                    onClick={handleDownloadImage}
-                    className="w-full px-3 py-2 text-gray-500 hover:text-gray-300 font-mono text-sm transition-colors flex items-center justify-center gap-2"
+                    onClick={handleShareText}
+                    className="w-full px-4 py-3 bg-black border-2 border-cyan-500 text-cyan-400 font-orbitron font-bold rounded-lg hover:bg-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2"
                   >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
-                    <span>Or download image instead</span>
+                    <span>Open X / Twitter</span>
                   </button>
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-3 text-center">
-                  {copyStatus === 'error' 
-                    ? 'Image downloaded! Attach it to your X post manually.'
-                    : 'Copy the image, then click "Post to X" and paste it into your tweet!'
+                  {copyStatus === 'copied' 
+                    ? 'Image copied! Now click "Open X / Twitter" and paste it in your post.'
+                    : copyStatus === 'error'
+                    ? 'Copy not supported on your browser. Download the image and attach it to your post.'
+                    : '1. Copy or download the scorecard  2. Open X/Twitter  3. Paste or attach the image'
                   }
                 </p>
               </div>

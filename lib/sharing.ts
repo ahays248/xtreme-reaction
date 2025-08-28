@@ -41,6 +41,8 @@ export async function generateScoreCardImage(element: HTMLElement): Promise<Blob
 
 export async function copyScoreCardToClipboard(element: HTMLElement): Promise<boolean> {
   try {
+    console.log('Starting copy process...')
+    
     const canvas = await html2canvas(element, {
       backgroundColor: '#000000',
       scale: 2,
@@ -49,42 +51,48 @@ export async function copyScoreCardToClipboard(element: HTMLElement): Promise<bo
       allowTaint: true
     })
     
-    // Try modern clipboard API first (requires HTTPS)
-    try {
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error('Failed to generate image blob'))
-          }
-        }, 'image/png', 0.95)
-      })
-      
-      // Check if ClipboardItem is available and we're on HTTPS
-      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+    console.log('Canvas created successfully')
+    
+    // Convert canvas to blob
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob)
+        } else {
+          reject(new Error('Failed to generate image blob'))
+        }
+      }, 'image/png', 0.95)
+    })
+    
+    console.log('Blob created:', blob.size, 'bytes')
+    
+    // Check browser support
+    console.log('Checking clipboard support...')
+    console.log('ClipboardItem available?', typeof ClipboardItem !== 'undefined')
+    console.log('navigator.clipboard?', !!navigator.clipboard)
+    console.log('navigator.clipboard.write?', !!navigator.clipboard?.write)
+    console.log('Location protocol:', window.location.protocol)
+    
+    // Try modern clipboard API (requires HTTPS)
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      try {
+        console.log('Attempting to copy with ClipboardItem API...')
         const item = new ClipboardItem({ 'image/png': blob })
         await navigator.clipboard.write([item])
+        console.log('Copy successful!')
         return true
+      } catch (err) {
+        console.error('ClipboardItem write failed:', err)
+        // Check if it's a permission issue
+        if (err instanceof Error) {
+          console.error('Error details:', err.message, err.name)
+        }
       }
-    } catch (clipboardError) {
-      console.log('ClipboardItem API failed, trying fallback:', clipboardError)
+    } else {
+      console.log('ClipboardItem API not available')
     }
     
-    // Fallback: Try to copy canvas as data URL to clipboard (text)
-    try {
-      const dataUrl = canvas.toDataURL('image/png')
-      if (navigator.clipboard?.writeText) {
-        // This won't paste as an image but at least copies something
-        await navigator.clipboard.writeText(dataUrl)
-        return false // Indicate fallback was used
-      }
-    } catch (textError) {
-      console.log('Text clipboard also failed:', textError)
-    }
-    
-    // If all clipboard methods fail, return false
+    // All methods failed
     return false
   } catch (error) {
     console.error('Error in copyScoreCardToClipboard:', error)
