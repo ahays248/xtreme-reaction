@@ -48,11 +48,11 @@ export default function SimpleCaptcha({ onVerify }: SimpleCaptchaProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       <div className="text-center">
-        <p className="text-sm text-gray-400 mb-2">Verify you're human</p>
-        <div className="bg-black/50 border border-green-500/30 rounded-lg p-4">
-          <p className="text-2xl font-mono text-neon-cyan">
+        <p className="text-xs sm:text-sm text-gray-400 mb-2">Verify you're human</p>
+        <div className="bg-black/50 border border-green-500/30 rounded-lg p-3 sm:p-4">
+          <p className="text-xl sm:text-2xl font-mono text-neon-cyan">
             {num1} + {num2} = ?
           </p>
         </div>
@@ -64,18 +64,20 @@ export default function SimpleCaptcha({ onVerify }: SimpleCaptchaProps) {
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
           onKeyPress={handleKeyPress}
-          className={`flex-1 px-3 py-2 bg-black border-2 rounded-lg font-mono transition-colors ${
+          className={`flex-1 px-3 py-2 bg-black border-2 rounded-lg font-mono transition-colors text-base ${
             error 
               ? 'border-red-500 text-red-400' 
               : 'border-green-500/50 text-neon-green focus:border-green-500'
           }`}
           placeholder="Answer"
           autoComplete="off"
+          inputMode="numeric"
         />
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={!userAnswer}
-          className="px-4 py-2 bg-black border-2 border-green-500 text-neon-green font-bold rounded-lg hover:bg-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="px-3 sm:px-4 py-2 bg-black border-2 border-green-500 text-neon-green font-bold rounded-lg hover:bg-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm sm:text-base"
         >
           Verify
         </button>

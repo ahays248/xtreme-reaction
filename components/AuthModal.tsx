@@ -75,27 +75,28 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
           
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 overflow-y-auto z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div
-              className="bg-black border-2 border-neon-green rounded-lg p-6 sm:p-8 max-w-md w-full shadow-neon-green"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.3 }}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="flex min-h-full items-center justify-center p-4">
+              <motion.div
+                className="bg-black border-2 border-neon-green rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full shadow-neon-green my-8"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", duration: 0.3 }}
+                onClick={(e) => e.stopPropagation()}
+              >
               {/* Header */}
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-neon-green">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-neon-green">
                   {mode === 'signin' ? 'Sign In' : 'Create Account'}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-neon-green transition-colors text-2xl"
+                  className="text-gray-400 hover:text-neon-green transition-colors text-2xl p-1 min-w-[32px] min-h-[32px]"
                   disabled={loading}
                 >
                   ×
@@ -110,10 +111,10 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 {/* Email */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1 sm:mb-2">
                     Email
                   </label>
                   <input
@@ -123,14 +124,15 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="w-full px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all"
+                    className="w-full px-3 sm:px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all text-base"
                     placeholder="player@example.com"
+                    autoComplete="email"
                   />
                 </div>
 
                 {/* Password */}
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1 sm:mb-2">
                     Password
                   </label>
                   <input
@@ -141,8 +143,9 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                     required
                     disabled={loading}
                     minLength={6}
-                    className="w-full px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all"
+                    className="w-full px-3 sm:px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all text-base"
                     placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                   />
                 </div>
 
@@ -151,7 +154,7 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                   <>
                     {/* Username */}
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1 sm:mb-2">
                         Username <span className="text-neon-green">*</span>
                       </label>
                       <input
@@ -164,18 +167,19 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                         minLength={3}
                         maxLength={20}
                         pattern="[a-zA-Z0-9_]+"
-                        className="w-full px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all"
+                        className="w-full px-3 sm:px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all text-base"
                         placeholder="CoolGamer123"
+                        autoComplete="username"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        3-20 characters, letters, numbers, and underscores only
+                        3-20 characters, letters, numbers, underscores
                       </p>
                     </div>
 
                     {/* X Handle (Optional) */}
                     <div>
-                      <label htmlFor="xHandle" className="block text-sm font-medium text-gray-300 mb-2">
-                        X Handle <span className="text-gray-500">(Optional)</span>
+                      <label htmlFor="xHandle" className="block text-sm font-medium text-gray-300 mb-1 sm:mb-2">
+                        X Handle <span className="text-gray-500 text-xs">(Optional)</span>
                       </label>
                       <input
                         type="text"
@@ -184,16 +188,17 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                         onChange={(e) => setXHandle(e.target.value)}
                         disabled={loading}
                         maxLength={15}
-                        className="w-full px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all"
+                        className="w-full px-3 sm:px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all text-base"
                         placeholder="@YourXHandle"
+                        autoComplete="off"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Your X (Twitter) username for leaderboard display
+                        Your X username for leaderboard
                       </p>
                     </div>
 
                     {/* Captcha for signup */}
-                    <div className="border-t border-gray-700 pt-4">
+                    <div className="border-t border-gray-700 pt-3 sm:pt-4">
                       <SimpleCaptcha onVerify={setCaptchaVerified} />
                     </div>
                   </>
@@ -225,7 +230,8 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                   </button>
                 </div>
               </form>
-            </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
         </>
       )}
