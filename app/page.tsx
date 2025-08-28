@@ -378,7 +378,9 @@ export default function Home() {
   const actualElapsedTime = gameState.gameStartTime && gameState.status === 'playing'
     ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
     : 0
-  const difficultyRound = gameState.status === 'playing' 
+  
+  // Calculate difficulty round (1-10) based on time progression
+  const difficultyRound = gameState.status === 'playing' && gameState.maxGameTime > 0
     ? Math.min(10, Math.floor((actualElapsedTime / gameState.maxGameTime) * 10) + 1)
     : 1
   const currentDifficulty = getDifficultyConfig(difficultyRound, 10)

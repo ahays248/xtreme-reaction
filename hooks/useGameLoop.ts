@@ -10,7 +10,9 @@ export function useGameLoop() {
     setGameState({
       ...initialGameState,
       status: 'playing',
-      currentRound: 1
+      currentRound: 1,
+      gameStartTime: Date.now(),
+      elapsedTime: 0
     })
   }, [])
 
