@@ -237,6 +237,28 @@ export default function PerformanceCard({
           <p className="text-lg font-bold text-neon-cyan">{hits} targets</p>
         </div>
       </div>
+
+      {/* Navigation Links */}
+      <div className="flex gap-3 mt-4">
+        <motion.button
+          onClick={() => window.location.href = '/stats'}
+          className="flex-1 px-4 py-2 bg-purple-500/20 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-500/30 transition-all font-mono text-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          View Stats
+        </motion.button>
+        <motion.button
+          onClick={() => window.location.href = '/leaderboard'}
+          className="flex-1 px-4 py-2 bg-cyan/20 border border-cyan text-cyan rounded-lg hover:bg-cyan/30 transition-all font-mono text-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+        >
+          Leaderboard
+        </motion.button>
+      </div>
       
       {/* Save Status / Practice Mode Indicator */}
       {isPracticeMode ? (
@@ -244,7 +266,7 @@ export default function PerformanceCard({
           className="mt-4 p-3 bg-amber-900/20 border border-amber-500/50 rounded-lg"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 1.2 }}
         >
           <p className="text-sm text-amber-400 text-center font-mono">
             🎮 Practice Mode - Sign in to save your scores!
@@ -255,7 +277,7 @@ export default function PerformanceCard({
           className="mt-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 1.2 }}
         >
           {saveStatus === 'saving' && (
             <p className="text-sm text-yellow-400 text-center font-mono animate-pulse">
