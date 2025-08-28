@@ -44,9 +44,13 @@ export async function copyScoreCardToClipboard(element: HTMLElement): Promise<bo
   try {
     console.log('Starting copy process...')
     
+    // Detect if we're on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    
     const canvas = await html2canvas(element, {
       backgroundColor: '#000000',
-      scale: 2,
+      scale: isMobile ? 1.5 : 2, // Lower scale for mobile to reduce memory usage
       logging: false,
       useCORS: true,
       allowTaint: true
@@ -69,10 +73,19 @@ export async function copyScoreCardToClipboard(element: HTMLElement): Promise<bo
     
     // Check browser support
     console.log('Checking clipboard support...')
+    console.log('Is Mobile?', isMobile)
+    console.log('Is Safari?', isSafari)
     console.log('ClipboardItem available?', typeof ClipboardItem !== 'undefined')
     console.log('navigator.clipboard?', !!navigator.clipboard)
     console.log('navigator.clipboard.write?', !!navigator.clipboard?.write)
     console.log('Location protocol:', window.location.protocol)
+    
+    // Safari and some mobile browsers don't support clipboard.write for images
+    // DuckDuckGo browser on iOS is based on WebKit but has limited clipboard support
+    if (isMobile || isSafari) {
+      console.log('Mobile/Safari detected - clipboard copy may not work for images')
+      return false
+    }
     
     // Try modern clipboard API (requires HTTPS)
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {

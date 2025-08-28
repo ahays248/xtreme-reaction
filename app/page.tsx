@@ -416,7 +416,10 @@ export default function Home() {
       await initializeAudio()
       await enableSound()  // This sets soundEnabled and saves to localStorage
       console.log('Sound enabled successfully')
-      // Menu music will start playing via the useEffect
+      // Start menu music immediately since we're on the idle screen
+      if (gameState.status === 'idle') {
+        playMusic('menu')
+      }
     } catch (error) {
       console.error('Failed to enable sound:', error)
     }

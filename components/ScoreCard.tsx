@@ -51,6 +51,9 @@ export default function ScoreCard({
 }: ScoreCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
+  // Detect if we're rendering for mobile (would be passed from parent ideally)
+  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  
   // Grade colors
   const gradeColors: Record<string, string> = {
     'S': colors.purple400,
@@ -99,31 +102,31 @@ export default function ScoreCard({
         {/* Title */}
         <div style={{ textAlign: 'center', marginBottom: '12px' }}>
           <h1 style={{
-            fontSize: '48px',
+            fontSize: isMobile ? '40px' : '48px',
             fontWeight: 900,
             color: colors.neonGreen,
             textShadow: `0 0 20px rgba(0, 255, 0, 0.5)`,
-            lineHeight: '48px',
-            marginBottom: '24px',
-            letterSpacing: '3px'
+            lineHeight: isMobile ? '50px' : '48px',
+            marginBottom: isMobile ? '28px' : '24px',
+            letterSpacing: isMobile ? '4px' : '3px'
           }}>
             XTREME REACTION
           </h1>
-          <p style={{ fontSize: '18px', color: colors.gray400, lineHeight: '24px', marginTop: '0', letterSpacing: '1.5px' }}>Ultimate Reflex Challenge</p>
+          <p style={{ fontSize: isMobile ? '16px' : '18px', color: colors.gray400, lineHeight: isMobile ? '28px' : '24px', marginTop: '0', letterSpacing: isMobile ? '2px' : '1.5px' }}>Ultimate Reflex Challenge</p>
         </div>
         
         {/* Score and Grade/Percentile */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '60px' }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1, letterSpacing: '1.5px' }}>FINAL SCORE</p>
+            <p style={{ fontSize: isMobile ? '14px' : '16px', color: colors.gray400, marginBottom: isMobile ? '8px' : '4px', lineHeight: isMobile ? '20px' : '16px', letterSpacing: isMobile ? '2.5px' : '1.5px' }}>FINAL SCORE</p>
             <p style={{
-              fontSize: '52px',
+              fontSize: isMobile ? '44px' : '52px',
               fontWeight: 900,
               color: colors.neonYellow,
               textShadow: `0 0 30px rgba(255, 255, 0, 0.5)`,
-              lineHeight: '52px',
-              marginTop: '8px',
-              letterSpacing: '1.5px'
+              lineHeight: isMobile ? '50px' : '52px',
+              marginTop: isMobile ? '4px' : '8px',
+              letterSpacing: isMobile ? '2.5px' : '1.5px'
             }}>
               {formatScore(finalScore)}
             </p>
@@ -132,30 +135,30 @@ export default function ScoreCard({
           <div style={{ textAlign: 'center' }}>
             {scorePercentile !== null && scorePercentile !== undefined ? (
               <>
-                <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1, letterSpacing: '1.5px' }}>TODAY'S RANK</p>
+                <p style={{ fontSize: isMobile ? '14px' : '16px', color: colors.gray400, marginBottom: isMobile ? '8px' : '4px', lineHeight: isMobile ? '20px' : '16px', letterSpacing: isMobile ? '2.5px' : '1.5px' }}>TODAY'S RANK</p>
                 <div style={{
-                  fontSize: '52px',
+                  fontSize: isMobile ? '38px' : '52px',
                   fontWeight: 900,
                   color: colors.cyan400,
                   textShadow: `0 0 25px ${colors.cyan400}`,
-                  lineHeight: '52px',
-                  marginTop: '8px',
-                  letterSpacing: '1.5px'
+                  lineHeight: isMobile ? '44px' : '52px',
+                  marginTop: isMobile ? '4px' : '8px',
+                  letterSpacing: isMobile ? '2.5px' : '1.5px'
                 }}>
                   TOP {100 - scorePercentile}%
                 </div>
               </>
             ) : (
               <>
-                <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1, letterSpacing: '1.5px' }}>GRADE</p>
+                <p style={{ fontSize: isMobile ? '14px' : '16px', color: colors.gray400, marginBottom: isMobile ? '8px' : '4px', lineHeight: isMobile ? '20px' : '16px', letterSpacing: isMobile ? '2.5px' : '1.5px' }}>GRADE</p>
                 <div style={{
-                  fontSize: '52px',
+                  fontSize: isMobile ? '44px' : '52px',
                   fontWeight: 900,
                   color: gradeColors[grade],
                   textShadow: `0 0 25px ${gradeColors[grade]}`,
-                  lineHeight: '52px',
-                  marginTop: '8px',
-                  letterSpacing: '1.5px'
+                  lineHeight: isMobile ? '50px' : '52px',
+                  marginTop: isMobile ? '4px' : '8px',
+                  letterSpacing: isMobile ? '2.5px' : '1.5px'
                 }}>
                   {grade}
                 </div>
@@ -167,16 +170,16 @@ export default function ScoreCard({
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginTop: '8px' }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px', letterSpacing: '1.5px' }}>ACCURACY</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.green400, lineHeight: '28px', marginTop: '0', letterSpacing: '1px' }}>{accuracy}%</p>
+            <p style={{ color: colors.gray400, fontSize: isMobile ? '12px' : '13px', marginBottom: isMobile ? '8px' : '6px', lineHeight: isMobile ? '18px' : '16px', letterSpacing: isMobile ? '2px' : '1.5px' }}>ACCURACY</p>
+            <p style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: 'bold', color: colors.green400, lineHeight: isMobile ? '26px' : '28px', marginTop: '0', letterSpacing: isMobile ? '1.5px' : '1px' }}>{accuracy}%</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px', letterSpacing: '1.5px' }}>AVG SPEED</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.yellow400, lineHeight: '28px', marginTop: '0', letterSpacing: '1px' }}>{formatTime(avgReactionTime)}</p>
+            <p style={{ color: colors.gray400, fontSize: isMobile ? '12px' : '13px', marginBottom: isMobile ? '8px' : '6px', lineHeight: isMobile ? '18px' : '16px', letterSpacing: isMobile ? '2px' : '1.5px' }}>AVG SPEED</p>
+            <p style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: 'bold', color: colors.yellow400, lineHeight: isMobile ? '26px' : '28px', marginTop: '0', letterSpacing: isMobile ? '1.5px' : '1px' }}>{formatTime(avgReactionTime)}</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.gray400, fontSize: '13px', marginBottom: '6px', lineHeight: '16px', letterSpacing: '1.5px' }}>BEST STREAK</p>
-            <p style={{ fontSize: '26px', fontWeight: 'bold', color: colors.orange400, lineHeight: '28px', marginTop: '0', letterSpacing: '1px' }}>{bestStreak}</p>
+            <p style={{ color: colors.gray400, fontSize: isMobile ? '12px' : '13px', marginBottom: isMobile ? '8px' : '6px', lineHeight: isMobile ? '18px' : '16px', letterSpacing: isMobile ? '2px' : '1.5px' }}>BEST STREAK</p>
+            <p style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: 'bold', color: colors.orange400, lineHeight: isMobile ? '26px' : '28px', marginTop: '0', letterSpacing: isMobile ? '1.5px' : '1px' }}>{bestStreak}</p>
           </div>
         </div>
         
@@ -198,8 +201,8 @@ export default function ScoreCard({
         
         {/* Call to Action */}
         <div style={{ textAlign: 'center', marginTop: '16px', paddingBottom: '8px' }}>
-          <p style={{ fontSize: '17px', color: colors.gray400, marginBottom: '10px', lineHeight: '24px', letterSpacing: '1px' }}>Think you can beat this score?</p>
-          <p style={{ fontSize: '19px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: '26px', letterSpacing: '1.5px' }}>
+          <p style={{ fontSize: isMobile ? '15px' : '17px', color: colors.gray400, marginBottom: isMobile ? '12px' : '10px', lineHeight: isMobile ? '26px' : '24px', letterSpacing: isMobile ? '1.5px' : '1px' }}>Think you can beat this score?</p>
+          <p style={{ fontSize: isMobile ? '17px' : '19px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: isMobile ? '28px' : '26px', letterSpacing: isMobile ? '2px' : '1.5px' }}>
             Play at XtremeReaction.lol
           </p>
         </div>

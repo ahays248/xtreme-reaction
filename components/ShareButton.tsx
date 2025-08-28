@@ -251,7 +251,11 @@ export default function ShareButton({
                   {copyStatus === 'copied' 
                     ? 'Image copied! Now click "Open X / Twitter" and paste it in your post.'
                     : copyStatus === 'error'
-                    ? 'Copy not supported on your browser. Download the image and attach it to your post.'
+                    ? /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) 
+                      ? 'Mobile browsers don\'t support image copy. Download the image and attach it to your post.'
+                      : 'Copy not supported on your browser. Download the image and attach it to your post.'
+                    : /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                    ? '1. Download the scorecard  2. Open X/Twitter  3. Attach the image to your post'
                     : '1. Copy or download the scorecard  2. Open X/Twitter  3. Paste or attach the image'
                   }
                 </p>
