@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import SimpleCaptcha from './SimpleCaptcha'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -18,10 +19,18 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
   const [xHandle, setXHandle] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [captchaVerified, setCaptchaVerified] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    
+    // Check captcha for signup
+    if (mode === 'signup' && !captchaVerified) {
+      setError('Please complete the captcha verification')
+      return
+    }
+    
     setLoading(true)
 
     try {
@@ -48,6 +57,7 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
   const switchMode = () => {
     setMode(mode === 'signin' ? 'signup' : 'signin')
     setError(null)
+    setCaptchaVerified(false) // Reset captcha when switching
   }
 
   return (
@@ -180,6 +190,11 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                       <p className="text-xs text-gray-500 mt-1">
                         Your X (Twitter) username for leaderboard display
                       </p>
+                    </div>
+
+                    {/* Captcha for signup */}
+                    <div className="border-t border-gray-700 pt-4">
+                      <SimpleCaptcha onVerify={setCaptchaVerified} />
                     </div>
                   </>
                 )}

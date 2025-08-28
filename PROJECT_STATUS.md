@@ -243,6 +243,26 @@
 - ✅ Music not switching properly
 - ✅ Negative consistency percentages
 
+## 🔒 SECURITY MEASURES IMPLEMENTED
+
+### Rate Limiting
+- **Game Sessions**: 30 saves per minute per user
+- **Authentication**: 5 attempts per minute per email
+- **Leaderboards**: 60 requests per minute
+- Prevents bots from abusing API and running up costs
+- Implemented in-memory rate limiting with automatic cleanup
+
+### Bot Protection
+- **Simple Math Captcha**: Required for sign-up
+- Prevents automated account creation
+- Lightweight and user-friendly
+- No external dependencies or API costs
+
+### Implementation Files
+- `/lib/rateLimit.ts` - Rate limiting utility
+- `/components/SimpleCaptcha.tsx` - Math captcha component
+- Rate limits applied to all database operations
+
 ## 🚀 NEXT: Phase 17 - Share to X
 
 ### Ready to Implement:

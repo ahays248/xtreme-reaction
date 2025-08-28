@@ -1,6 +1,7 @@
 import { createClient } from './client'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Database } from './database.types'
+import { authLimiter } from '../rateLimit'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -13,6 +14,11 @@ export async function signUpWithEmail(
   username: string, 
   xHandle?: string
 ) {
+  // Rate limiting
+  if (authLimiter.isRateLimited(email)) {
+    throw new Error('Too many attempts. Please wait before trying again.')
+  }
+  
   const supabase = createClient()
   
   try {
@@ -72,6 +78,11 @@ export async function signUpWithEmail(
  * Sign in with email and password
  */
 export async function signInWithEmail(email: string, password: string) {
+  // Rate limiting
+  if (authLimiter.isRateLimited(email)) {
+    throw new Error('Too many login attempts. Please wait before trying again.')
+  }
+  
   const supabase = createClient()
   
   try {

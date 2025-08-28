@@ -1,5 +1,6 @@
 import { createClient } from './client'
 import type { Database } from './database.types'
+import { gameSessionLimiter } from '../rateLimit'
 
 type GameSession = Database['public']['Tables']['game_sessions']['Row']
 type GameSessionInsert = Database['public']['Tables']['game_sessions']['Insert']
@@ -30,6 +31,15 @@ export async function saveGameSession(
   userId: string,
   results: GameResults
 ): Promise<{ data: GameSession | null; error: Error | null }> {
+  // Rate limiting check
+  if (gameSessionLimiter.isRateLimited(userId)) {
+    console.warn('Rate limit exceeded for user:', userId)
+    return { 
+      data: null, 
+      error: new Error('Too many requests. Please wait before saving another game.') 
+    }
+  }
+  
   const supabase = createClient()
   
   const gameSessionData: GameSessionInsert = {
