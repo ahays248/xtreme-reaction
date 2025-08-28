@@ -56,15 +56,39 @@ export function useGameLoop() {
   }, [])
 
   const recordTrapHit = useCallback(() => {
-    setGameState(prev => ({
-      ...prev,
-      status: 'gameOver',
-      trapHit: true
-    }))
+    setGameState(prev => {
+      const elapsedTime = prev.gameStartTime 
+        ? Math.floor((Date.now() - prev.gameStartTime) / 1000)
+        : 0
+      return {
+        ...prev,
+        status: 'gameOver',
+        trapHit: true,
+        elapsedTime
+      }
+    })
   }, [])
 
   const resetGame = useCallback(() => {
     setGameState(initialGameState)
+  }, [])
+
+  const updateElapsedTime = useCallback(() => {
+    setGameState(prev => {
+      if (prev.status !== 'playing' || !prev.gameStartTime) return prev
+      
+      const elapsedTime = Math.floor((Date.now() - prev.gameStartTime) / 1000)
+      
+      // Auto end game if time is up
+      if (elapsedTime >= prev.maxGameTime) {
+        return { ...prev, status: 'gameOver', elapsedTime }
+      }
+      
+      // Update difficulty based on time (increases over 60 seconds)
+      const difficultyPercent = Math.min(100, (elapsedTime / prev.maxGameTime) * 100)
+      
+      return { ...prev, elapsedTime, difficultyLevel: difficultyPercent }
+    })
   }, [])
 
   return {
@@ -74,6 +98,7 @@ export function useGameLoop() {
     recordHit,
     recordMiss,
     recordTrapHit,
-    resetGame
+    resetGame,
+    updateElapsedTime
   }
 }

@@ -19,6 +19,7 @@ interface PerformanceCardProps {
   reactionTimes: number[]
   isPracticeMode?: boolean
   saveStatus?: 'idle' | 'saving' | 'saved' | 'error'
+  elapsedTime: number // Time played in seconds
 }
 
 export default function PerformanceCard({
@@ -34,7 +35,8 @@ export default function PerformanceCard({
   previousHighScore,
   reactionTimes,
   isPracticeMode = false,
-  saveStatus = 'idle'
+  saveStatus = 'idle',
+  elapsedTime
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -192,12 +194,12 @@ export default function PerformanceCard({
       {/* Additional Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-white font-mono">MAX DIFFICULTY</p>
-          <p className="text-lg font-bold text-purple-400">Level {Math.round(difficultyLevel / 10)}</p>
+          <p className="text-xs text-white font-mono">TIME PLAYED</p>
+          <p className="text-lg font-bold text-purple-400">{elapsedTime}s / 60s</p>
         </div>
         <div className="bg-black/50 border border-neon-green/30 rounded-lg p-3 text-center">
-          <p className="text-xs text-white font-mono">ROUNDS COMPLETED</p>
-          <p className="text-lg font-bold text-neon-cyan">10/10</p>
+          <p className="text-xs text-white font-mono">TARGETS HIT</p>
+          <p className="text-lg font-bold text-neon-cyan">{hits} targets</p>
         </div>
       </div>
       

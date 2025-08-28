@@ -2,8 +2,11 @@ export type GameStatus = 'idle' | 'playing' | 'gameOver'
 
 export interface GameState {
   status: GameStatus
-  currentRound: number
-  maxRounds: number
+  currentRound: number // Still track rounds for difficulty progression
+  maxRounds: number // Keep for compatibility but won't limit the game
+  gameStartTime?: number // Track when game started
+  elapsedTime: number // Track elapsed time in seconds
+  maxGameTime: number // Maximum game duration in seconds
   hits: number
   misses: number
   reactionTimes: number[]
@@ -18,7 +21,10 @@ export interface GameState {
 export const initialGameState: GameState = {
   status: 'idle',
   currentRound: 0,
-  maxRounds: 10,
+  maxRounds: 999, // Effectively unlimited
+  gameStartTime: undefined,
+  elapsedTime: 0,
+  maxGameTime: 60, // 60 seconds
   hits: 0,
   misses: 0,
   reactionTimes: [],

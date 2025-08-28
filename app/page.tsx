@@ -39,7 +39,7 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const processingMiss = useRef<boolean>(false)
   
-  const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame } = useGameLoop()
+  const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame, updateElapsedTime } = useGameLoop()
   const { 
     playSound, 
     playMusic, 
@@ -67,9 +67,19 @@ export default function Home() {
     }
   }, [])
 
+  // Update timer every second
+  useEffect(() => {
+    if (gameState.status === 'playing') {
+      const timerId = setInterval(() => {
+        updateElapsedTime()
+      }, 1000)
+      return () => clearInterval(timerId)
+    }
+  }, [gameState.status, updateElapsedTime])
+
   // Auto-spawn targets during game
   useEffect(() => {
-    if (gameState.status === 'playing' && !showTarget && gameState.currentRound <= gameState.maxRounds) {
+    if (gameState.status === 'playing' && !showTarget && gameState.elapsedTime < gameState.maxGameTime) {
       // Small delay before showing next target
       roundDelayId.current = setTimeout(() => {
         showNextTarget()
@@ -159,7 +169,7 @@ export default function Home() {
           totalClicks: gameState.hits + gameState.misses + (gameState.trapHit ? 1 : 0),
           maxStreak: gameState.bestStreak,
           roundsCompleted: gameState.currentRound - 1,
-          gameDuration: 30000, // Estimate for 10 rounds
+          gameDuration: gameState.elapsedTime * 1000, // Convert seconds to milliseconds
           targetsShown: gameState.currentRound,
           trapsAvoided: 0, // Will implement tracking later
           trapHit: gameState.trapHit,
@@ -186,8 +196,8 @@ export default function Home() {
     // Reset processing flag for new round
     processingMiss.current = false
     
-    // 25% chance of trap target (increases slightly with difficulty)
-    const trapChance = 0.20 + (gameState.currentRound / gameState.maxRounds) * 0.10 // 20-30%
+    // 25% chance of trap target (increases with time elapsed)
+    const trapChance = 0.20 + (gameState.elapsedTime / gameState.maxGameTime) * 0.10 // 20-30%
     const isCurrentTrap = Math.random() < trapChance
     
     // Generate random position for this target
@@ -199,8 +209,9 @@ export default function Home() {
     setLastMissed(false)
     targetShowTime.current = Date.now()
     
-    // Get difficulty settings for current round
-    const difficulty = getDifficultyConfig(gameState.currentRound, gameState.maxRounds)
+    // Get difficulty settings based on elapsed time
+    const difficultyRound = Math.min(10, Math.floor((gameState.elapsedTime / gameState.maxGameTime) * 10) + 1)
+    const difficulty = getDifficultyConfig(difficultyRound, 10)
     
     // Set timeout for auto-hide with progressive difficulty
     timeoutId.current = setTimeout(() => {
@@ -363,9 +374,10 @@ export default function Home() {
   const averageTime = calculateAverage(last5Times)
   
   // Get current difficulty settings
-  const currentDifficulty = gameState.status === 'playing' 
-    ? getDifficultyConfig(gameState.currentRound, gameState.maxRounds)
-    : getDifficultyConfig(1, gameState.maxRounds)
+  const difficultyRound = gameState.status === 'playing' 
+    ? Math.min(10, Math.floor((gameState.elapsedTime / gameState.maxGameTime) * 10) + 1)
+    : 1
+  const currentDifficulty = getDifficultyConfig(difficultyRound, 10)
 
   return (
     <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative">
@@ -478,7 +490,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-lg md:text-xl font-orbitron font-bold text-neon-cyan">
-                Round {gameState.currentRound}/{gameState.maxRounds}
+                Time: {gameState.maxGameTime - gameState.elapsedTime}s
               </div>
               <div className="text-lg md:text-xl font-mono text-neon-yellow font-bold">
                 {formatScore(gameState.score)}
@@ -567,6 +579,7 @@ export default function Home() {
               previousHighScore={highScore}
               reactionTimes={gameState.reactionTimes}
               saveStatus={saveStatus}
+              elapsedTime={gameState.elapsedTime}
             />
           )
         })()}
