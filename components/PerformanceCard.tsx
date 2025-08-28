@@ -25,6 +25,7 @@ interface PerformanceCardProps {
   leaderboardType?: 'daily' | 'all-time'
   username?: string
   xHandle?: string | null
+  scorePercentile?: number | null
 }
 
 export default function PerformanceCard({
@@ -45,7 +46,8 @@ export default function PerformanceCard({
   userRank,
   leaderboardType = 'daily',
   username,
-  xHandle
+  xHandle,
+  scorePercentile
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -111,14 +113,20 @@ export default function PerformanceCard({
             {formatScore(finalScore)}
           </motion.p>
           
-          {/* Grade Badge */}
+          {/* Percentile or Grade Badge */}
           <motion.div 
             className="inline-block mt-3 px-4 py-2 border-2 border-neon-cyan rounded-full"
             initial={{ rotate: -180, opacity: 0 }}
             animate={{ rotate: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <span className="text-2xl font-bold text-neon-cyan text-glow">GRADE: {grade}</span>
+            {scorePercentile !== null && scorePercentile !== undefined ? (
+              <span className="text-2xl font-bold text-neon-cyan text-glow">
+                TOP {100 - scorePercentile}% TODAY
+              </span>
+            ) : (
+              <span className="text-2xl font-bold text-neon-cyan text-glow">GRADE: {grade}</span>
+            )}
           </motion.div>
           
           {/* High Score Indicator */}
@@ -283,6 +291,7 @@ export default function PerformanceCard({
             leaderboardType={leaderboardType}
             username={username}
             xHandle={xHandle}
+            scorePercentile={scorePercentile}
           />
         </motion.div>
       )}

@@ -14,6 +14,7 @@ interface ScoreCardProps {
   leaderboardType?: 'daily' | 'all-time'
   username?: string
   xHandle?: string | null
+  scorePercentile?: number | null
 }
 
 export default function ScoreCard({
@@ -26,7 +27,8 @@ export default function ScoreCard({
   userRank,
   leaderboardType = 'daily',
   username,
-  xHandle
+  xHandle,
+  scorePercentile
 }: ScoreCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -66,7 +68,7 @@ export default function ScoreCard({
           <h1 className="text-6xl font-black text-neon-green" style={{ textShadow: '0 0 20px rgba(0, 255, 0, 0.5)' }}>
             XTREME REACTION
           </h1>
-          <p className="text-xl text-gray-400">Cyberpunk Reflex Challenge</p>
+          <p className="text-xl text-gray-400">Ultimate Reflex Challenge</p>
         </div>
         
         {/* Score and Grade */}
@@ -79,10 +81,21 @@ export default function ScoreCard({
           </div>
           
           <div className="text-center">
-            <p className="text-lg text-gray-400 mb-2">GRADE</p>
-            <div className={`text-6xl font-black ${gradeColors[grade]}`} style={{ textShadow: '0 0 25px currentColor' }}>
-              {grade}
-            </div>
+            {scorePercentile !== null && scorePercentile !== undefined ? (
+              <>
+                <p className="text-lg text-gray-400 mb-2">TODAY'S RANK</p>
+                <div className="text-5xl font-black text-cyan-400" style={{ textShadow: '0 0 25px currentColor' }}>
+                  TOP {100 - scorePercentile}%
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-lg text-gray-400 mb-2">GRADE</p>
+                <div className={`text-6xl font-black ${gradeColors[grade]}`} style={{ textShadow: '0 0 25px currentColor' }}>
+                  {grade}
+                </div>
+              </>
+            )}
           </div>
         </div>
         

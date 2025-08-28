@@ -15,10 +15,10 @@ import { useSound } from '@/hooks/useSound'
 import { useAuth } from '@/hooks/useAuth'
 import { calculateReactionTime, calculateAverage, formatTime, getLastNTimes } from '@/lib/timing'
 import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
-import { calculateFinalScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
+import { calculateFinalScore, calculateHitScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
-import { saveGameSession, getUserRank, type GameResults } from '@/lib/supabase/gameService'
+import { saveGameSession, getUserRank, getScorePercentile, type GameResults } from '@/lib/supabase/gameService'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -32,6 +32,7 @@ export default function Home() {
   const [targetPosition, setTargetPosition] = useState<TargetPosition>({ x: 50, y: 50 })
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [userRank, setUserRank] = useState<number | null>(null)
+  const [scorePercentile, setScorePercentile] = useState<number | null>(null)
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -214,10 +215,14 @@ export default function Home() {
         } else {
           setSaveStatus('saved')
           
-          // Fetch user rank after successful save
+          // Fetch user rank and percentile after successful save
           try {
             const { rank } = await getUserRank(user.id, 'daily')
             setUserRank(rank)
+            
+            // Calculate percentile for the score
+            const percentile = await getScorePercentile(gameResults.score)
+            setScorePercentile(percentile)
           } catch (rankError) {
             console.error('Failed to fetch user rank:', rankError)
           }
@@ -227,6 +232,20 @@ export default function Home() {
     
     if (gameState.status === 'gameOver') {
       saveScore()
+      
+      // Calculate percentile even for practice mode
+      if (isPracticeMode) {
+        const finalScore = calculateFinalScore(
+          gameState.reactionTimes.map(t => calculateHitScore(t)),
+          calculateAccuracy(gameState.hits, gameState.misses),
+          gameState.difficultyLevel || 0,
+          calculateStreakBonus(gameState.bestStreak)
+        )
+        
+        getScorePercentile(finalScore).then(percentile => {
+          setScorePercentile(percentile)
+        })
+      }
     }
   }, [gameState.status, gameState, user, isPracticeMode])
 
@@ -655,6 +674,7 @@ export default function Home() {
               leaderboardType="daily"
               username={profile?.username}
               xHandle={profile?.x_username}
+              scorePercentile={scorePercentile}
             />
           )
         })()}

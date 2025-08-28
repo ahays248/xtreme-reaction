@@ -224,6 +224,47 @@ export async function getUserRank(
 }
 
 /**
+ * Get percentile ranking for a score compared to today's scores
+ * Returns what percentage of players you beat today
+ */
+export async function getScorePercentile(score: number): Promise<number | null> {
+  const supabase = createClient()
+  
+  try {
+    const today = new Date().toISOString().split('T')[0]
+    const startOfDay = `${today}T00:00:00.000Z`
+    const endOfDay = `${today}T23:59:59.999Z`
+    
+    // Get all scores from today
+    const { data: allScores, error } = await supabase
+      .from('game_sessions')
+      .select('score')
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay)
+      .order('score', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching scores for percentile:', error)
+      return null
+    }
+    
+    if (!allScores || allScores.length === 0) {
+      // If no scores today, you're in the 100th percentile!
+      return 100
+    }
+    
+    // Find how many scores are below this score
+    const scoresBelow = allScores.filter(s => s.score < score).length
+    const percentile = Math.round((scoresBelow / allScores.length) * 100)
+    
+    return percentile
+  } catch (error) {
+    console.error('Error calculating percentile:', error)
+    return null
+  }
+}
+
+/**
  * Test database connection
  * Simple utility to verify database is accessible
  */
