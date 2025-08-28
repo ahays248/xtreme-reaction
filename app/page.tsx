@@ -76,6 +76,24 @@ export default function Home() {
       return () => clearInterval(timerId)
     }
   }, [gameState.status, updateElapsedTime])
+  
+  // Clear all timeouts when game ends
+  useEffect(() => {
+    if (gameState.status === 'gameOver') {
+      // Clear any pending timeouts
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current)
+        timeoutId.current = null
+      }
+      if (roundDelayId.current) {
+        clearTimeout(roundDelayId.current)
+        roundDelayId.current = null
+      }
+      // Hide target immediately
+      setShowTarget(false)
+      targetShowTime.current = 0
+    }
+  }, [gameState.status])
 
   // Auto-spawn targets during game
   useEffect(() => {
@@ -216,6 +234,12 @@ export default function Home() {
     
     // Set timeout for auto-hide with progressive difficulty
     timeoutId.current = setTimeout(() => {
+      // Check if game is still playing before processing
+      if (gameState.status !== 'playing') {
+        setShowTarget(false)
+        return
+      }
+      
       setShowTarget(false)
       targetShowTime.current = 0  // Clear this immediately to prevent click handler from firing
       
@@ -317,6 +341,19 @@ export default function Home() {
         if (soundEnabled) playSound('miss')
         setLastMissed(true)
         setShowMissFeedback(true)
+        
+        // Immediately hide the target and clear timeout when missing
+        if (showTarget && !isTrapTarget) {
+          setShowTarget(false)
+          if (timeoutId.current) {
+            clearTimeout(timeoutId.current)
+            timeoutId.current = null
+          }
+          // Move to next round after a short delay
+          setTimeout(() => {
+            nextRound()
+          }, 300)
+        }
         
         // Clear feedback and processing flag after delay
         setTimeout(() => {
