@@ -27,15 +27,14 @@ export default function StatsPage() {
   })
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/')
-      return
+    if (!authLoading) {
+      if (user) {
+        loadStats()
+      } else {
+        setLoading(false)
+      }
     }
-
-    if (user) {
-      loadStats()
-    }
-  }, [user, authLoading, router])
+  }, [user, authLoading])
 
   async function loadStats() {
     setLoading(true)
@@ -65,6 +64,32 @@ export default function StatsPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-neon-green text-xl">Loading stats...</div>
+      </div>
+    )
+  }
+
+  // Show message for unauthenticated users
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+        <h1 className="text-3xl font-bold text-purple-500 mb-4">Stats Requires Login</h1>
+        <p className="text-gray-400 mb-8 text-center max-w-md">
+          Sign in to track your performance, view progress charts, and analyze your improvement over time.
+        </p>
+        <div className="flex gap-4">
+          <Link 
+            href="/"
+            className="px-6 py-3 bg-purple-500/20 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-500/30 transition-all"
+          >
+            Sign In & Play
+          </Link>
+          <Link 
+            href="/leaderboard"
+            className="px-6 py-3 bg-cyan/20 border border-cyan text-cyan rounded-lg hover:bg-cyan/30 transition-all"
+          >
+            View Leaderboard
+          </Link>
+        </div>
       </div>
     )
   }
