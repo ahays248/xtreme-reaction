@@ -104,12 +104,12 @@ export default function ScoreCard({
             color: colors.neonGreen,
             textShadow: `0 0 20px rgba(0, 255, 0, 0.5)`,
             lineHeight: 1,
-            marginBottom: '12px',
+            marginBottom: '20px',
             letterSpacing: '2px'
           }}>
             XTREME REACTION
           </h1>
-          <p style={{ fontSize: '20px', color: colors.gray400, lineHeight: 1 }}>Ultimate Reflex Challenge</p>
+          <p style={{ fontSize: '20px', color: colors.gray400, lineHeight: 1.2 }}>Ultimate Reflex Challenge</p>
         </div>
         
         {/* Score and Grade/Percentile */}
@@ -117,7 +117,7 @@ export default function ScoreCard({
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>FINAL SCORE</p>
             <p style={{
-              fontSize: '64px',
+              fontSize: '56px',
               fontWeight: 900,
               color: colors.neonYellow,
               textShadow: `0 0 30px rgba(255, 255, 0, 0.5)`,
@@ -133,7 +133,7 @@ export default function ScoreCard({
               <>
                 <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>TODAY'S RANK</p>
                 <div style={{
-                  fontSize: '44px',
+                  fontSize: '48px',
                   fontWeight: 900,
                   color: colors.cyan400,
                   textShadow: `0 0 25px ${colors.cyan400}`,
@@ -147,7 +147,7 @@ export default function ScoreCard({
               <>
                 <p style={{ fontSize: '16px', color: colors.gray400, marginBottom: '4px', lineHeight: 1 }}>GRADE</p>
                 <div style={{
-                  fontSize: '54px',
+                  fontSize: '56px',
                   fontWeight: 900,
                   color: gradeColors[grade],
                   textShadow: `0 0 25px ${gradeColors[grade]}`,
@@ -195,8 +195,8 @@ export default function ScoreCard({
         
         {/* Call to Action */}
         <div style={{ textAlign: 'center', marginTop: '16px', paddingBottom: '8px' }}>
-          <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '6px', lineHeight: 1 }}>Think you can beat this score?</p>
-          <p style={{ fontSize: '20px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: 1 }}>
+          <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px', lineHeight: 1.4 }}>Think you can beat this score?</p>
+          <p style={{ fontSize: '20px', fontWeight: 'bold', color: colors.neonGreen, lineHeight: 1.4 }}>
             Play at XtremeReaction.lol
           </p>
         </div>
