@@ -39,6 +39,40 @@ export async function generateScoreCardImage(element: HTMLElement): Promise<Blob
   }
 }
 
+export async function copyScoreCardToClipboard(element: HTMLElement): Promise<void> {
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#000000',
+      scale: 2,
+      logging: false,
+      useCORS: true,
+      allowTaint: true
+    })
+    
+    // Convert canvas to blob
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob)
+        } else {
+          reject(new Error('Failed to generate image blob'))
+        }
+      }, 'image/png', 0.95)
+    })
+    
+    // Copy to clipboard using Clipboard API
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({ 'image/png': blob })
+      await navigator.clipboard.write([item])
+    } else {
+      throw new Error('Clipboard API not supported')
+    }
+  } catch (error) {
+    console.error('Error copying to clipboard:', error)
+    throw error
+  }
+}
+
 export function createShareText(data: ShareData): string {
   const lines = []
   
