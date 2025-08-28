@@ -1,6 +1,6 @@
 # Xtreme Reaction - AI Assistant Guide
 
-**Last Updated**: August 28, 2025 - Phase 15 Complete!
+**Last Updated**: August 28, 2025 - Phase 16 Complete!
 **GitHub**: https://github.com/ahays248/xtreme-reaction
 
 ## 🎯 CRITICAL: DEVELOPMENT PHILOSOPHY - READ THIS FIRST!
@@ -36,7 +36,8 @@ After experiencing complexity spiral with the previous implementation, we've ado
 - ✅ **Email Authentication** - Sign up/sign in with email, username, optional X handle
 - 🎮 Live on Vercel with automatic deployments
 - ✅ **Phase 15 COMPLETE** - Scores save to database for authenticated users
-- **→ Ready for Phase 16: Leaderboards**
+- ✅ **Phase 16 COMPLETE** - Leaderboards showing top players (daily & all-time)
+- **→ Ready for Phase 17: Share to X**
 
 ### What We're Building
 **Xtreme Reaction** is a competitive reaction time game for the X community:
@@ -143,10 +144,17 @@ After experiencing complexity spiral with the previous implementation, we've ado
 # - Practice mode blocks saves appropriately
 # - Graceful offline handling
 # 
+# What's New in Phase 16:
+# - Leaderboard page with Daily/All-Time views
+# - Shows top 20 players with rankings
+# - Current user highlighted in green
+# - Auto-refreshes every 30 seconds
+# - Mobile-responsive design
+# 
 # Next Steps:
-# 1. Phase 16: Leaderboards with usernames
-# 2. Phase 17: Share scores to X
-# 3. Phase 19: Charts & Analytics
+# 1. Phase 17: Share scores to X
+# 2. Phase 19: Charts & Analytics
+# 3. Phase 20: Final polish
 ```
 
 ## Tech Stack
@@ -291,7 +299,7 @@ className="pb-safe"       // For iOS safe areas
 13. **Database Setup** - Connect Supabase
 14. **Email Auth** - Email/password login ✅
 15. **Save Scores** - Persist data ✅
-16. **Leaderboards** - Show rankings
+16. **Leaderboards** - Show rankings ✅
 17. **Share to X** - Social features
 18. **Practice Mode** - Guest play
 19. **Charts** - Data viz
