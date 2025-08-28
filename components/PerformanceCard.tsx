@@ -43,9 +43,25 @@ export default function PerformanceCard({
   // Calculate performance metrics
   const fastestTime = reactionTimes.length > 0 ? Math.min(...reactionTimes) : 0
   const slowestTime = reactionTimes.length > 0 ? Math.max(...reactionTimes) : 0
-  const consistency = reactionTimes.length > 1 
-    ? Math.round((1 - (slowestTime - fastestTime) / avgReactionTime) * 100)
-    : 100
+  // Calculate consistency - how similar reaction times are
+  // Using coefficient of variation (lower = more consistent)
+  const calculateConsistency = () => {
+    if (reactionTimes.length <= 1) return 100
+    
+    // Calculate standard deviation
+    const mean = avgReactionTime
+    const variance = reactionTimes.reduce((sum, time) => sum + Math.pow(time - mean, 2), 0) / reactionTimes.length
+    const stdDev = Math.sqrt(variance)
+    
+    // Coefficient of variation (CV) as percentage
+    const cv = (stdDev / mean) * 100
+    
+    // Convert CV to consistency score (lower CV = higher consistency)
+    // CV of 0% = 100% consistency, CV of 50%+ = 0% consistency
+    return Math.max(0, Math.round(100 - (cv * 2)))
+  }
+  
+  const consistency = calculateConsistency()
   
   // Visual bar widths (percentage) - ensure they're valid numbers
   const accuracyBar = Math.max(0, Math.min(100, accuracy || 0))
