@@ -100,7 +100,9 @@ class AudioManager {
    * Create HTML5 Audio elements for iOS fallback
    */
   private async createAudioElements(): Promise<void> {
-    console.log('Creating HTML5 Audio elements for iOS')
+    console.log('Creating HTML5 Audio elements for mobile')
+    
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     
     // Create audio elements for sound effects
     const sounds: SoundType[] = ['hit', 'miss', 'trap']
@@ -109,8 +111,18 @@ class AudioManager {
       audio.preload = 'auto'
       // Set playsinline to work on iOS
       audio.setAttribute('playsinline', '')
-      // Volume control
-      audio.volume = this.gainNode?.gain.value || 1
+      // Volume control - lower on mobile
+      audio.volume = isMobile ? 0.6 : (this.gainNode?.gain.value || 1)
+      
+      // Preload by playing silently
+      const originalVolume = audio.volume
+      audio.volume = 0
+      audio.play().then(() => {
+        audio.pause()
+        audio.currentTime = 0
+        audio.volume = originalVolume
+      }).catch(() => {})
+      
       this.audioElements.set(sound, audio)
     }
     
@@ -121,11 +133,11 @@ class AudioManager {
       audio.preload = 'auto'
       audio.loop = true
       audio.setAttribute('playsinline', '')
-      audio.volume = this.musicGainNode?.gain.value || 0.3
+      audio.volume = isMobile ? 0.2 : (this.musicGainNode?.gain.value || 0.3)
       this.audioElements.set(track, audio)
     }
     
-    console.log('HTML5 Audio elements created')
+    console.log('HTML5 Audio elements created and preloaded')
   }
 
   /**
@@ -176,36 +188,34 @@ class AudioManager {
    * Play a sound effect
    */
   async play(sound: SoundType): Promise<void> {
-    console.log(`Attempting to play sound: ${sound}, initialized: ${this.initialized}, soundEnabled: ${this.soundEnabled}, muted: ${this.muted}, iOS: ${this.isIOS}`)
+    if (!this.initialized || !this.soundEnabled || this.muted) return
     
-    if (!this.initialized) {
-      console.log('Audio not initialized')
-      return
-    }
-    if (!this.soundEnabled) {
-      console.log('Sound not enabled by user')
-      return
-    }
-    if (this.muted) {
-      console.log('Sound is muted')
-      return
-    }
+    // Detect mobile for optimized playback
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-    // Use HTML5 Audio on iOS for better compatibility with silent mode
-    if (this.isIOS) {
+    // Use HTML5 Audio on all mobile devices for better performance
+    if (this.isIOS || isMobile) {
       const audioElement = this.audioElements.get(sound)
       if (audioElement) {
         try {
-          // Reset and play
-          audioElement.currentTime = 0
-          audioElement.volume = this.gainNode?.gain.value || 1
-          const playPromise = audioElement.play()
-          if (playPromise) {
-            await playPromise
-          }
-          console.log(`Successfully played sound via HTML5 Audio: ${sound}`)
+          // Clone audio for overlapping sounds (prevents cutting off)
+          const clone = audioElement.cloneNode() as HTMLAudioElement
+          clone.volume = this.gainNode?.gain.value || 1
+          
+          // Play immediately without waiting for promise
+          clone.play().catch(() => {
+            // Fallback: try original element if clone fails
+            audioElement.currentTime = 0
+            audioElement.volume = this.gainNode?.gain.value || 1
+            audioElement.play().catch(() => {})
+          })
+          
+          // Clean up clone after playing
+          clone.addEventListener('ended', () => {
+            clone.remove()
+          })
         } catch (error) {
-          console.error(`Failed to play HTML5 audio: ${sound}`, error)
+          // Silent fail for better performance
         }
       }
       return

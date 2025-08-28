@@ -26,6 +26,7 @@ interface PerformanceCardProps {
   username?: string
   xHandle?: string | null
   scorePercentile?: number | null
+  onShareModalChange?: (isOpen: boolean) => void
 }
 
 export default function PerformanceCard({
@@ -47,7 +48,8 @@ export default function PerformanceCard({
   leaderboardType = 'daily',
   username,
   xHandle,
-  scorePercentile
+  scorePercentile,
+  onShareModalChange
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -292,6 +294,7 @@ export default function PerformanceCard({
             username={username}
             xHandle={xHandle}
             scorePercentile={scorePercentile}
+            onModalChange={onShareModalChange}
           />
         </motion.div>
       )}

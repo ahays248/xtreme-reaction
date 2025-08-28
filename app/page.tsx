@@ -33,6 +33,7 @@ export default function Home() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [userRank, setUserRank] = useState<number | null>(null)
   const [scorePercentile, setScorePercentile] = useState<number | null>(null)
+  const [shareModalOpen, setShareModalOpen] = useState(false)
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -68,6 +69,19 @@ export default function Home() {
     return () => {
       if (timeoutId.current) clearTimeout(timeoutId.current)
       if (roundDelayId.current) clearTimeout(roundDelayId.current)
+    }
+  }, [])
+  
+  // Hide Safari URL bar on mobile
+  useEffect(() => {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    
+    if (isSafari && isIOS) {
+      // Scroll down slightly to hide URL bar
+      setTimeout(() => {
+        window.scrollTo(0, 1)
+      }, 100)
     }
   }, [])
 
@@ -678,6 +692,7 @@ export default function Home() {
               username={profile?.username}
               xHandle={profile?.x_username}
               scorePercentile={scorePercentile}
+              onShareModalChange={setShareModalOpen}
             />
           )
         })()}
@@ -721,7 +736,7 @@ export default function Home() {
             </div>
           )}
           
-          {gameState.status === 'gameOver' && (
+          {gameState.status === 'gameOver' && !shareModalOpen && (
             <div className="flex flex-col sm:flex-row gap-3">
               <motion.button
                 onClick={handleStartGame}

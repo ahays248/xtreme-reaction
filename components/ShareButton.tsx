@@ -17,6 +17,7 @@ interface ShareButtonProps {
   username?: string
   xHandle?: string | null
   scorePercentile?: number | null
+  onModalChange?: (isOpen: boolean) => void
 }
 
 export default function ShareButton({
@@ -29,11 +30,17 @@ export default function ShareButton({
   leaderboardType = 'daily',
   username,
   xHandle,
-  scorePercentile
+  scorePercentile,
+  onModalChange
 }: ShareButtonProps) {
   const [showModal, setShowModal] = useState(false)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle')
   const scoreCardRef = useRef<HTMLDivElement>(null)
+  
+  // Notify parent when modal state changes
+  useEffect(() => {
+    onModalChange?.(showModal)
+  }, [showModal, onModalChange])
   
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -66,23 +73,8 @@ export default function ShareButton({
     }
   }
   
-  const handleDownloadImage = async () => {
-    if (!scoreCardRef.current) return
-    
-    try {
-      const blob = await generateScoreCardImage(scoreCardRef.current)
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `xtreme-reaction-score-${finalScore}.png`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error downloading image:', error)
-    }
-  }
+  // Detect if mobile
+  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
   
   const handleShareText = async () => {
     const shareData: ShareData = {
@@ -153,11 +145,12 @@ export default function ShareButton({
                 </button>
               </div>
               
-              {/* Scorecard Preview */}
-              <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-gray-900/50">
-                <div className="transform scale-50 sm:scale-75 lg:scale-90 origin-center">
-                  <div ref={scoreCardRef}>
-                    <ScoreCard
+              {/* Scorecard Preview - Only show on desktop */}
+              {!isMobile && (
+                <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-gray-900/50">
+                  <div className="transform scale-50 sm:scale-75 lg:scale-90 origin-center">
+                    <div ref={scoreCardRef}>
+                      <ScoreCard
                       finalScore={finalScore}
                       accuracy={accuracy}
                       avgReactionTime={avgReactionTime}
@@ -169,21 +162,23 @@ export default function ShareButton({
                       username={username}
                       xHandle={xHandle}
                       scorePercentile={scorePercentile}
-                    />
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               
               {/* Action Buttons */}
               <div className="p-4 border-t border-neon-green/30">
                 <div className="flex flex-col gap-3">
-                  {/* Primary Actions */}
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Desktop: Show copy button and scorecard preview */}
+                  {/* Mobile: Only show share to X button */}
+                  {!isMobile && (
                     <button
                       onClick={handleCopyImage}
                       disabled={copyStatus === 'copying'}
                       className={`
-                        flex-1 px-4 py-3 font-orbitron font-bold rounded-lg
+                        w-full px-4 py-3 font-orbitron font-bold rounded-lg
                         transition-all duration-200 flex items-center justify-center gap-2
                         ${copyStatus === 'copied' 
                           ? 'bg-green-900/30 border-2 border-green-500 text-green-400'
@@ -206,7 +201,7 @@ export default function ShareButton({
                           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
-                          <span>Copied!</span>
+                          <span>Copied to Clipboard!</span>
                         </>
                       ) : copyStatus === 'error' ? (
                         <>
@@ -220,21 +215,11 @@ export default function ShareButton({
                           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                           </svg>
-                          <span>Copy Image</span>
+                          <span>Copy Scorecard</span>
                         </>
                       )}
                     </button>
-                    
-                    <button
-                      onClick={handleDownloadImage}
-                      className="flex-1 px-4 py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold rounded-lg hover:bg-gray-600/20 hover:border-gray-400 hover:text-white transition-all duration-200 flex items-center justify-center gap-2"
-                    >
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      <span>Download</span>
-                    </button>
-                  </div>
+                  )}
                   
                   <button
                     onClick={handleShareText}
@@ -243,20 +228,18 @@ export default function ShareButton({
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
-                    <span>Open X / Twitter</span>
+                    <span>{isMobile ? 'Share Stats to X' : 'Share to X / Twitter'}</span>
                   </button>
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-3 text-center">
-                  {copyStatus === 'copied' 
-                    ? 'Image copied! Now click "Open X / Twitter" and paste it in your post.'
+                  {isMobile 
+                    ? 'Share your stats with all the details on X!'
+                    : copyStatus === 'copied' 
+                    ? 'Scorecard copied! Now share to X and paste the image.'
                     : copyStatus === 'error'
-                    ? /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) 
-                      ? 'Mobile browsers don\'t support image copy. Download the image and attach it to your post.'
-                      : 'Copy not supported on your browser. Download the image and attach it to your post.'
-                    : /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-                    ? '1. Download the scorecard  2. Open X/Twitter  3. Attach the image to your post'
-                    : '1. Copy or download the scorecard  2. Open X/Twitter  3. Paste or attach the image'
+                    ? 'Copy failed. Try again or share without image.'
+                    : 'Copy the scorecard, then share to X with the image!'
                   }
                 </p>
               </div>

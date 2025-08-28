@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   title: "Xtreme Reaction - Phase 16 Complete | 60-Second Challenge",
   description: "Challenge your reaction time with this fast-paced reflex game. Compete on leaderboards and share your scores!",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Xtreme Reaction',
+  },
   icons: {
     icon: [
       { url: '/xr-icon.svg', type: 'image/svg+xml' },
