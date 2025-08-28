@@ -34,6 +34,11 @@ export default function Home() {
   const [userRank, setUserRank] = useState<number | null>(null)
   const [scorePercentile, setScorePercentile] = useState<number | null>(null)
   const [shareModalOpen, setShareModalOpen] = useState(false)
+  
+  // Check if mobile - mobile always needs user interaction even if sound was previously enabled
+  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
+  
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const roundDelayId = useRef<NodeJS.Timeout | null>(null)
@@ -429,10 +434,20 @@ export default function Home() {
       // Initialize audio on user interaction and enable sound
       await initializeAudio()
       await enableSound()  // This sets soundEnabled and saves to localStorage
+      setHasUserInteracted(true)
       console.log('Sound enabled successfully')
+      
       // Start menu music immediately since we're on the idle screen
+      // Small delay on mobile to ensure audio context is ready
       if (gameState.status === 'idle') {
-        playMusic('menu')
+        if (isMobile) {
+          // Mobile needs a tiny delay for audio context to be ready
+          setTimeout(() => {
+            playMusic('menu')
+          }, 100)
+        } else {
+          playMusic('menu')
+        }
       }
     } catch (error) {
       console.error('Failed to enable sound:', error)
@@ -554,8 +569,8 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Enable Sound Button - shows when audio not enabled */}
-            {!soundEnabled && (
+            {/* Enable Sound Button - shows when audio not enabled or mobile needs user interaction */}
+            {(!soundEnabled || (!hasUserInteracted && isMobile)) && (
               <motion.button
                 onClick={handleEnableSound}
                 className="mb-4 px-6 sm:px-8 py-3 sm:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense animate-pulse"
