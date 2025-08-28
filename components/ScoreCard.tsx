@@ -3,6 +3,25 @@
 import { formatScore, getScoreGrade } from '@/lib/scoring'
 import { formatTime } from '@/lib/timing'
 
+// Use inline styles with hex colors to avoid html2canvas issues with modern CSS color functions
+const colors = {
+  neonGreen: '#00ff00',
+  neonYellow: '#ffff00',
+  neonCyan: '#00ffff',
+  gray400: '#9ca3af',
+  green400: '#4ade80',
+  yellow400: '#facc15',
+  orange400: '#fb923c',
+  cyan400: '#22d3ee',
+  purple400: '#c084fc',
+  blue400: '#60a5fa',
+  red400: '#f87171',
+  gray300: '#d1d5db',
+  gray500: '#6b7280',
+  black: '#000000',
+  white: '#ffffff'
+}
+
 interface ScoreCardProps {
   finalScore: number
   accuracy: number
@@ -34,12 +53,12 @@ export default function ScoreCard({
   
   // Grade colors
   const gradeColors: Record<string, string> = {
-    'S': 'text-purple-400',
-    'A': 'text-green-400',
-    'B': 'text-blue-400',
-    'C': 'text-yellow-400',
-    'D': 'text-orange-400',
-    'F': 'text-red-400'
+    'S': colors.purple400,
+    'A': colors.green400,
+    'B': colors.blue400,
+    'C': colors.yellow400,
+    'D': colors.orange400,
+    'F': colors.red400
   }
   
   const displayName = xHandle ? `@${xHandle}` : username || 'Anonymous'
@@ -47,51 +66,85 @@ export default function ScoreCard({
   return (
     <div 
       id="score-card"
-      className="w-[1200px] h-[630px] bg-black flex flex-col items-center justify-center p-12 relative"
       style={{
+        width: '1200px',
+        height: '630px',
+        backgroundColor: colors.black,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px',
+        position: 'relative',
         fontFamily: 'Orbitron, monospace',
-        background: 'linear-gradient(135deg, #000000 0%, #0a0a0a 100%)'
+        background: 'linear-gradient(135deg, #000000 0%, #0a0a0a 100%)',
+        color: colors.white
       }}
     >
       {/* Matrix-style background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="h-full w-full" style={{
-          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(0, 255, 0, 0.1) 35px, rgba(0, 255, 0, 0.1) 70px),
-                           repeating-linear-gradient(90deg, transparent, transparent 35px, rgba(0, 255, 0, 0.1) 35px, rgba(0, 255, 0, 0.1) 70px)`
-        }} />
-      </div>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.1,
+        backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(0, 255, 0, 0.1) 35px, rgba(0, 255, 0, 0.1) 70px),
+                         repeating-linear-gradient(90deg, transparent, transparent 35px, rgba(0, 255, 0, 0.1) 35px, rgba(0, 255, 0, 0.1) 70px)`
+      }} />
       
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center space-y-8">
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
         {/* Title */}
-        <div className="text-center space-y-2">
-          <h1 className="text-6xl font-black text-neon-green" style={{ textShadow: '0 0 20px rgba(0, 255, 0, 0.5)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{
+            fontSize: '60px',
+            fontWeight: 900,
+            color: colors.neonGreen,
+            textShadow: `0 0 20px rgba(0, 255, 0, 0.5)`,
+            marginBottom: '8px'
+          }}>
             XTREME REACTION
           </h1>
-          <p className="text-xl text-gray-400">Ultimate Reflex Challenge</p>
+          <p style={{ fontSize: '20px', color: colors.gray400 }}>Ultimate Reflex Challenge</p>
         </div>
         
-        {/* Score and Grade */}
-        <div className="flex items-center space-x-12">
-          <div className="text-center">
-            <p className="text-lg text-gray-400 mb-2">FINAL SCORE</p>
-            <p className="text-7xl font-black text-neon-yellow" style={{ textShadow: '0 0 30px rgba(255, 255, 0, 0.5)' }}>
+        {/* Score and Grade/Percentile */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px' }}>FINAL SCORE</p>
+            <p style={{
+              fontSize: '70px',
+              fontWeight: 900,
+              color: colors.neonYellow,
+              textShadow: `0 0 30px rgba(255, 255, 0, 0.5)`
+            }}>
               {formatScore(finalScore)}
             </p>
           </div>
           
-          <div className="text-center">
+          <div style={{ textAlign: 'center' }}>
             {scorePercentile !== null && scorePercentile !== undefined ? (
               <>
-                <p className="text-lg text-gray-400 mb-2">TODAY'S RANK</p>
-                <div className="text-5xl font-black text-cyan-400" style={{ textShadow: '0 0 25px currentColor' }}>
+                <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px' }}>TODAY'S RANK</p>
+                <div style={{
+                  fontSize: '50px',
+                  fontWeight: 900,
+                  color: colors.cyan400,
+                  textShadow: `0 0 25px ${colors.cyan400}`
+                }}>
                   TOP {100 - scorePercentile}%
                 </div>
               </>
             ) : (
               <>
-                <p className="text-lg text-gray-400 mb-2">GRADE</p>
-                <div className={`text-6xl font-black ${gradeColors[grade]}`} style={{ textShadow: '0 0 25px currentColor' }}>
+                <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px' }}>GRADE</p>
+                <div style={{
+                  fontSize: '60px',
+                  fontWeight: 900,
+                  color: gradeColors[grade],
+                  textShadow: `0 0 25px ${gradeColors[grade]}`
+                }}>
                   {grade}
                 </div>
               </>
@@ -100,25 +153,25 @@ export default function ScoreCard({
         </div>
         
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-8">
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-1">ACCURACY</p>
-            <p className="text-3xl font-bold text-green-400">{accuracy}%</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px' }}>ACCURACY</p>
+            <p style={{ fontSize: '30px', fontWeight: 'bold', color: colors.green400 }}>{accuracy}%</p>
           </div>
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-1">AVG SPEED</p>
-            <p className="text-3xl font-bold text-yellow-400">{formatTime(avgReactionTime)}</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px' }}>AVG SPEED</p>
+            <p style={{ fontSize: '30px', fontWeight: 'bold', color: colors.yellow400 }}>{formatTime(avgReactionTime)}</p>
           </div>
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-1">BEST STREAK</p>
-            <p className="text-3xl font-bold text-orange-400">{bestStreak}</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: colors.gray400, fontSize: '14px', marginBottom: '4px' }}>BEST STREAK</p>
+            <p style={{ fontSize: '30px', fontWeight: 'bold', color: colors.orange400 }}>{bestStreak}</p>
           </div>
         </div>
         
         {/* Leaderboard Rank */}
         {userRank && (
-          <div className="text-center">
-            <p className="text-2xl font-bold text-cyan-400">
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '24px', fontWeight: 'bold', color: colors.cyan400 }}>
               {leaderboardType === 'daily' ? 'Daily' : 'All-Time'} Rank: #{userRank}
             </p>
           </div>
@@ -126,25 +179,25 @@ export default function ScoreCard({
         
         {/* Player Name */}
         {displayName !== 'Anonymous' && (
-          <div className="text-center">
-            <p className="text-xl text-gray-300">{displayName}</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '20px', color: colors.gray300 }}>{displayName}</p>
           </div>
         )}
         
         {/* Call to Action */}
-        <div className="text-center space-y-2 pt-4">
-          <p className="text-lg text-gray-400">Think you can beat this score?</p>
-          <p className="text-xl font-bold text-neon-green">
+        <div style={{ textAlign: 'center', paddingTop: '16px' }}>
+          <p style={{ fontSize: '18px', color: colors.gray400, marginBottom: '8px' }}>Think you can beat this score?</p>
+          <p style={{ fontSize: '20px', fontWeight: 'bold', color: colors.neonGreen }}>
             Play at XtremeReaction.lol
           </p>
         </div>
       </div>
       
       {/* Corner decorations */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-neon-green opacity-50" />
-      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-neon-green opacity-50" />
-      <div className="absolute bottom-8 left-8 w-16 h-16 border-l-2 border-b-2 border-neon-green opacity-50" />
-      <div className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 border-neon-green opacity-50" />
+      <div style={{ position: 'absolute', top: '32px', left: '32px', width: '64px', height: '64px', borderLeft: `2px solid ${colors.neonGreen}`, borderTop: `2px solid ${colors.neonGreen}`, opacity: 0.5 }} />
+      <div style={{ position: 'absolute', top: '32px', right: '32px', width: '64px', height: '64px', borderRight: `2px solid ${colors.neonGreen}`, borderTop: `2px solid ${colors.neonGreen}`, opacity: 0.5 }} />
+      <div style={{ position: 'absolute', bottom: '32px', left: '32px', width: '64px', height: '64px', borderLeft: `2px solid ${colors.neonGreen}`, borderBottom: `2px solid ${colors.neonGreen}`, opacity: 0.5 }} />
+      <div style={{ position: 'absolute', bottom: '32px', right: '32px', width: '64px', height: '64px', borderRight: `2px solid ${colors.neonGreen}`, borderBottom: `2px solid ${colors.neonGreen}`, opacity: 0.5 }} />
     </div>
   )
 }
