@@ -149,15 +149,13 @@ export default function Home() {
         // Calculate streak bonus the same way as PerformanceCard
         const streakBonus = calculateStreakBonus(gameState.bestStreak) * gameState.bestStreak
         
-        // Calculate final score the same way as PerformanceCard
-        const finalScore = gameState.trapHit 
-          ? 0 
-          : calculateFinalScore(
-              gameState.hitScores,
-              accuracy,
-              gameState.difficultyLevel || 0,
-              streakBonus
-            )
+        // Calculate final score - keep score even if trap hit (just ends game early)
+        const finalScore = calculateFinalScore(
+          gameState.hitScores,
+          accuracy,
+          gameState.difficultyLevel || 0,
+          streakBonus
+        )
         
         const gameResults: GameResults = {
           score: finalScore,
@@ -472,7 +470,7 @@ export default function Home() {
             <p className="text-lg sm:text-xl md:text-2xl font-rajdhani font-bold text-glow">Ready to test your reflexes?</p>
             <div className="space-y-0.5 sm:space-y-1 md:space-y-2">
               <p className="text-xs sm:text-sm opacity-70 font-mono">Hit GREEN targets for 60 seconds!</p>
-              <p className="text-xs sm:text-sm text-neon-red font-mono">⚠️ Avoid RED targets! ⚠️</p>
+              <p className="text-xs sm:text-sm text-neon-red font-mono">⚠️ RED targets end your game! ⚠️</p>
             </div>
             {getHighScore() > 0 && (
               <motion.p 
@@ -553,15 +551,13 @@ export default function Home() {
             ? calculateAverage(gameState.reactionTimes) 
             : 0
           const streakBonus = calculateStreakBonus(gameState.bestStreak) * gameState.bestStreak
-          // If trap hit, score is 0 (penalty for hitting trap)
-          const finalScore = gameState.trapHit 
-            ? 0 
-            : calculateFinalScore(
-                gameState.hitScores,
-                accuracy,
-                gameState.difficultyLevel || 0,
-                streakBonus
-              )
+          // Calculate final score - keep score even if trap hit (just ends game early)
+          const finalScore = calculateFinalScore(
+            gameState.hitScores,
+            accuracy,
+            gameState.difficultyLevel || 0,
+            streakBonus
+          )
           const highScore = getHighScore()
           const isNewHigh = isNewHighScore(finalScore)
           

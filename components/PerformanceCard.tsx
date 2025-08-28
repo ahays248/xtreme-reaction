@@ -66,10 +66,10 @@ export default function PerformanceCard({
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 0.5, repeat: Infinity }}
         >
-          {trapHit ? 'TRAP HIT!' : 'PERFORMANCE REPORT'}
+          {trapHit ? 'GAME OVER - TRAP HIT!' : 'PERFORMANCE REPORT'}
         </motion.h2>
         {trapHit && (
-          <p className="text-sm sm:text-base text-neon-red">You clicked a red trap target!</p>
+          <p className="text-sm sm:text-base text-neon-red">Red target ended your run early!</p>
         )}
       </div>
 
