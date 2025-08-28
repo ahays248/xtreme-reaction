@@ -136,8 +136,18 @@ export default function Home() {
           : 0
         const accuracy = calculateAccuracy(gameState.hits, gameState.misses)
         
+        // Calculate final score the same way as PerformanceCard
+        const finalScore = gameState.trapHit 
+          ? 0 
+          : calculateFinalScore(
+              gameState.hitScores,
+              accuracy,
+              gameState.difficultyLevel || 0,
+              gameState.bestStreak
+            )
+        
         const gameResults: GameResults = {
-          score: gameState.score,
+          score: finalScore,
           avgReactionTime,
           successfulHits: gameState.hits,
           incorrectHits: gameState.trapHit ? 1 : 0,
