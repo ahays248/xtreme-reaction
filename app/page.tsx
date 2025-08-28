@@ -38,6 +38,7 @@ export default function Home() {
   // Check if mobile - mobile always needs user interaction even if sound was previously enabled
   const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
+  const [needsUserAction, setNeedsUserAction] = useState(true) // Assume we need user action until proven otherwise
   
   const targetShowTime = useRef<number>(0)
   const timeoutId = useRef<NodeJS.Timeout | null>(null)
@@ -136,17 +137,27 @@ export default function Home() {
 
   // Handle background music based on game state
   useEffect(() => {
-    // Only play music if audio has been initialized
-    if (!initialized || !soundEnabled) return
+    // Only play music if audio has been initialized AND sound is enabled
+    if (!initialized || !soundEnabled) {
+      // We need user action if:
+      // 1. Sound is not enabled at all, OR
+      // 2. Sound should be enabled but audio isn't initialized
+      setNeedsUserAction(true)
+      return
+    }
     
     // Small delay to ensure state has fully updated
     const musicTimer = setTimeout(() => {
       if (gameState.status === 'idle') {
         switchMusic('menu')  // Use switchMusic consistently
+        // Music is playing, no user action needed
+        setNeedsUserAction(false)
       } else if (gameState.status === 'playing') {
         switchMusic('gameplay')
+        setNeedsUserAction(false)
       } else if (gameState.status === 'gameOver') {
         switchMusic('results')
+        setNeedsUserAction(false)
       }
     }, 50)
     
@@ -435,6 +446,7 @@ export default function Home() {
       await initializeAudio()
       await enableSound()  // This sets soundEnabled and saves to localStorage
       setHasUserInteracted(true)
+      setNeedsUserAction(false) // Hide the button immediately
       console.log('Sound enabled successfully')
       
       // Start menu music immediately since we're on the idle screen
@@ -447,6 +459,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Failed to enable sound:', error)
+      // If enabling sound failed, we still need user action
+      setNeedsUserAction(true)
     }
   }
 
@@ -565,8 +579,8 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Enable Sound Button - shows when audio not enabled or not initialized */}
-            {(!soundEnabled || !initialized || (!hasUserInteracted && isMobile)) && (
+            {/* Enable Sound Button - shows when we need user interaction for audio */}
+            {needsUserAction && (
               <motion.button
                 onClick={handleEnableSound}
                 className="mb-4 px-6 sm:px-8 py-3 sm:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense animate-pulse"
