@@ -91,6 +91,39 @@ export default function Home() {
     }
   }, [gameState.status, switchMusic, initialized, soundEnabled])
 
+  // Resume correct music when returning from leaderboard
+  useEffect(() => {
+    // When component mounts or page becomes visible again
+    const handleFocus = () => {
+      if (!initialized || !soundEnabled) return
+      
+      // Re-trigger the correct music based on current game state
+      if (gameState.status === 'idle') {
+        switchMusic('menu')
+      } else if (gameState.status === 'playing') {
+        switchMusic('gameplay')
+      } else if (gameState.status === 'gameOver') {
+        switchMusic('results')
+      }
+    }
+    
+    // Listen for page visibility changes
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        handleFocus()
+      }
+    })
+    
+    // Trigger on mount
+    handleFocus()
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleFocus)
+    }
+  }, [gameState.status, switchMusic, initialized, soundEnabled])
+
   // Save score when game ends (only for authenticated users)
   useEffect(() => {
     const saveScore = async () => {

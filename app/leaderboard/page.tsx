@@ -1,15 +1,18 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import MatrixRain from '@/components/MatrixRain'
 import Leaderboard from '@/components/Leaderboard'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { useAuth } from '@/hooks/useAuth'
+import { useSound } from '@/hooks/useSound'
 
 export default function LeaderboardPage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { switchMusic, initialized } = useSound()
   const { 
     leaderboard, 
     loading, 
@@ -19,6 +22,13 @@ export default function LeaderboardPage() {
     setType,
     refresh 
   } = useLeaderboard('daily')
+
+  // Play menu music on leaderboard page
+  useEffect(() => {
+    if (initialized) {
+      switchMusic('menu')
+    }
+  }, [initialized, switchMusic])
 
   return (
     <main className="min-h-screen bg-black text-neon-green flex flex-col items-center p-2 sm:p-4 relative">
