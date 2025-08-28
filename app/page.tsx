@@ -383,10 +383,15 @@ export default function Home() {
   }
 
   const handleEnableSound = async () => {
-    // Initialize audio on user interaction and enable sound
-    await initializeAudio()
-    enableSound()  // This sets soundEnabled and saves to localStorage
-    // Menu music will start playing via the useEffect
+    try {
+      // Initialize audio on user interaction and enable sound
+      await initializeAudio()
+      await enableSound()  // This sets soundEnabled and saves to localStorage
+      console.log('Sound enabled successfully')
+      // Menu music will start playing via the useEffect
+    } catch (error) {
+      console.error('Failed to enable sound:', error)
+    }
   }
 
   const handleStartGame = async () => {

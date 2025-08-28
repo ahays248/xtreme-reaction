@@ -27,6 +27,7 @@ class AudioManager {
 
     try {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      console.log('AudioContext created, state:', this.audioContext.state)
       
       // Setup sound effects gain node
       this.gainNode = this.audioContext.createGain()
@@ -68,6 +69,7 @@ class AudioManager {
       ])
       
       this.initialized = true
+      console.log('Audio initialized successfully')
     } catch (error) {
       console.error('Failed to initialize audio:', error)
     }
@@ -127,7 +129,7 @@ class AudioManager {
    * Play a sound effect
    */
   async play(sound: SoundType): Promise<void> {
-    if (!this.initialized || !this.audioContext || this.muted) return
+    if (!this.initialized || !this.audioContext || !this.soundEnabled || this.muted) return
 
     // Ensure AudioContext is resumed (for mobile)
     await this.ensureResumed()
@@ -295,9 +297,27 @@ class AudioManager {
   /**
    * Enable sound (user's explicit choice)
    */
-  enableSound(): void {
+  async enableSound(): Promise<void> {
     this.soundEnabled = true
     localStorage.setItem('soundEnabled', 'true')
+    
+    // Ensure AudioContext is resumed (critical for mobile)
+    await this.ensureResumed()
+    
+    // Play a silent buffer to unlock audio on iOS Safari
+    if (this.audioContext) {
+      try {
+        const buffer = this.audioContext.createBuffer(1, 1, 22050)
+        const source = this.audioContext.createBufferSource()
+        source.buffer = buffer
+        source.connect(this.audioContext.destination)
+        source.start(0)
+        console.log('Played silent buffer to unlock audio')
+      } catch (error) {
+        console.warn('Failed to play silent buffer:', error)
+      }
+    }
+    
     // If there was music that should be playing, start it now
     if (this.currentMusic && !this.musicMuted) {
       this.playMusic(this.currentMusic)

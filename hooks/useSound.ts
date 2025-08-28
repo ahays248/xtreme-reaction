@@ -107,8 +107,8 @@ export function useSound(): UseSoundReturn {
     setInitialized(true)
   }, [])
 
-  const enableSound = useCallback(() => {
-    audioManager.enableSound()
+  const enableSound = useCallback(async () => {
+    await audioManager.enableSound()
     setSoundEnabled(true)
   }, [])
 
