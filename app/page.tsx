@@ -98,9 +98,15 @@ export default function Home() {
   // Auto-spawn targets during game
   useEffect(() => {
     if (gameState.status === 'playing' && !showTarget && gameState.elapsedTime < gameState.maxGameTime) {
+      // Clear any existing round delay to prevent double spawning
+      if (roundDelayId.current) {
+        clearTimeout(roundDelayId.current)
+      }
       // Small delay before showing next target
       roundDelayId.current = setTimeout(() => {
-        showNextTarget()
+        if (gameState.status === 'playing') {
+          showNextTarget()
+        }
       }, ROUND_DELAY)
     }
   }, [gameState.currentRound, gameState.status, showTarget])
@@ -110,13 +116,18 @@ export default function Home() {
     // Only play music if audio has been initialized
     if (!initialized || !soundEnabled) return
     
-    if (gameState.status === 'idle') {
-      switchMusic('menu')  // Use switchMusic consistently
-    } else if (gameState.status === 'playing') {
-      switchMusic('gameplay')
-    } else if (gameState.status === 'gameOver') {
-      switchMusic('results')
-    }
+    // Small delay to ensure state has fully updated
+    const musicTimer = setTimeout(() => {
+      if (gameState.status === 'idle') {
+        switchMusic('menu')  // Use switchMusic consistently
+      } else if (gameState.status === 'playing') {
+        switchMusic('gameplay')
+      } else if (gameState.status === 'gameOver') {
+        switchMusic('results')
+      }
+    }, 50)
+    
+    return () => clearTimeout(musicTimer)
   }, [gameState.status, switchMusic, initialized, soundEnabled])
 
   // Resume correct music when returning from leaderboard
@@ -345,13 +356,16 @@ export default function Home() {
         // Immediately hide the target and clear timeout when missing
         if (showTarget && !isTrapTarget) {
           setShowTarget(false)
+          targetShowTime.current = 0 // Prevent timeout handler from firing
           if (timeoutId.current) {
             clearTimeout(timeoutId.current)
             timeoutId.current = null
           }
           // Move to next round after a short delay
           setTimeout(() => {
-            nextRound()
+            if (gameState.status === 'playing') {
+              nextRound()
+            }
           }, 300)
         }
         
