@@ -159,11 +159,11 @@ export default function Home() {
         
         const gameResults: GameResults = {
           score: finalScore,
-          avgReactionTime,
+          avgReactionTime: Math.round(avgReactionTime),
           successfulHits: gameState.hits,
           incorrectHits: gameState.trapHit ? 1 : 0,
           missedCues: gameState.misses,
-          accuracy,
+          accuracy: Math.round(accuracy), // Database expects integer
           totalClicks: gameState.hits + gameState.misses + (gameState.trapHit ? 1 : 0),
           maxStreak: gameState.bestStreak,
           roundsCompleted: gameState.currentRound - 1,
@@ -171,7 +171,7 @@ export default function Home() {
           targetsShown: gameState.currentRound,
           trapsAvoided: 0, // Will implement tracking later
           trapHit: gameState.trapHit,
-          difficultyLevel: gameState.difficultyLevel,
+          difficultyLevel: gameState.difficultyLevel || 0,
         }
         
         const { error } = await saveGameSession(user.id, gameResults)

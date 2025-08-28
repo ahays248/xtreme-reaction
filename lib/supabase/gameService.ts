@@ -47,7 +47,7 @@ export async function saveGameSession(
     game_duration: results.gameDuration,
     targets_shown: results.targetsShown,
     fakes_avoided: results.trapsAvoided,
-    difficulty_reached: results.difficultyLevel || results.roundsCompleted,
+    difficulty_reached: Math.round(results.difficultyLevel || results.roundsCompleted),
   }
 
   const { data, error } = await supabase
