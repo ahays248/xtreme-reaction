@@ -112,13 +112,25 @@ export async function getUserGameSessions(
   return { data, error: null }
 }
 
+export interface LeaderboardEntry {
+  user_id: string
+  username: string
+  x_username: string | null
+  best_score: number
+  best_reaction_time: number
+  games_today?: number | null
+  total_games?: number | null
+  lifetime_hits?: number | null
+  lifetime_misses?: number | null
+}
+
 /**
  * Get daily leaderboard
  * For Phase 16: Leaderboards
  */
 export async function getDailyLeaderboard(
   limit = 20
-): Promise<{ data: any[] | null; error: Error | null }> {
+): Promise<{ data: LeaderboardEntry[] | null; error: Error | null }> {
   const supabase = createClient()
   
   const { data, error } = await supabase
@@ -131,7 +143,12 @@ export async function getDailyLeaderboard(
     return { data: null, error }
   }
 
-  return { data, error: null }
+  // Filter out any entries with null required fields and cast
+  const validData = data?.filter(entry => 
+    entry.user_id && entry.username && entry.best_score !== null && entry.best_reaction_time !== null
+  ) as LeaderboardEntry[] || []
+
+  return { data: validData, error: null }
 }
 
 /**
@@ -140,7 +157,7 @@ export async function getDailyLeaderboard(
  */
 export async function getAllTimeLeaderboard(
   limit = 20
-): Promise<{ data: any[] | null; error: Error | null }> {
+): Promise<{ data: LeaderboardEntry[] | null; error: Error | null }> {
   const supabase = createClient()
   
   const { data, error } = await supabase
@@ -153,7 +170,47 @@ export async function getAllTimeLeaderboard(
     return { data: null, error }
   }
 
-  return { data, error: null }
+  // Filter out any entries with null required fields and cast
+  const validData = data?.filter(entry => 
+    entry.user_id && entry.username && entry.best_score !== null && entry.best_reaction_time !== null
+  ) as LeaderboardEntry[] || []
+
+  return { data: validData, error: null }
+}
+
+/**
+ * Get user's rank in the leaderboard
+ * For Phase 16: Shows user position even if not in top 20
+ */
+export async function getUserRank(
+  userId: string,
+  type: 'daily' | 'all-time' = 'daily'
+): Promise<{ rank: number | null; error: Error | null }> {
+  const supabase = createClient()
+  
+  try {
+    // Get all scores ordered properly to calculate rank
+    const view = type === 'daily' ? 'daily_leaderboard' : 'all_time_leaderboard'
+    const { data, error } = await supabase
+      .from(view)
+      .select('user_id, best_score')
+      .order('best_score', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching user rank:', error)
+      return { rank: null, error }
+    }
+    
+    if (!data) return { rank: null, error: null }
+    
+    // Find user's position
+    const userIndex = data.findIndex(entry => entry.user_id === userId)
+    if (userIndex === -1) return { rank: null, error: null }
+    
+    return { rank: userIndex + 1, error: null }
+  } catch (err) {
+    return { rank: null, error: err as Error }
+  }
 }
 
 /**

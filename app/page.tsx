@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import Target from '@/components/Target'
 import MatrixRain from '@/components/MatrixRain'
 import VolumeControl from '@/components/VolumeControl'
@@ -22,6 +23,7 @@ import { saveGameSession, type GameResults } from '@/lib/supabase/gameService'
 const ROUND_DELAY = 1500 // Delay between rounds
 
 export default function Home() {
+  const router = useRouter()
   const [showTarget, setShowTarget] = useState(false)
   const [lastReaction, setLastReaction] = useState<number | null>(null)
   const [lastMissed, setLastMissed] = useState(false)
@@ -542,18 +544,28 @@ export default function Home() {
         transition={{ delay: 0.3 }}
       >
           {gameState.status === 'idle' && (
-            <motion.button
-              onClick={handleStartGame}
-              className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              START GAME
-            </motion.button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <motion.button
+                onClick={handleStartGame}
+                className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                START GAME
+              </motion.button>
+              <motion.button
+                onClick={() => router.push('/leaderboard')}
+                className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-black border-2 border-cyan-500 text-cyan-400 font-orbitron font-bold text-base sm:text-lg md:text-xl rounded-lg hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-400 transition-all duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                LEADERBOARD
+              </motion.button>
+            </div>
           )}
           
           {gameState.status === 'gameOver' && (
-            <>
+            <div className="flex flex-col sm:flex-row gap-3">
               <motion.button
                 onClick={handleStartGame}
                 className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm md:text-base rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense"
@@ -563,6 +575,14 @@ export default function Home() {
                 PLAY AGAIN
               </motion.button>
               <motion.button
+                onClick={() => router.push('/leaderboard')}
+                className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-cyan-500 text-cyan-400 font-orbitron font-bold text-sm md:text-base rounded-lg hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-400 transition-all duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                LEADERBOARD
+              </motion.button>
+              <motion.button
                 onClick={handleReset}
                 className="px-4 md:px-6 py-2 md:py-3 bg-black border-2 border-gray-500 text-white font-orbitron font-bold text-sm md:text-base rounded-lg hover:border-gray-300 hover:text-gray-100 transition-all duration-200"
                 whileHover={{ scale: 1.05 }}
@@ -570,7 +590,7 @@ export default function Home() {
               >
                 MENU
               </motion.button>
-            </>
+            </div>
           )}
           
           {gameState.status === 'playing' && (
