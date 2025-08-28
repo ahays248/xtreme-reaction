@@ -122,7 +122,7 @@ export default function ScoreCard({
         <div className="text-center space-y-2 pt-4">
           <p className="text-lg text-gray-400">Think you can beat this score?</p>
           <p className="text-xl font-bold text-neon-green">
-            Play at xtreme-reaction.vercel.app
+            Play at XtremeReaction.lol
           </p>
         </div>
       </div>

@@ -78,7 +78,7 @@ export function createXShareUrl(text: string, url: string): string {
 }
 
 export async function shareToX(data: ShareData, scoreCardElement?: HTMLElement): Promise<void> {
-  const shareUrl = 'https://xtreme-reaction.vercel.app'
+  const shareUrl = 'https://XtremeReaction.lol'
   const shareText = createShareText(data)
   
   // Check if Web Share API is available (mobile)

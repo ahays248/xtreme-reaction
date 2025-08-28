@@ -50,6 +50,7 @@ export default function PerformanceCard({
   xHandle
 }: PerformanceCardProps) {
   const scoreCardRef = useRef<HTMLDivElement>(null)
+  const [showScoreCard, setShowScoreCard] = useState(false)
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
   // Calculate performance metrics
@@ -287,27 +288,62 @@ export default function PerformanceCard({
             username={username}
             xHandle={xHandle}
             scoreCardElement={scoreCardRef.current}
+            onShowScoreCard={() => setShowScoreCard(true)}
           />
         </motion.div>
       )}
       
-      {/* Hidden ScoreCard for image generation */}
-      <div className="hidden">
-        <div ref={scoreCardRef}>
-          <ScoreCard
-            finalScore={finalScore}
-            accuracy={accuracy}
-            avgReactionTime={avgReactionTime}
-            hits={hits}
-            bestStreak={bestStreak}
-            trapHit={trapHit}
-            userRank={userRank}
-            leaderboardType={leaderboardType}
-            username={username}
-            xHandle={xHandle}
-          />
-        </div>
+      {/* Hidden ScoreCard for image generation - make visible when requested */}
+      <div className={showScoreCard ? 'fixed inset-0 z-50 overflow-auto bg-black/95 flex items-center justify-center p-4' : 'hidden'}>
+        {showScoreCard && (
+          <>
+            <button
+              onClick={() => setShowScoreCard(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="transform scale-75 origin-center">
+              <div ref={scoreCardRef}>
+                <ScoreCard
+                  finalScore={finalScore}
+                  accuracy={accuracy}
+                  avgReactionTime={avgReactionTime}
+                  hits={hits}
+                  bestStreak={bestStreak}
+                  trapHit={trapHit}
+                  userRank={userRank}
+                  leaderboardType={leaderboardType}
+                  username={username}
+                  xHandle={xHandle}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
+      
+      {/* Always render ScoreCard invisibly for download */}
+      {!showScoreCard && (
+        <div className="absolute -left-[9999px] -top-[9999px]">
+          <div ref={!showScoreCard ? scoreCardRef : undefined}>
+            <ScoreCard
+              finalScore={finalScore}
+              accuracy={accuracy}
+              avgReactionTime={avgReactionTime}
+              hits={hits}
+              bestStreak={bestStreak}
+              trapHit={trapHit}
+              userRank={userRank}
+              leaderboardType={leaderboardType}
+              username={username}
+              xHandle={xHandle}
+            />
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }
