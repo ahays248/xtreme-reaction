@@ -593,8 +593,7 @@ export default function Home() {
           <h1 className="text-2xl sm:text-3xl md:text-6xl font-orbitron font-black mb-1 sm:mb-2 md:mb-4 text-glow-soft animate-flicker">
             XTREME REACTION
           </h1>
-          <p className="text-sm sm:text-lg md:text-xl mb-0.5 sm:mb-1 md:mb-2 font-mono text-neon-cyan">v1.0 - Phase 16 Complete</p>
-          <p className="text-xs md:text-sm opacity-70 font-rajdhani hidden sm:block">
+          <p className="text-xs md:text-sm opacity-70 font-rajdhani">
             Test your reflexes. Compete with the world. Share on X.
           </p>
         </motion.div>
