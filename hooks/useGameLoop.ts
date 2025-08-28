@@ -62,11 +62,15 @@ export function useGameLoop() {
       const elapsedTime = prev.gameStartTime 
         ? Math.floor((Date.now() - prev.gameStartTime) / 1000)
         : 0
+      const finalDifficulty = prev.maxGameTime > 0 
+        ? Math.min(100, (elapsedTime / prev.maxGameTime) * 100)
+        : 0
       return {
         ...prev,
         status: 'gameOver',
         trapHit: true,
-        elapsedTime
+        elapsedTime,
+        difficultyLevel: finalDifficulty
       }
     })
   }, [])
@@ -83,7 +87,8 @@ export function useGameLoop() {
       
       // Auto end game if time is up
       if (elapsedTime >= prev.maxGameTime) {
-        return { ...prev, status: 'gameOver', elapsedTime }
+        const finalDifficulty = Math.min(100, (elapsedTime / prev.maxGameTime) * 100)
+        return { ...prev, status: 'gameOver', elapsedTime, difficultyLevel: finalDifficulty }
       }
       
       // Update difficulty based on time (increases over 60 seconds)
