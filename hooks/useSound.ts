@@ -19,6 +19,7 @@ interface UseSoundReturn {
   soundEnabled: boolean
   enableSound: () => void
   disableSound: () => void
+  isAudioRunning: () => boolean
 }
 
 export function useSound(): UseSoundReturn {
