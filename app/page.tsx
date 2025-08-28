@@ -223,8 +223,8 @@ export default function Home() {
     // Reset processing flag for new round
     processingMiss.current = false
     
-    // 25% chance of trap target (increases with time elapsed)
-    const trapChance = 0.20 + (gameState.elapsedTime / gameState.maxGameTime) * 0.10 // 20-30%
+    // Chance of trap target (increases with time elapsed)
+    const trapChance = 0.15 + (gameState.elapsedTime / gameState.maxGameTime) * 0.10 // 15-25%
     const isCurrentTrap = Math.random() < trapChance
     
     // Generate random position for this target
