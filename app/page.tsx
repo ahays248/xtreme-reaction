@@ -438,16 +438,12 @@ export default function Home() {
       console.log('Sound enabled successfully')
       
       // Start menu music immediately since we're on the idle screen
-      // Small delay on mobile to ensure audio context is ready
+      // Small delay to ensure audio context is ready on all platforms
       if (gameState.status === 'idle') {
-        if (isMobile) {
-          // Mobile needs a tiny delay for audio context to be ready
-          setTimeout(() => {
-            playMusic('menu')
-          }, 100)
-        } else {
+        // Give audio context time to initialize properly
+        setTimeout(() => {
           playMusic('menu')
-        }
+        }, 100)
       }
     } catch (error) {
       console.error('Failed to enable sound:', error)
@@ -569,8 +565,8 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Enable Sound Button - shows when audio not enabled or mobile needs user interaction */}
-            {(!soundEnabled || (!hasUserInteracted && isMobile)) && (
+            {/* Enable Sound Button - shows when audio not enabled or not initialized */}
+            {(!soundEnabled || !initialized || (!hasUserInteracted && isMobile)) && (
               <motion.button
                 onClick={handleEnableSound}
                 className="mb-4 px-6 sm:px-8 py-3 sm:py-4 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-base sm:text-lg rounded-lg hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green transition-all duration-200 shadow-neon-green hover:shadow-neon-intense animate-pulse"
