@@ -94,9 +94,13 @@ class AudioManager {
     const loadPromises = sounds.map(async (sound) => {
       try {
         const response = await fetch(`/sounds/${sound}.mp3`)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
         const arrayBuffer = await response.arrayBuffer()
         const audioBuffer = await this.audioContext!.decodeAudioData(arrayBuffer)
         this.buffers.set(sound, audioBuffer)
+        console.log(`Loaded sound: ${sound}`)
       } catch (error) {
         console.warn(`Failed to load sound: ${sound}`, error)
       }
@@ -129,19 +133,40 @@ class AudioManager {
    * Play a sound effect
    */
   async play(sound: SoundType): Promise<void> {
-    if (!this.initialized || !this.audioContext || !this.soundEnabled || this.muted) return
+    console.log(`Attempting to play sound: ${sound}, initialized: ${this.initialized}, soundEnabled: ${this.soundEnabled}, muted: ${this.muted}`)
+    
+    if (!this.initialized) {
+      console.log('Audio not initialized')
+      return
+    }
+    if (!this.audioContext) {
+      console.log('No audio context')
+      return
+    }
+    if (!this.soundEnabled) {
+      console.log('Sound not enabled by user')
+      return
+    }
+    if (this.muted) {
+      console.log('Sound is muted')
+      return
+    }
 
     // Ensure AudioContext is resumed (for mobile)
     await this.ensureResumed()
 
     const buffer = this.buffers.get(sound)
-    if (!buffer) return
+    if (!buffer) {
+      console.warn(`No buffer found for sound: ${sound}`)
+      return
+    }
 
     try {
       const source = this.audioContext.createBufferSource()
       source.buffer = buffer
       source.connect(this.gainNode!)
       source.start(0)
+      console.log(`Successfully played sound: ${sound}`)
     } catch (error) {
       console.error(`Failed to play sound: ${sound}`, error)
     }
