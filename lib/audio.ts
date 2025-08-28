@@ -481,6 +481,13 @@ class AudioManager {
   isSoundEnabled(): boolean {
     return this.soundEnabled
   }
+  
+  /**
+   * Check if audio context is actually running
+   */
+  isAudioContextRunning(): boolean {
+    return this.audioContext?.state === 'running'
+  }
 }
 
 // Export singleton instance

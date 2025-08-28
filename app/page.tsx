@@ -65,7 +65,8 @@ export default function Home() {
     initialized,
     soundEnabled,
     enableSound,
-    disableSound
+    disableSound,
+    isAudioRunning
   } = useSound()
   
   const { user, profile, isPracticeMode } = useAuth()
@@ -137,32 +138,39 @@ export default function Home() {
 
   // Handle background music based on game state
   useEffect(() => {
-    // Only play music if audio has been initialized AND sound is enabled
-    if (!initialized || !soundEnabled) {
-      // We need user action if:
-      // 1. Sound is not enabled at all, OR
-      // 2. Sound should be enabled but audio isn't initialized
-      setNeedsUserAction(true)
+    // Check if audio context is actually running
+    const audioRunning = isAudioRunning()
+    
+    // Only play music if audio has been initialized AND sound is enabled AND audio context is running
+    if (!initialized || !soundEnabled || !audioRunning) {
+      // We need user action if sound should be enabled but audio isn't running
+      if (soundEnabled && initialized && !audioRunning) {
+        console.log('Sound enabled but audio context not running - need user action')
+        setNeedsUserAction(true)
+      } else if (!soundEnabled) {
+        console.log('Sound not enabled - need user action')
+        setNeedsUserAction(true)
+      }
       return
     }
+    
+    // Audio context is running, we can play music
+    console.log('Audio context is running, playing music')
+    setNeedsUserAction(false)
     
     // Small delay to ensure state has fully updated
     const musicTimer = setTimeout(() => {
       if (gameState.status === 'idle') {
-        switchMusic('menu')  // Use switchMusic consistently
-        // Music is playing, no user action needed
-        setNeedsUserAction(false)
+        playMusic('menu')
       } else if (gameState.status === 'playing') {
-        switchMusic('gameplay')
-        setNeedsUserAction(false)
+        playMusic('gameplay')
       } else if (gameState.status === 'gameOver') {
-        switchMusic('results')
-        setNeedsUserAction(false)
+        playMusic('results')
       }
     }, 50)
     
     return () => clearTimeout(musicTimer)
-  }, [gameState.status, switchMusic, initialized, soundEnabled])
+  }, [gameState.status, playMusic, initialized, soundEnabled, isAudioRunning])
 
   // Resume correct music when returning from leaderboard
   useEffect(() => {

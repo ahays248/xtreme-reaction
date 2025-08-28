@@ -117,6 +117,11 @@ export function useSound(): UseSoundReturn {
     setSoundEnabled(false)
   }, [])
 
+  // Check if audio context is actually running
+  const isAudioRunning = useCallback(() => {
+    return audioManager.isAudioContextRunning()
+  }, [])
+
   return {
     playSound,
     playMusic,
@@ -134,6 +139,7 @@ export function useSound(): UseSoundReturn {
     initializeAudio,
     soundEnabled,
     enableSound,
-    disableSound
+    disableSound,
+    isAudioRunning
   }
 }
