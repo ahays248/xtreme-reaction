@@ -16,6 +16,9 @@ export interface GameState {
   hitScores: number[] // Individual scores for each hit
   currentStreak: number // Current consecutive hits
   bestStreak: number // Best streak this game
+  trapsShown: number // Track number of red circles shown
+  targetsShown: number // Track total targets shown
+  targetsSinceLastTrap: number // Track spacing between red circles
 }
 
 export const initialGameState: GameState = {
@@ -31,5 +34,8 @@ export const initialGameState: GameState = {
   score: 0,
   hitScores: [],
   currentStreak: 0,
-  bestStreak: 0
+  bestStreak: 0,
+  trapsShown: 0,
+  targetsShown: 0,
+  targetsSinceLastTrap: 0
 }

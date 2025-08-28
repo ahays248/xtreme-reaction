@@ -47,7 +47,7 @@ export default function Home() {
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const processingMiss = useRef<boolean>(false)
   
-  const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame, updateElapsedTime } = useGameLoop()
+  const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame, updateElapsedTime, recordTargetShown } = useGameLoop()
   const { 
     playSound, 
     playMusic, 
@@ -291,9 +291,37 @@ export default function Home() {
     // Reset processing flag for new round
     processingMiss.current = false
     
-    // Chance of trap target (increases with time elapsed)
-    const trapChance = 0.15 + (gameState.elapsedTime / gameState.maxGameTime) * 0.10 // 15-25%
-    const isCurrentTrap = Math.random() < trapChance
+    // Fair red circle logic - maximum 5 per game
+    let isCurrentTrap = false
+    
+    const MAX_TRAPS = 5 // Maximum red circles per game
+    const MIN_SPACING = 3 // Minimum green targets between reds
+    
+    if (gameState.trapsShown >= MAX_TRAPS) {
+      // Already shown maximum red circles
+      isCurrentTrap = false
+    } else if (gameState.targetsShown < 5) {
+      // Warm-up period - no red circles in first 5 targets
+      isCurrentTrap = false
+    } else if (gameState.targetsSinceLastTrap < MIN_SPACING) {
+      // Too soon after last red circle
+      isCurrentTrap = false
+    } else {
+      // Calculate dynamic probability based on remaining time and traps
+      const remainingTime = Math.max(1, gameState.maxGameTime - gameState.elapsedTime)
+      const remainingTraps = MAX_TRAPS - gameState.trapsShown
+      
+      // Base chance is low (5-10%)
+      // Slightly increase if we need to distribute remaining traps
+      const baseChance = 0.05
+      const urgencyBonus = (remainingTraps / remainingTime) * 0.05
+      const trapChance = Math.min(0.15, baseChance + urgencyBonus) // Cap at 15%
+      
+      isCurrentTrap = Math.random() < trapChance
+    }
+    
+    // Record that we're showing a target
+    recordTargetShown(isCurrentTrap)
     
     // Generate random position for this target
     const newPosition = generateRandomPosition()
@@ -627,7 +655,7 @@ export default function Home() {
           <>
             {/* Minimal game info - just round counter and score */}
             <motion.div 
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-8 items-center"
+              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-4 sm:gap-8 items-center"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -636,6 +664,9 @@ export default function Home() {
               </div>
               <div className="text-lg md:text-xl font-mono text-neon-yellow font-bold">
                 {formatScore(gameState.score)}
+              </div>
+              <div className="text-sm md:text-base font-mono text-red-400">
+                Red: {gameState.trapsShown}/5
               </div>
             </motion.div>
 

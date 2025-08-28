@@ -12,7 +12,10 @@ export function useGameLoop() {
       status: 'playing',
       currentRound: 1,
       gameStartTime: Date.now(),
-      elapsedTime: 0
+      elapsedTime: 0,
+      trapsShown: 0,
+      targetsShown: 0,
+      targetsSinceLastTrap: 0
     })
   }, [])
 
@@ -98,6 +101,15 @@ export function useGameLoop() {
     })
   }, [])
 
+  const recordTargetShown = useCallback((isTrap: boolean) => {
+    setGameState(prev => ({
+      ...prev,
+      targetsShown: prev.targetsShown + 1,
+      trapsShown: isTrap ? prev.trapsShown + 1 : prev.trapsShown,
+      targetsSinceLastTrap: isTrap ? 0 : prev.targetsSinceLastTrap + 1
+    }))
+  }, [])
+
   return {
     gameState,
     startGame,
@@ -106,6 +118,7 @@ export function useGameLoop() {
     recordMiss,
     recordTrapHit,
     resetGame,
-    updateElapsedTime
+    updateElapsedTime,
+    recordTargetShown
   }
 }
