@@ -94,7 +94,8 @@ export default function ShareButton({
       leaderboardType,
       username,
       xHandle,
-      grade
+      grade,
+      scorePercentile
     }
     
     await shareToX(shareData)
@@ -122,7 +123,7 @@ export default function ShareButton({
           <>
             {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 bg-black/90 z-50"
+              className="fixed inset-0 bg-black/90 z-[100]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -131,7 +132,7 @@ export default function ShareButton({
             
             {/* Modal */}
             <motion.div
-              className="fixed inset-4 sm:inset-8 lg:inset-12 flex flex-col bg-black border-2 border-neon-green rounded-lg z-50 overflow-hidden"
+              className="fixed inset-4 sm:inset-8 lg:inset-12 flex flex-col bg-black border-2 border-neon-green rounded-lg z-[101] overflow-hidden"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}

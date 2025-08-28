@@ -12,6 +12,7 @@ export interface ShareData {
   username?: string
   xHandle?: string | null
   grade: string
+  scorePercentile?: number | null
 }
 
 export async function generateScoreCardImage(element: HTMLElement): Promise<Blob> {
@@ -104,14 +105,20 @@ export function createShareText(data: ShareData): string {
   const lines = []
   
   // Main score announcement
-  lines.push(`🎯 Just scored ${formatScore(data.finalScore)} points in Xtreme Reaction!`)
+  lines.push(`🎯 Just scored ${formatScore(data.finalScore)} in Xtreme Reaction!`)
   lines.push('')
   
   // Stats with emojis
   lines.push(`⚡ Avg reaction: ${formatTime(data.avgReactionTime)}`)
   lines.push(`🎯 Accuracy: ${data.accuracy}%`)
   lines.push(`🔥 Best streak: ${data.bestStreak}`)
-  lines.push(`📊 Grade: ${data.grade}`)
+  
+  // Show percentile if available, otherwise show grade
+  if (data.scorePercentile !== null && data.scorePercentile !== undefined) {
+    lines.push(`📊 Top ${100 - data.scorePercentile}% today!`)
+  } else {
+    lines.push(`📊 Grade: ${data.grade}`)
+  }
   
   // Add rank if available
   if (data.userRank) {
@@ -121,10 +128,6 @@ export function createShareText(data: ShareData): string {
   
   lines.push('')
   lines.push('Think you can beat me? 💪')
-  lines.push('')
-  
-  // Hashtags
-  lines.push('#XtremeReaction #ReactionTime #Gaming')
   
   return lines.join('\n')
 }
