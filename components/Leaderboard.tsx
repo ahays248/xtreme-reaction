@@ -128,21 +128,12 @@ export default function Leaderboard({
                     {getRankDisplay(rank)}
                   </div>
                   <div className="col-span-4 sm:col-span-5 lg:col-span-4">
-                    {entry.x_username ? (
-                      <>
-                        <a 
-                          href={`https://x.com/${entry.x_username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-orbitron text-white hover:text-neon-cyan truncate text-xs sm:text-sm block transition-colors"
-                        >
-                          @{entry.x_username}
-                        </a>
-                        <p className="text-xs text-gray-500 truncate">{entry.username}</p>
-                      </>
-                    ) : (
-                      <p className="font-orbitron text-white truncate text-xs sm:text-sm">
-                        {entry.username}
+                    <p className="font-orbitron text-white truncate text-xs sm:text-sm">
+                      {entry.username}
+                    </p>
+                    {entry.x_username && (
+                      <p className="text-xs text-gray-500 truncate">
+                        @{entry.x_username}
                       </p>
                     )}
                   </div>

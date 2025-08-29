@@ -219,11 +219,11 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp }: AuthM
                         disabled={loading}
                         maxLength={15}
                         className="w-full px-3 sm:px-4 py-2 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-green focus:shadow-neon-green transition-all text-base"
-                        placeholder="@YourXHandle"
+                        placeholder="username (without @)"
                         autoComplete="off"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Your X username for leaderboard
+                        Only add if you want to show your real X profile
                       </p>
                     </div>
 
