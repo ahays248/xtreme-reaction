@@ -12,6 +12,8 @@ interface LeaderboardProps {
   type: 'daily' | 'all-time'
   onTypeChange: (type: 'daily' | 'all-time') => void
   loading?: boolean
+  lastUpdated?: Date | null
+  onRefresh?: () => void
 }
 
 export default function Leaderboard({ 
@@ -20,8 +22,19 @@ export default function Leaderboard({
   userRank,
   type,
   onTypeChange,
-  loading = false 
+  loading = false,
+  lastUpdated,
+  onRefresh
 }: LeaderboardProps) {
+  
+  const getTimeAgo = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+    if (seconds < 60) return 'just now'
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`
+    const hours = Math.floor(minutes / 60)
+    return `${hours} hour${hours === 1 ? '' : 's'} ago`
+  }
   
   const getRankDisplay = (rank: number) => {
     switch(rank) {
@@ -34,6 +47,24 @@ export default function Leaderboard({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {/* Last Updated & Refresh */}
+      {lastUpdated && (
+        <div className="flex justify-between items-center mb-3 px-1">
+          <p className="text-xs text-gray-500 font-mono">
+            Updated {getTimeAgo(lastUpdated)}
+          </p>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={loading}
+              className="text-xs px-3 py-1 border border-gray-600 text-gray-400 hover:border-neon-green hover:text-neon-green rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+          )}
+        </div>
+      )}
+      
       {/* Tabs */}
       <div className="flex gap-2 mb-4 sm:mb-6">
         <button

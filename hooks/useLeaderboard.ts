@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getDailyLeaderboard, getAllTimeLeaderboard, getUserRank, type LeaderboardEntry } from '@/lib/supabase/gameService'
 import { useAuth } from './useAuth'
 
@@ -12,6 +12,7 @@ interface UseLeaderboardReturn {
   refresh: () => void
   type: LeaderboardType
   setType: (type: LeaderboardType) => void
+  lastUpdated: Date | null
 }
 
 export function useLeaderboard(initialType: LeaderboardType = 'daily'): UseLeaderboardReturn {
@@ -20,6 +21,9 @@ export function useLeaderboard(initialType: LeaderboardType = 'daily'): UseLeade
   const [error, setError] = useState<Error | null>(null)
   const [userRank, setUserRank] = useState<number | null>(null)
   const [type, setType] = useState<LeaderboardType>(initialType)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const { user } = useAuth()
 
   const fetchLeaderboard = useCallback(async () => {
@@ -36,6 +40,7 @@ export function useLeaderboard(initialType: LeaderboardType = 'daily'): UseLeade
       }
       
       setLeaderboard(data || [])
+      setLastUpdated(new Date())
       
       // If user is logged in, fetch their rank
       if (user) {
@@ -55,11 +60,38 @@ export function useLeaderboard(initialType: LeaderboardType = 'daily'): UseLeade
     fetchLeaderboard()
   }, [fetchLeaderboard])
 
-  // Auto-refresh every 30 seconds
+  // Handle page visibility changes
   useEffect(() => {
-    const interval = setInterval(fetchLeaderboard, 30000)
-    return () => clearInterval(interval)
-  }, [fetchLeaderboard])
+    const handleVisibilityChange = () => {
+      setIsTabVisible(!document.hidden)
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
+  // Auto-refresh every 150 seconds (2.5 minutes) only when tab is visible
+  useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    // Only set interval if tab is visible
+    if (isTabVisible) {
+      intervalRef.current = setInterval(fetchLeaderboard, 150000) // 150 seconds
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [fetchLeaderboard, isTabVisible])
 
   return {
     leaderboard,
@@ -68,6 +100,7 @@ export function useLeaderboard(initialType: LeaderboardType = 'daily'): UseLeade
     userRank,
     refresh: fetchLeaderboard,
     type,
-    setType
+    setType,
+    lastUpdated
   }
 }

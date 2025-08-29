@@ -20,7 +20,8 @@ export default function LeaderboardPage() {
     userRank, 
     type, 
     setType,
-    refresh 
+    refresh,
+    lastUpdated 
   } = useLeaderboard('daily')
 
   // Play menu music on leaderboard page (only if user enabled sound)
@@ -65,6 +66,8 @@ export default function LeaderboardPage() {
           type={type}
           onTypeChange={setType}
           loading={loading}
+          lastUpdated={lastUpdated}
+          onRefresh={refresh}
         />
 
         {/* Error State */}
@@ -93,12 +96,6 @@ export default function LeaderboardPage() {
           className="px-3 sm:px-6 py-2 sm:py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm sm:text-base rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200"
         >
           BACK TO GAME
-        </button>
-        <button
-          onClick={refresh}
-          className="px-3 sm:px-6 py-2 sm:py-3 bg-black border-2 border-gray-600 text-gray-400 font-orbitron font-bold text-sm sm:text-base rounded-lg hover:border-gray-400 hover:text-white transition-all duration-200"
-        >
-          REFRESH
         </button>
       </motion.div>
 

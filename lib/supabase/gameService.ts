@@ -143,13 +143,35 @@ export interface LeaderboardEntry {
   lifetime_misses?: number | null
 }
 
+// Simple cache for leaderboard data
+interface CacheEntry {
+  data: LeaderboardEntry[] | null
+  timestamp: number
+}
+
+const leaderboardCache: {
+  daily: CacheEntry | null
+  'all-time': CacheEntry | null
+} = {
+  daily: null,
+  'all-time': null
+}
+
+const CACHE_DURATION = 60000 // 60 seconds
+
 /**
- * Get daily leaderboard
+ * Get daily leaderboard with caching
  * For Phase 16: Leaderboards
  */
 export async function getDailyLeaderboard(
   limit = 20
 ): Promise<{ data: LeaderboardEntry[] | null; error: Error | null }> {
+  // Check cache first
+  const now = Date.now()
+  if (leaderboardCache.daily && (now - leaderboardCache.daily.timestamp < CACHE_DURATION)) {
+    return { data: leaderboardCache.daily.data, error: null }
+  }
+
   const supabase = createClient()
   
   const { data, error } = await supabase
@@ -167,16 +189,28 @@ export async function getDailyLeaderboard(
     entry.user_id && entry.username && entry.best_score !== null && entry.best_reaction_time !== null
   ) as LeaderboardEntry[] || []
 
+  // Update cache
+  leaderboardCache.daily = {
+    data: validData,
+    timestamp: now
+  }
+
   return { data: validData, error: null }
 }
 
 /**
- * Get all-time leaderboard
+ * Get all-time leaderboard with caching
  * For Phase 16: Leaderboards
  */
 export async function getAllTimeLeaderboard(
   limit = 20
 ): Promise<{ data: LeaderboardEntry[] | null; error: Error | null }> {
+  // Check cache first
+  const now = Date.now()
+  if (leaderboardCache['all-time'] && (now - leaderboardCache['all-time'].timestamp < CACHE_DURATION)) {
+    return { data: leaderboardCache['all-time'].data, error: null }
+  }
+
   const supabase = createClient()
   
   const { data, error } = await supabase
@@ -193,6 +227,12 @@ export async function getAllTimeLeaderboard(
   const validData = data?.filter(entry => 
     entry.user_id && entry.username && entry.best_score !== null && entry.best_reaction_time !== null
   ) as LeaderboardEntry[] || []
+
+  // Update cache
+  leaderboardCache['all-time'] = {
+    data: validData,
+    timestamp: now
+  }
 
   return { data: validData, error: null }
 }
