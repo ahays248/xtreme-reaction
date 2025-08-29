@@ -46,6 +46,7 @@ export default function Home() {
   const lastTapTime = useRef<number>(0)
   const gameAreaRef = useRef<HTMLDivElement>(null)
   const processingMiss = useRef<boolean>(false)
+  const hasSavedScore = useRef<boolean>(false)
   
   const { gameState, startGame, nextRound, recordHit, recordMiss, recordTrapHit, resetGame, updateElapsedTime, recordTargetShown } = useGameLoop()
   const { 
@@ -208,7 +209,8 @@ export default function Home() {
   // Save score when game ends (only for authenticated users)
   useEffect(() => {
     const saveScore = async () => {
-      if (gameState.status === 'gameOver' && !isPracticeMode && user) {
+      if (gameState.status === 'gameOver' && !isPracticeMode && user && !hasSavedScore.current) {
+        hasSavedScore.current = true // Prevent duplicate saves
         setSaveStatus('saving')
         
         // Calculate game results
@@ -266,6 +268,11 @@ export default function Home() {
           }
         }
       }
+    }
+    
+    // Reset the save flag when starting a new game
+    if (gameState.status === 'playing') {
+      hasSavedScore.current = false
     }
     
     if (gameState.status === 'gameOver') {
