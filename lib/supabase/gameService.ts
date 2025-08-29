@@ -275,15 +275,17 @@ export async function getUserRank(
 /**
  * Get percentile ranking for a score compared to today's best scores per player
  * Returns what percentage of players you beat today
+ * @param score - The score to calculate percentile for
+ * @param userId - Optional user ID to exclude from comparison (compare against others only)
  */
-export async function getScorePercentile(score: number): Promise<number | null> {
+export async function getScorePercentile(score: number, userId?: string): Promise<number | null> {
   const supabase = createClient()
   
   try {
     // Get today's best scores per player from the daily leaderboard view
     const { data: leaderboard, error } = await supabase
       .from('daily_leaderboard')
-      .select('best_score')
+      .select('user_id, best_score')
     
     if (error) {
       console.error('Error fetching scores for percentile:', error)
@@ -295,9 +297,19 @@ export async function getScorePercentile(score: number): Promise<number | null> 
       return 100
     }
     
-    // Count how many best scores are below this score
-    const scoresBelow = leaderboard.filter(entry => entry.best_score !== null && entry.best_score < score).length
-    const percentile = Math.round((scoresBelow / leaderboard.length) * 100)
+    // Filter out the current user's score if userId provided (compare against others only)
+    const otherPlayers = userId 
+      ? leaderboard.filter(entry => entry.user_id !== userId)
+      : leaderboard
+    
+    // If no other players to compare against, return 100 (you're #1 by default)
+    if (otherPlayers.length === 0) {
+      return 100
+    }
+    
+    // Count how many other players' best scores are below this score
+    const scoresBelow = otherPlayers.filter(entry => entry.best_score !== null && entry.best_score < score).length
+    const percentile = Math.round((scoresBelow / otherPlayers.length) * 100)
     
     return percentile
   } catch (error) {

@@ -258,8 +258,8 @@ export default function Home() {
             const { rank } = await getUserRank(user.id, 'daily')
             setUserRank(rank)
             
-            // Calculate percentile for the score
-            const percentile = await getScorePercentile(gameResults.score)
+            // Calculate percentile for the score (excluding user's own best score)
+            const percentile = await getScorePercentile(gameResults.score, user.id)
             setScorePercentile(percentile)
           } catch (rankError) {
             console.error('Failed to fetch user rank:', rankError)
@@ -280,7 +280,7 @@ export default function Home() {
           calculateStreakBonus(gameState.bestStreak)
         )
         
-        getScorePercentile(finalScore).then(percentile => {
+        getScorePercentile(finalScore, user?.id).then(percentile => {
           setScorePercentile(percentile)
         })
       }
