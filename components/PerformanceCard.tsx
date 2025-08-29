@@ -124,7 +124,13 @@ export default function PerformanceCard({
           >
             {scorePercentile !== null && scorePercentile !== undefined ? (
               <span className="text-2xl font-bold text-neon-cyan text-glow">
-                TOP {100 - scorePercentile}% TODAY
+                {scorePercentile >= 100 ? (
+                  "#1 PLAYER TODAY! 🏆"
+                ) : scorePercentile >= 99 ? (
+                  "TOP 1% TODAY"
+                ) : (
+                  `TOP ${100 - scorePercentile}% TODAY`
+                )}
               </span>
             ) : (
               <span className="text-2xl font-bold text-neon-cyan text-glow">GRADE: {grade}</span>
