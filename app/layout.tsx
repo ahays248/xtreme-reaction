@@ -32,11 +32,20 @@ export const metadata: Metadata = {
     url: "https://XtremeReaction.lol",
     siteName: "Xtreme Reaction",
     type: "website",
+    images: [
+      {
+        url: "https://XtremeReaction.lol/api/og",
+        width: 1200,
+        height: 630,
+        alt: "Xtreme Reaction - Test Your Reflexes",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Xtreme Reaction - Test Your Reflexes",
     description: "How fast are your reflexes? Find out in 60 seconds!",
+    images: ["https://XtremeReaction.lol/api/og"],
   },
   manifest: "/manifest.json",
   appleWebApp: {
