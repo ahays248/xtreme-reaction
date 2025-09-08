@@ -10,7 +10,9 @@ import {
   signInWithEmail as signIn,
   signUpWithEmail as signUp,
   signInWithGoogle as signInGoogle,
-  signOut as signOutUser
+  signOut as signOutUser,
+  updateUsername as updateUserUsername,
+  needsUsernameSetup
 } from '@/lib/supabase/authHelpers'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
@@ -20,6 +22,7 @@ interface AuthState {
   profile: Profile | null
   loading: boolean
   isPracticeMode: boolean
+  needsUsernameSetup: boolean
 }
 
 export function useAuth() {
@@ -30,6 +33,7 @@ export function useAuth() {
     profile: null,
     loading: true,
     isPracticeMode: true,
+    needsUsernameSetup: false,
   })
 
   useEffect(() => {
@@ -38,12 +42,19 @@ export function useAuth() {
       const user = await getUser()
       
       if (user) {
-        const profile = await getUserProfile(user.id)
+        // Check if user is OAuth user (no password)
+        const isOAuthUser = user.app_metadata?.provider === 'google' || 
+                           user.app_metadata?.providers?.includes('google')
+        
+        const profile = await getUserProfile(user.id, isOAuthUser)
+        const needsSetup = needsUsernameSetup(profile)
+        
         setAuthState({
           user,
           profile,
           loading: false,
           isPracticeMode: false,
+          needsUsernameSetup: needsSetup,
         })
       } else {
         setAuthState({
@@ -51,6 +62,7 @@ export function useAuth() {
           profile: null,
           loading: false,
           isPracticeMode: true,
+          needsUsernameSetup: false,
         })
       }
     }
@@ -60,12 +72,17 @@ export function useAuth() {
     // Subscribe to auth changes
     const subscription = onAuthStateChange(async (user) => {
       if (user) {
-        const profile = await getUserProfile(user.id)
+        const isOAuthUser = user.app_metadata?.provider === 'google' || 
+                           user.app_metadata?.providers?.includes('google')
+        const profile = await getUserProfile(user.id, isOAuthUser)
+        const needsSetup = needsUsernameSetup(profile)
+        
         setAuthState({
           user,
           profile,
           loading: false,
           isPracticeMode: false,
+          needsUsernameSetup: needsSetup,
         })
       } else {
         setAuthState({
@@ -73,6 +90,7 @@ export function useAuth() {
           profile: null,
           loading: false,
           isPracticeMode: true,
+          needsUsernameSetup: false,
         })
       }
     })
@@ -127,14 +145,38 @@ export function useAuth() {
     // Auth state will be updated by the subscription
   }
 
+  const updateUsername = async (username: string, xHandle?: string) => {
+    if (!authState.user) {
+      throw new Error('No user logged in')
+    }
+    
+    setAuthState(prev => ({ ...prev, loading: true }))
+    const { data, error } = await updateUserUsername(authState.user.id, username, xHandle)
+    
+    if (error) {
+      setAuthState(prev => ({ ...prev, loading: false }))
+      throw error
+    }
+    
+    // Update the local state with new profile
+    setAuthState(prev => ({
+      ...prev,
+      profile: data,
+      loading: false,
+      needsUsernameSetup: false,
+    }))
+  }
+
   return {
     user: authState.user,
     profile: authState.profile,
     loading: authState.loading,
     isPracticeMode: authState.isPracticeMode,
+    needsUsernameSetup: authState.needsUsernameSetup,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
     signOut,
+    updateUsername,
   }
 }

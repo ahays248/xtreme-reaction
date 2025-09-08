@@ -187,7 +187,7 @@ export async function getUser(): Promise<User | null> {
 /**
  * Get the user's profile from the database
  */
-export async function getUserProfile(userId: string): Promise<Profile | null> {
+export async function getUserProfile(userId: string, isOAuthUser?: boolean): Promise<Profile | null> {
   const supabase = createClient()
   
   const { data, error } = await supabase
@@ -199,11 +199,17 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
   if (error) {
     // Profile might not exist yet, create it
     if (error.code === 'PGRST116') {
+      // For OAuth users, create with a temporary username that needs to be changed
+      // For email users, they already chose a username during signup
+      const tempUsername = isOAuthUser 
+        ? `Player${userId.slice(0, 6)}` // Temporary username for OAuth
+        : `User${userId.slice(0, 6)}` // Fallback for email users who somehow don't have a profile
+      
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert({
           id: userId,
-          username: 'Player' + userId.slice(0, 6), // Default username
+          username: tempUsername,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -247,6 +253,81 @@ export function onAuthStateChange(
  */
 export function isPracticeMode(user: User | null): boolean {
   return !user
+}
+
+/**
+ * Update user's username (for Google OAuth users who need to set it)
+ */
+export async function updateUsername(
+  userId: string, 
+  username: string, 
+  xHandle?: string
+): Promise<{ data: Profile | null; error: Error | null }> {
+  const supabase = createClient()
+  
+  // Validate username format
+  if (!username || username.length < 3 || username.length > 20) {
+    return { data: null, error: new Error('Username must be 3-20 characters') }
+  }
+  
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    return { data: null, error: new Error('Username can only contain letters, numbers, and underscores') }
+  }
+  
+  // Prevent email-like usernames
+  if (username.includes('@') || username.includes('.com')) {
+    return { data: null, error: new Error('Username cannot look like an email address') }
+  }
+  
+  try {
+    // Check if username is already taken
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .neq('id', userId)
+      .single()
+    
+    if (existingUser) {
+      return { data: null, error: new Error('Username is already taken') }
+    }
+    
+    // Update the profile
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        username,
+        x_username: xHandle || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating username:', error)
+      return { data: null, error }
+    }
+    
+    return { data, error: null }
+  } catch (err) {
+    console.error('Unexpected error updating username:', err)
+    return { data: null, error: err as Error }
+  }
+}
+
+/**
+ * Check if a username needs to be set up (for OAuth users)
+ */
+export function needsUsernameSetup(profile: Profile | null): boolean {
+  if (!profile) return false
+  
+  // Check if username is the default pattern (Player + ID substring)
+  // or if it's null/empty
+  return !profile.username || 
+         profile.username === '' ||
+         profile.username.startsWith('Player') ||
+         profile.username.includes('@') // Somehow got email as username
 }
 
 /**

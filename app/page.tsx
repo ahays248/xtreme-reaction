@@ -9,6 +9,7 @@ import VolumeControl from '@/components/VolumeControl'
 import PerformanceCard from '@/components/PerformanceCard'
 import AuthButton from '@/components/AuthButton'
 import SupabaseCheck from '@/components/SupabaseCheck'
+import UsernameSetup from '@/components/UsernameSetup'
 import { useClickHandler } from '@/hooks/useClickHandler'
 import { useGameLoop } from '@/hooks/useGameLoop'
 import { useSound } from '@/hooks/useSound'
@@ -71,7 +72,7 @@ export default function Home() {
     isAudioRunning
   } = useSound()
   
-  const { user, profile, isPracticeMode } = useAuth()
+  const { user, profile, isPracticeMode, needsUsernameSetup, updateUsername } = useAuth()
 
   // Clear timeouts when component unmounts
   useEffect(() => {
@@ -918,6 +919,13 @@ export default function Home() {
           </a>
         </div>
       )}
+
+      {/* Username Setup Modal - Shows for OAuth users who need to set username */}
+      <UsernameSetup
+        isOpen={needsUsernameSetup && !isPracticeMode}
+        currentUsername={profile?.username}
+        onSave={updateUsername}
+      />
 
     </main>
   )
