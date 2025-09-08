@@ -34,6 +34,7 @@ interface ScoreCardProps {
   username?: string
   xHandle?: string | null
   scorePercentile?: number | null
+  totalPlayersToday?: number
 }
 
 export default function ScoreCard({
@@ -47,7 +48,8 @@ export default function ScoreCard({
   leaderboardType = 'daily',
   username,
   xHandle,
-  scorePercentile
+  scorePercentile,
+  totalPlayersToday = 0
 }: ScoreCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
@@ -133,7 +135,7 @@ export default function ScoreCard({
           </div>
           
           <div style={{ textAlign: 'center' }}>
-            {scorePercentile !== null && scorePercentile !== undefined ? (
+            {userRank && totalPlayersToday > 0 ? (
               <>
                 <p style={{ fontSize: isMobile ? '14px' : '16px', color: colors.gray400, marginBottom: isMobile ? '8px' : '4px', lineHeight: isMobile ? '20px' : '16px', letterSpacing: isMobile ? '2.5px' : '1.5px' }}>TODAY'S RANK</p>
                 <div style={{
@@ -145,8 +147,11 @@ export default function ScoreCard({
                   marginTop: isMobile ? '4px' : '8px',
                   letterSpacing: isMobile ? '2.5px' : '1.5px'
                 }}>
-                  TOP {100 - scorePercentile}%
+                  {userRank === 1 ? '🏆 #1' : `#${userRank}`}
                 </div>
+                <p style={{ fontSize: isMobile ? '12px' : '14px', color: colors.gray500, marginTop: '4px', letterSpacing: '1px' }}>
+                  of {totalPlayersToday} players
+                </p>
               </>
             ) : (
               <>

@@ -18,7 +18,7 @@ import { getDifficultyConfig, getTargetSizeClass } from '@/lib/difficulty'
 import { calculateFinalScore, calculateHitScore, formatScore, getHighScore, setHighScore, isNewHighScore } from '@/lib/scoring'
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
-import { saveGameSession, getUserRank, getScorePercentile, type GameResults } from '@/lib/supabase/gameService'
+import { saveGameSession, getUserRank, getScorePercentile, getTotalPlayersToday, type GameResults } from '@/lib/supabase/gameService'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -33,6 +33,7 @@ export default function Home() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [userRank, setUserRank] = useState<number | null>(null)
   const [scorePercentile, setScorePercentile] = useState<number | null>(null)
+  const [totalPlayersToday, setTotalPlayersToday] = useState<number>(0)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   
   // Check if mobile - mobile always needs user interaction even if sound was previously enabled
@@ -255,7 +256,7 @@ export default function Home() {
         } else {
           setSaveStatus('saved')
           
-          // Fetch user rank and percentile after successful save
+          // Fetch user rank, percentile, and total players after successful save
           try {
             const { rank } = await getUserRank(user.id, 'daily')
             setUserRank(rank)
@@ -263,6 +264,10 @@ export default function Home() {
             // Calculate percentile for the score (excluding user's own best score)
             const percentile = await getScorePercentile(gameResults.score, user.id)
             setScorePercentile(percentile)
+            
+            // Get total players today for context
+            const total = await getTotalPlayersToday()
+            setTotalPlayersToday(total)
           } catch (rankError) {
             console.error('Failed to fetch user rank:', rankError)
           }
@@ -278,7 +283,7 @@ export default function Home() {
     if (gameState.status === 'gameOver') {
       saveScore()
       
-      // Calculate percentile even for practice mode
+      // Calculate percentile and get total players even for practice mode
       if (isPracticeMode) {
         const finalScore = calculateFinalScore(
           gameState.reactionTimes.map(t => calculateHitScore(t)),
@@ -289,6 +294,10 @@ export default function Home() {
         
         getScorePercentile(finalScore, user?.id).then(percentile => {
           setScorePercentile(percentile)
+        })
+        
+        getTotalPlayersToday().then(total => {
+          setTotalPlayersToday(total)
         })
       }
     }
@@ -621,6 +630,23 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Practice Mode Warning */}
+            {isPracticeMode && (
+              <motion.div 
+                className="mb-4 px-4 py-3 bg-amber-500/10 border border-amber-500/50 rounded-lg"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <p className="text-amber-500 font-medium text-sm sm:text-base mb-1">
+                  ⚠️ Playing in Practice Mode
+                </p>
+                <p className="text-amber-400/80 text-xs sm:text-sm">
+                  Sign in to save scores & compete on the leaderboard!
+                </p>
+              </motion.div>
+            )}
+            
             {/* Enable Sound Button - shows when we need user interaction for audio */}
             {needsUserAction && (
               <motion.button
@@ -759,6 +785,7 @@ export default function Home() {
               username={profile?.username}
               xHandle={profile?.x_username}
               scorePercentile={scorePercentile}
+              totalPlayersToday={totalPlayersToday}
               onShareModalChange={setShareModalOpen}
             />
           )

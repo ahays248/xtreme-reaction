@@ -17,6 +17,7 @@ interface ShareButtonProps {
   username?: string
   xHandle?: string | null
   scorePercentile?: number | null
+  totalPlayersToday?: number
   onModalChange?: (isOpen: boolean) => void
 }
 
@@ -31,6 +32,7 @@ export default function ShareButton({
   username,
   xHandle,
   scorePercentile,
+  totalPlayersToday = 0,
   onModalChange
 }: ShareButtonProps) {
   const [showModal, setShowModal] = useState(false)
@@ -87,7 +89,8 @@ export default function ShareButton({
       username,
       xHandle,
       grade,
-      scorePercentile
+      scorePercentile,
+      totalPlayersToday
     }
     
     await shareToX(shareData)
@@ -162,6 +165,7 @@ export default function ShareButton({
                       username={username}
                       xHandle={xHandle}
                       scorePercentile={scorePercentile}
+                      totalPlayersToday={totalPlayersToday}
                       />
                     </div>
                   </div>

@@ -26,6 +26,7 @@ interface PerformanceCardProps {
   username?: string
   xHandle?: string | null
   scorePercentile?: number | null
+  totalPlayersToday?: number
   onShareModalChange?: (isOpen: boolean) => void
 }
 
@@ -49,6 +50,7 @@ export default function PerformanceCard({
   username,
   xHandle,
   scorePercentile,
+  totalPlayersToday = 0,
   onShareModalChange
 }: PerformanceCardProps) {
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
@@ -115,14 +117,22 @@ export default function PerformanceCard({
             {formatScore(finalScore)}
           </motion.p>
           
-          {/* Percentile or Grade Badge */}
+          {/* Rank or Grade Badge */}
           <motion.div 
             className="inline-block mt-3 px-4 py-2 border-2 border-neon-cyan rounded-full"
             initial={{ rotate: -180, opacity: 0 }}
             animate={{ rotate: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {scorePercentile !== null && scorePercentile !== undefined ? (
+            {userRank && totalPlayersToday > 0 ? (
+              <span className="text-2xl font-bold text-neon-cyan text-glow">
+                {userRank === 1 ? (
+                  "#1 PLAYER TODAY! 🏆"
+                ) : (
+                  `#${userRank} of ${totalPlayersToday} players today`
+                )}
+              </span>
+            ) : scorePercentile !== null && scorePercentile !== undefined ? (
               <span className="text-2xl font-bold text-neon-cyan text-glow">
                 {scorePercentile >= 100 ? (
                   "#1 PLAYER TODAY! 🏆"
@@ -274,8 +284,11 @@ export default function PerformanceCard({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
         >
-          <p className="text-sm text-amber-400 text-center font-mono">
-            🎮 Practice Mode - Sign in to save your scores!
+          <p className="text-sm text-amber-400 text-center font-mono mb-1">
+            ⚠️ Practice Mode - Score not saved!
+          </p>
+          <p className="text-xs text-amber-400/80 text-center">
+            Sign in to save scores & compete on the leaderboard
           </p>
         </motion.div>
       ) : (
@@ -322,6 +335,7 @@ export default function PerformanceCard({
             username={username}
             xHandle={xHandle}
             scorePercentile={scorePercentile}
+            totalPlayersToday={totalPlayersToday}
             onModalChange={onShareModalChange}
           />
         </motion.div>

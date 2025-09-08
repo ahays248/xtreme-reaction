@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import AuthModal from './AuthModal'
 
 export default function AuthButton() {
-  const { user, profile, loading, isPracticeMode, signInWithEmail, signUpWithEmail, signOut } = useAuth()
+  const { user, profile, loading, isPracticeMode, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
 
   if (loading) {
@@ -42,15 +42,15 @@ export default function AuthButton() {
     <>
       <div className="flex items-center gap-2 sm:gap-4">
         {isPracticeMode && (
-          <div className="text-xs sm:text-sm text-amber-500">
-            Practice Mode
+          <div className="text-xs sm:text-sm text-amber-500 font-medium">
+            Guest Mode
           </div>
         )}
         <button
           onClick={() => setShowAuthModal(true)}
-          className="px-3 sm:px-4 py-1.5 sm:py-2 bg-black hover:bg-gray-900 border border-neon-green rounded-lg text-neon-green font-medium transition-all duration-200 group text-xs sm:text-sm"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 bg-black hover:bg-neon-green/20 border-2 border-neon-green rounded-lg text-neon-green font-bold transition-all duration-200 group text-xs sm:text-sm animate-pulse hover:animate-none shadow-neon-green"
         >
-          Sign In
+          Sign In to Save
         </button>
       </div>
       
@@ -59,6 +59,7 @@ export default function AuthButton() {
         onClose={() => setShowAuthModal(false)}
         onSignIn={signInWithEmail}
         onSignUp={signUpWithEmail}
+        onGoogleSignIn={signInWithGoogle}
       />
     </>
   )

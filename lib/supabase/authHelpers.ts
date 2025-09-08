@@ -104,6 +104,36 @@ export async function signInWithEmail(email: string, password: string) {
 }
 
 /**
+ * Sign in with Google OAuth
+ */
+export async function signInWithGoogle() {
+  const supabase = createClient()
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      }
+    })
+
+    if (error) {
+      console.error('Google sign in error:', error)
+      return { error }
+    }
+
+    return { data, error: null }
+  } catch (err) {
+    console.error('Unexpected error during Google sign in:', err)
+    return { error: err as Error }
+  }
+}
+
+/**
  * Sign out the current user
  */
 export async function signOut() {

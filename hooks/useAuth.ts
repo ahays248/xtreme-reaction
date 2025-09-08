@@ -9,6 +9,7 @@ import {
   onAuthStateChange,
   signInWithEmail as signIn,
   signUpWithEmail as signUp,
+  signInWithGoogle as signInGoogle,
   signOut as signOutUser
 } from '@/lib/supabase/authHelpers'
 
@@ -106,6 +107,16 @@ export function useAuth() {
     // Auth state will be updated by the subscription
   }
 
+  const signInWithGoogle = async () => {
+    setAuthState(prev => ({ ...prev, loading: true }))
+    const { error } = await signInGoogle()
+    if (error) {
+      setAuthState(prev => ({ ...prev, loading: false }))
+      throw error
+    }
+    // OAuth will redirect, state will be updated when returning
+  }
+
   const signOut = async () => {
     setAuthState(prev => ({ ...prev, loading: true }))
     const { error } = await signOutUser()
@@ -123,6 +134,7 @@ export function useAuth() {
     isPracticeMode: authState.isPracticeMode,
     signInWithEmail,
     signUpWithEmail,
+    signInWithGoogle,
     signOut,
   }
 }

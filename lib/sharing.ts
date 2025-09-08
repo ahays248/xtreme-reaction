@@ -13,6 +13,7 @@ export interface ShareData {
   xHandle?: string | null
   grade: string
   scorePercentile?: number | null
+  totalPlayersToday?: number
 }
 
 export async function generateScoreCardImage(element: HTMLElement): Promise<Blob> {
@@ -126,17 +127,19 @@ export function createShareText(data: ShareData): string {
   lines.push(`🎯 Accuracy: ${data.accuracy}%`)
   lines.push(`🔥 Best streak: ${data.bestStreak}`)
   
-  // Show percentile if available, otherwise show grade
-  if (data.scorePercentile !== null && data.scorePercentile !== undefined) {
+  // Show rank if available (prioritize this over percentile)
+  if (data.userRank && data.totalPlayersToday) {
+    if (data.userRank === 1) {
+      lines.push(`🏆 Ranked #1 today out of ${data.totalPlayersToday} players!`)
+    } else {
+      lines.push(`🏆 Ranked #${data.userRank} of ${data.totalPlayersToday} players today`)
+    }
+  } else if (data.scorePercentile !== null && data.scorePercentile !== undefined) {
+    // Fallback to percentile if rank not available
     lines.push(`📊 Top ${100 - data.scorePercentile}% today!`)
   } else {
+    // Fallback to grade
     lines.push(`📊 Grade: ${data.grade}`)
-  }
-  
-  // Add rank if available
-  if (data.userRank) {
-    const rankType = data.leaderboardType === 'daily' ? 'Daily' : 'All-Time'
-    lines.push(`🏆 ${rankType} Rank: #${data.userRank}`)
   }
   
   lines.push('')

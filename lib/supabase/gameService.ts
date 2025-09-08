@@ -319,6 +319,31 @@ export async function getScorePercentile(score: number, userId?: string): Promis
 }
 
 /**
+ * Get the total number of unique players today
+ * Returns the count of unique users who have played today
+ */
+export async function getTotalPlayersToday(): Promise<number> {
+  const supabase = createClient()
+  
+  try {
+    // Get count of unique users from daily leaderboard
+    const { data, error, count } = await supabase
+      .from('daily_leaderboard')
+      .select('*', { count: 'exact', head: true })
+    
+    if (error) {
+      console.error('Error getting total players:', error)
+      return 0
+    }
+    
+    return count || 0
+  } catch (err) {
+    console.error('Unexpected error getting total players:', err)
+    return 0
+  }
+}
+
+/**
  * Test database connection
  * Simple utility to verify database is accessible
  */
