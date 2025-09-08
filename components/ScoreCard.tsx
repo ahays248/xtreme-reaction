@@ -143,13 +143,13 @@ export default function ScoreCard({
                   fontWeight: 900,
                   color: colors.cyan400,
                   textShadow: `0 0 25px ${colors.cyan400}`,
-                  lineHeight: isMobile ? '44px' : '52px',
+                  lineHeight: isMobile ? '48px' : '58px',
                   marginTop: isMobile ? '4px' : '8px',
                   letterSpacing: isMobile ? '2.5px' : '1.5px'
                 }}>
                   {userRank === 1 ? '🏆 #1' : `#${userRank}`}
                 </div>
-                <p style={{ fontSize: isMobile ? '12px' : '14px', color: colors.gray500, marginTop: '4px', letterSpacing: '1px' }}>
+                <p style={{ fontSize: isMobile ? '12px' : '14px', color: colors.gray500, marginTop: '8px', letterSpacing: '1px' }}>
                   of {totalPlayersToday} players
                 </p>
               </>
