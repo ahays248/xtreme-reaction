@@ -255,7 +255,7 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp, onGoogl
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-3 min-h-[44px] bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm sm:text-base rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   whileHover={!loading ? { scale: 1.02 } : {}}
                   whileTap={!loading ? { scale: 0.98 } : {}}
                 >
@@ -288,7 +288,7 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp, onGoogl
                         }
                       }}
                       disabled={loading}
-                      className="w-full px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                      className="w-full px-6 py-3 min-h-[44px] bg-white text-gray-900 font-medium text-sm sm:text-base rounded-lg hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                       whileHover={!loading ? { scale: 1.02 } : {}}
                       whileTap={!loading ? { scale: 0.98 } : {}}
                     >

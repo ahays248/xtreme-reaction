@@ -325,7 +325,7 @@ export default function PerformanceCard({
           </p>
           <motion.button
             onClick={() => setShowAuthModal(true)}
-            className="w-full px-4 py-2.5 bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-orbitron font-bold rounded-lg hover:bg-amber-500/30 hover:text-amber-300 hover:border-amber-400 transition-all duration-200"
+            className="w-full px-4 py-2.5 min-h-[44px] bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-orbitron font-bold text-sm sm:text-base rounded-lg hover:bg-amber-500/30 hover:text-amber-300 hover:border-amber-400 transition-all duration-200"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

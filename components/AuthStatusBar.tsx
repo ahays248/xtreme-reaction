@@ -53,14 +53,14 @@ export default function AuthStatusBar() {
               {user ? (
                 <button
                   onClick={signOut}
-                  className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs sm:text-sm text-gray-300 hover:text-white transition-all duration-200"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 min-h-[44px] bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs sm:text-sm text-gray-300 hover:text-white transition-all duration-200"
                 >
                   Sign Out
                 </button>
               ) : (
                 <motion.button
                   onClick={() => setShowAuthModal(true)}
-                  className="px-3 sm:px-4 py-1.5 sm:py-2 bg-black border-2 border-amber-500 text-amber-400 font-bold rounded-lg hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-200 text-xs sm:text-sm"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 min-h-[44px] bg-black border-2 border-amber-500 text-amber-400 font-bold rounded-lg hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-200 text-xs sm:text-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

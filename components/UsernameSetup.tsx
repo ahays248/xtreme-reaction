@@ -203,7 +203,7 @@ export default function UsernameSetup({ isOpen, currentUsername, onSave }: Usern
                   <motion.button
                     type="submit"
                     disabled={loading || !username}
-                    className="w-full px-6 py-3 bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-3 min-h-[44px] bg-black border-2 border-neon-green text-neon-green font-orbitron font-bold text-sm sm:text-base rounded-lg hover:bg-neon-green/20 hover:shadow-neon-intense transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     whileHover={!loading ? { scale: 1.02 } : {}}
                     whileTap={!loading ? { scale: 0.98 } : {}}
                   >
