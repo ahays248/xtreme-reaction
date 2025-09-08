@@ -1,10 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { formatTime } from '@/lib/timing'
 import { formatScore, getScoreGrade } from '@/lib/scoring'
 import { getStreakMultiplier } from '@/lib/statistics'
 import ShareButton from '@/components/ShareButton'
+import AuthModal from '@/components/AuthModal'
+import { useAuth } from '@/hooks/useAuth'
 
 interface PerformanceCardProps {
   finalScore: number
@@ -53,6 +56,8 @@ export default function PerformanceCard({
   totalPlayersToday = 0,
   onShareModalChange
 }: PerformanceCardProps) {
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth()
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
   
   // Calculate performance metrics
@@ -279,17 +284,25 @@ export default function PerformanceCard({
       {/* Save Status / Practice Mode Indicator */}
       {isPracticeMode ? (
         <motion.div 
-          className="mt-4 p-3 bg-amber-900/20 border border-amber-500/50 rounded-lg"
+          className="mt-4 p-4 bg-amber-900/20 border border-amber-500/50 rounded-lg"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
         >
-          <p className="text-sm text-amber-400 text-center font-mono mb-1">
+          <p className="text-sm text-amber-400 text-center font-mono mb-2">
             ⚠️ Practice Mode - Score not saved!
           </p>
-          <p className="text-xs text-amber-400/80 text-center">
+          <p className="text-xs text-amber-400/80 text-center mb-3">
             Sign in to save scores & compete on the leaderboard
           </p>
+          <motion.button
+            onClick={() => setShowAuthModal(true)}
+            className="w-full px-4 py-2.5 bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-orbitron font-bold rounded-lg hover:bg-amber-500/30 hover:text-amber-300 hover:border-amber-400 transition-all duration-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            🔐 Sign In to Save Future Scores
+          </motion.button>
         </motion.div>
       ) : (
         <motion.div 
@@ -340,6 +353,15 @@ export default function PerformanceCard({
           />
         </motion.div>
       )}
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSignIn={signInWithEmail}
+        onSignUp={signUpWithEmail}
+        onGoogleSignIn={signInWithGoogle}
+      />
     </motion.div>
   )
 }

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import MatrixRain from '@/components/MatrixRain'
 import Leaderboard from '@/components/Leaderboard'
+import AuthStatusBar from '@/components/AuthStatusBar'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { useAuth } from '@/hooks/useAuth'
 import { useSound } from '@/hooks/useSound'
@@ -37,10 +38,13 @@ export default function LeaderboardPage() {
       
       {/* Scanline effect */}
       <div className="scanline" />
+      
+      {/* Auth Status Bar */}
+      <AuthStatusBar />
 
-      {/* Header */}
+      {/* Header - Add top padding to account for status bar */}
       <motion.div
-        className="text-center mb-4 sm:mb-6 md:mb-8 relative z-10 mt-2 sm:mt-4 md:mt-8"
+        className="text-center mb-4 sm:mb-6 md:mb-8 relative z-10 mt-14 sm:mt-16 md:mt-20"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >

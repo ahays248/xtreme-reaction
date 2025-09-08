@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserGameStats, getTotalGamesPerDay, getUserAggregateStats } from '@/lib/supabase/statsService'
+import AuthStatusBar from '@/components/AuthStatusBar'
 import ProgressChart from '@/components/charts/ProgressChart'
 import AccuracyChart from '@/components/charts/AccuracyChart'
 import ScoreHistoryChart from '@/components/charts/ScoreHistoryChart'
@@ -73,6 +74,7 @@ export default function StatsPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+        <AuthStatusBar />
         <h1 className="text-3xl font-bold text-purple-500 mb-4">Stats Requires Login</h1>
         <p className="text-gray-400 mb-8 text-center max-w-md">
           Sign in to track your performance, view progress charts, and analyze your improvement over time.
@@ -82,7 +84,7 @@ export default function StatsPage() {
             href="/"
             className="px-6 py-3 bg-purple-500/20 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-500/30 transition-all"
           >
-            Sign In & Play
+            Back to Game
           </Link>
           <Link 
             href="/leaderboard"
@@ -98,6 +100,7 @@ export default function StatsPage() {
   if (gameStats.length === 0) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+        <AuthStatusBar />
         <h1 className="text-3xl font-bold text-neon-green mb-4">No Games Yet</h1>
         <p className="text-gray-400 mb-8">Play some games to see your stats!</p>
         <Link 
@@ -112,7 +115,8 @@ export default function StatsPage() {
 
   return (
     <div className="min-h-screen bg-black p-4">
-      <div className="max-w-6xl mx-auto">
+      <AuthStatusBar />
+      <div className="max-w-6xl mx-auto mt-14 sm:mt-16">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-neon-green">Your Stats</h1>
