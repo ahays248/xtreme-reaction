@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { formatTime } from '@/lib/timing'
 import { formatScore, getScoreGrade } from '@/lib/scoring'
@@ -8,6 +8,8 @@ import { getStreakMultiplier } from '@/lib/statistics'
 import ShareButton from '@/components/ShareButton'
 import AuthModal from '@/components/AuthModal'
 import { useAuth } from '@/hooks/useAuth'
+import { getPendingGameResults, clearPendingGameResults } from '@/lib/localStorage'
+import { saveGameSession, getUserRank } from '@/lib/supabase/gameService'
 
 interface PerformanceCardProps {
   finalScore: number
@@ -57,8 +59,44 @@ export default function PerformanceCard({
   onShareModalChange
 }: PerformanceCardProps) {
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth()
+  const [pendingSaveStatus, setPendingSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [pendingRank, setPendingRank] = useState<number | null>(null)
+  const { user, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth()
   const grade = trapHit ? 'F' : getScoreGrade(avgReactionTime, accuracy)
+  
+  // Check for pending scores to save after authentication
+  useEffect(() => {
+    const savePendingScore = async () => {
+      if (user && !isPracticeMode && pendingSaveStatus === 'idle') {
+        const pendingResults = getPendingGameResults()
+        if (pendingResults) {
+          setPendingSaveStatus('saving')
+          
+          try {
+            // Save the pending score
+            const { error } = await saveGameSession(user.id, pendingResults)
+            
+            if (!error) {
+              setPendingSaveStatus('saved')
+              clearPendingGameResults()
+              
+              // Fetch rank for the saved score
+              const { rank } = await getUserRank(user.id, 'daily')
+              setPendingRank(rank)
+            } else {
+              setPendingSaveStatus('error')
+              console.error('Failed to save pending score:', error)
+            }
+          } catch (error) {
+            setPendingSaveStatus('error')
+            console.error('Error saving pending score:', error)
+          }
+        }
+      }
+    }
+    
+    savePendingScore()
+  }, [user, isPracticeMode])
   
   // Calculate performance metrics
   const fastestTime = reactionTimes.length > 0 ? Math.min(...reactionTimes) : 0
@@ -122,29 +160,19 @@ export default function PerformanceCard({
             {formatScore(finalScore)}
           </motion.p>
           
-          {/* Rank or Grade Badge */}
+          {/* Rank or Grade Badge - Use pending values if available */}
           <motion.div 
             className="inline-block mt-3 px-4 py-2 border-2 border-neon-cyan rounded-full"
             initial={{ rotate: -180, opacity: 0 }}
             animate={{ rotate: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {userRank && totalPlayersToday > 0 ? (
+            {(pendingRank || userRank) && totalPlayersToday > 0 ? (
               <span className="text-2xl font-bold text-neon-cyan text-glow">
-                {userRank === 1 ? (
+                {(pendingRank || userRank) === 1 ? (
                   "#1 PLAYER TODAY! 🏆"
                 ) : (
-                  `#${userRank} of ${totalPlayersToday} players today`
-                )}
-              </span>
-            ) : scorePercentile !== null && scorePercentile !== undefined ? (
-              <span className="text-2xl font-bold text-neon-cyan text-glow">
-                {scorePercentile >= 100 ? (
-                  "#1 PLAYER TODAY! 🏆"
-                ) : scorePercentile >= 99 ? (
-                  "TOP 1% TODAY"
-                ) : (
-                  `TOP ${100 - scorePercentile}% TODAY`
+                  `#${pendingRank || userRank} of ${totalPlayersToday} players today`
                 )}
               </span>
             ) : (
@@ -293,7 +321,7 @@ export default function PerformanceCard({
             ⚠️ Practice Mode - Score not saved!
           </p>
           <p className="text-xs text-amber-400/80 text-center mb-3">
-            Sign in to save scores & compete on the leaderboard
+            Sign in to save this score & compete on the leaderboard
           </p>
           <motion.button
             onClick={() => setShowAuthModal(true)}
@@ -301,8 +329,37 @@ export default function PerformanceCard({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            🔐 Sign In to Save Future Scores
+            🔐 Sign In to Save This Score
           </motion.button>
+        </motion.div>
+      ) : pendingSaveStatus !== 'idle' ? (
+        // Show pending save status
+        <motion.div 
+          className="mt-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          {pendingSaveStatus === 'saving' && (
+            <p className="text-sm text-yellow-400 text-center font-mono animate-pulse">
+              💾 Saving your practice score...
+            </p>
+          )}
+          {pendingSaveStatus === 'saved' && (
+            <div className="text-center">
+              <p className="text-sm text-green-400 font-mono mb-1">
+                ✅ Your practice score has been saved!
+              </p>
+              <p className="text-xs text-green-400/80">
+                You're now competing on the leaderboard
+              </p>
+            </div>
+          )}
+          {pendingSaveStatus === 'error' && (
+            <p className="text-sm text-red-400 text-center font-mono">
+              ❌ Failed to save practice score
+            </p>
+          )}
         </motion.div>
       ) : (
         <motion.div 

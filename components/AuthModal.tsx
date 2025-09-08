@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import SimpleCaptcha from './SimpleCaptcha'
+import { hasPendingGameResults } from '@/lib/localStorage'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -23,6 +24,14 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp, onGoogl
   const [error, setError] = useState<string | null>(null)
   const [captchaVerified, setCaptchaVerified] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [hasPendingScore, setHasPendingScore] = useState(false)
+  
+  // Check if there's a pending score to save
+  useEffect(() => {
+    if (isOpen) {
+      setHasPendingScore(hasPendingGameResults())
+    }
+  }, [isOpen])
 
   // Ensure we only render portal on client
   useEffect(() => {
@@ -134,6 +143,13 @@ export default function AuthModal({ isOpen, onClose, onSignIn, onSignUp, onGoogl
                 </button>
               </div>
 
+              {/* Pending Score Message */}
+              {hasPendingScore && (
+                <div className="mb-4 p-3 bg-green-500/20 border border-green-500 rounded text-green-400 text-sm">
+                  🎯 Your practice score will be saved after signing in!
+                </div>
+              )}
+              
               {/* Error Message */}
               {error && (
                 <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded text-red-400 text-sm">

@@ -20,6 +20,7 @@ import { calculateFinalScore, calculateHitScore, formatScore, getHighScore, setH
 import { calculateAccuracy, calculateStreakBonus, getStreakMultiplier } from '@/lib/statistics'
 import { generateRandomPosition, isClickInPlayArea, getPlayAreaBounds, type TargetPosition } from '@/lib/targetPosition'
 import { saveGameSession, getUserRank, getScorePercentile, getTotalPlayersToday, type GameResults } from '@/lib/supabase/gameService'
+import { storePendingGameResults, clearPendingGameResults } from '@/lib/localStorage'
 
 const ROUND_DELAY = 1500 // Delay between rounds
 
@@ -282,17 +283,42 @@ export default function Home() {
     }
     
     if (gameState.status === 'gameOver') {
-      saveScore()
-      
-      // Calculate percentile and get total players even for practice mode
-      if (isPracticeMode) {
+      // For practice mode, store the game results for potential later saving
+      if (isPracticeMode && !hasSavedScore.current) {
+        const avgReactionTime = gameState.reactionTimes.length > 0 
+          ? calculateAverage(gameState.reactionTimes) 
+          : 0
+        const accuracy = calculateAccuracy(gameState.hits, gameState.misses)
+        const streakBonus = calculateStreakBonus(gameState.bestStreak) * gameState.bestStreak
         const finalScore = calculateFinalScore(
-          gameState.reactionTimes.map(t => calculateHitScore(t)),
-          calculateAccuracy(gameState.hits, gameState.misses),
+          gameState.hitScores,
+          accuracy,
           gameState.difficultyLevel || 0,
-          calculateStreakBonus(gameState.bestStreak)
+          streakBonus
         )
         
+        const gameResults: GameResults = {
+          score: finalScore,
+          avgReactionTime: Math.round(avgReactionTime),
+          successfulHits: gameState.hits,
+          incorrectHits: gameState.trapHit ? 1 : 0,
+          missedCues: gameState.misses,
+          accuracy: Math.round(accuracy),
+          totalClicks: gameState.hits + gameState.misses + (gameState.trapHit ? 1 : 0),
+          maxStreak: gameState.bestStreak,
+          roundsCompleted: gameState.currentRound - 1,
+          gameDuration: gameState.elapsedTime * 1000,
+          targetsShown: gameState.currentRound,
+          trapsAvoided: 0,
+          trapHit: gameState.trapHit,
+          difficultyLevel: gameState.difficultyLevel || 0,
+        }
+        
+        // Store in localStorage for potential later saving
+        storePendingGameResults(gameResults)
+        hasSavedScore.current = true // Prevent multiple stores
+        
+        // Still calculate percentile for display
         getScorePercentile(finalScore, user?.id).then(percentile => {
           setScorePercentile(percentile)
         })
@@ -300,6 +326,9 @@ export default function Home() {
         getTotalPlayersToday().then(total => {
           setTotalPlayersToday(total)
         })
+      } else if (!isPracticeMode) {
+        // Authenticated user - save immediately
+        saveScore()
       }
     }
   }, [gameState.status, gameState, user, isPracticeMode])
@@ -520,6 +549,9 @@ export default function Home() {
   const handleStartGame = async () => {
     // Reset save status for new game
     setSaveStatus('idle')
+    
+    // Clear any pending game results when starting a new game
+    clearPendingGameResults()
     
     // Only initialize audio if user explicitly enabled it
     // Don't auto-enable sound when starting game
