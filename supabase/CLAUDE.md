@@ -109,8 +109,8 @@ USING (auth.uid() = id);
 
 ### Running Migrations
 ```bash
-# Login first (if needed)
-~/.local/bin/supabase login --token sbp_eab39990962adb1bcbb57ba84def39d2189831e2
+# Login first (get token from https://supabase.com/dashboard/account/tokens)
+~/.local/bin/supabase login --token <YOUR_SUPABASE_ACCESS_TOKEN>
 
 # Apply all pending migrations
 ~/.local/bin/supabase db push --project-ref xhcfjhzfyozzuicubqmh

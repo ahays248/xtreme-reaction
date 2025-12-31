@@ -49,3 +49,8 @@ supabase/logs
 
 # OS
 Thumbs.db
+
+# Secrets - NEVER commit these
+client_secret_*.json
+mcp.json
+.mcp.json

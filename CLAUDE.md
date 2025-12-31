@@ -298,8 +298,8 @@ git push
 
 ### Apply Latest Migration
 ```bash
-# Login to Supabase CLI
-~/.local/bin/supabase login --token sbp_eab39990962adb1bcbb57ba84def39d2189831e2
+# Login to Supabase CLI (get token from https://supabase.com/dashboard/account/tokens)
+~/.local/bin/supabase login --token <YOUR_SUPABASE_ACCESS_TOKEN>
 
 # Apply migration 004
 ~/.local/bin/supabase db push --project-ref xhcfjhzfyozzuicubqmh
