@@ -8,7 +8,7 @@
 
 ## 🚀 Play Now!
 
-**The game is LIVE at [XtremeReaction.lol](https://XtremeReaction.lol)!**
+**The game has been archived**
 
 - ✅ **Version 1.0** - Fully launched and production-ready
 - 🎮 **60-Second Sessions** - Quick, competitive gameplay
